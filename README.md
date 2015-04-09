@@ -1,0 +1,1 @@
+This repository is for the development of the JavaFX initial Proof of Concept for the project overview / dashboard application.
