@@ -1,0 +1,12 @@
+.db-project-title {
+-fx-font-size: 20pt;
+}
+
+.db-side-menu-category{
+-fx-font-size: 14pt;
+-fx-padding: 5 0 0 10;
+}
+
+.db-side-menu-category .selected{
+-fx-background-color: green;
+}
