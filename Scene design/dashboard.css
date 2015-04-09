@@ -16,7 +16,7 @@
 -fx-padding: 0 0 0 5;
 -fx-translate-x: 10;
 -fx-max-width: 190;
--fx-border-color: gray;
+-fx-border-color: lightslategray ;
 -fx-border-style: inside;
 -fx-border-width: 0.5;
 -fx-cursor: hand;
@@ -46,4 +46,9 @@
 .db-application-header-text{
 -fx-font-size: 16pt;
 -fx-font-style: oblique;
+}
+
+.db-user-name{
+-fx-font-size: 10pt;
+-fx-font-weight: bold;
 }

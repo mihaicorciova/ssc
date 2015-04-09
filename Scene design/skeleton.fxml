@@ -30,19 +30,24 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <BorderPane maxWidth="1.7976931348623157E308" prefHeight="41.0" styleClass="db-application-header" VBox.vgrow="ALWAYS">
+            <BorderPane maxWidth="1.7976931348623157E308" prefHeight="57.0" prefWidth="1280.0" styleClass="db-application-header" VBox.vgrow="ALWAYS">
                <left>
                   <Label styleClass="db-application-header-text" text="ASML Litho InSight" BorderPane.alignment="CENTER" />
                </left>
-               <right>
-                  <Label text="John Doe" BorderPane.alignment="CENTER" />
-               </right>
                <VBox.margin>
                   <Insets />
                </VBox.margin>
                <padding>
                   <Insets left="20.0" right="20.0" />
                </padding>
+               <right>
+                  <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label styleClass="db-user-name" text="John Doe" />
+                        <Label text="process engineer" />
+                     </children>
+                  </VBox>
+               </right>
             </BorderPane>
          </children>
       </VBox>
@@ -64,7 +69,7 @@
       <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: lightgray;" BorderPane.alignment="CENTER">
          <children>
             <Label layoutX="383.0" layoutY="311.0" text="This is where the selected content will be diplayed" />
-            <Label layoutX="383.0" layoutY="335.0" text="Because this is a skeleton, this is not handled by the dashboard" />
+            <Label layoutX="383.0" layoutY="335.0" text="The content will be handled by the module itself" />
          </children>
       </Pane>
    </center>
