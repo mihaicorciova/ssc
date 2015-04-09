@@ -1,12 +1,49 @@
 .db-project-title {
 -fx-font-size: 20pt;
+-fx-cursor: hand;
 }
 
-.db-side-menu-category{
+.db-side-menu-phase{
 -fx-font-size: 14pt;
--fx-padding: 5 0 0 10;
+-fx-padding: 2.5 0 2.5 6;
+-fx-border-color: black;
+-fx-border-width: 0.5;
+-fx-cursor: hand;
 }
 
-.db-side-menu-category .selected{
--fx-background-color: green;
+.db-side-menu-subphase{
+-fx-font-size: 10pt;
+-fx-padding: 0 0 0 5;
+-fx-translate-x: 10;
+-fx-max-width: 190;
+-fx-border-color: gray;
+-fx-border-style: inside;
+-fx-border-width: 0.5;
+-fx-cursor: hand;
+}
+
+.db-side-menu{
+    -fx-border-color: transparent black transparent transparent;
+	
+}
+
+.db-item-selected{
+-fx-background-color: gray;
+}
+
+.db-application-header{
+    -fx-border-color: transparent transparent black transparent ;
+
+}
+
+.db-footer-text{
+-fx-text-fill: gray;
+}
+.db-footer{
+    -fx-border-color: black transparent  transparent transparent ;
+}
+
+.db-application-header-text{
+-fx-font-size: 16pt;
+-fx-font-style: oblique;
 }
