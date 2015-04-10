@@ -1,26 +1,28 @@
 .db-project-title {
--fx-font-size: 20pt;
+-fx-font-size: 1.8em;
 -fx-cursor: hand;
 }
 
 .db-side-menu-phase{
--fx-font-size: 12pt;
+-fx-font-size: 1.2em;
 -fx-font-weight: bold;
 -fx-padding: 2.5 0 2.5 6;
 -fx-border-color: black;
 -fx-border-width: 0.5;
 -fx-cursor: hand;
+-fx-alignment: left;
 }
 
 .db-side-menu-subphase{
--fx-font-size: 10pt;
+-fx-font-size: 1.1em;
 -fx-padding: 0 0 0 5;
 -fx-translate-x: 10;
 -fx-max-width: 190;
--fx-border-color: lightslategray ;
--fx-border-style: inside;
 -fx-border-width: 0.5;
 -fx-cursor: hand;
+-fx-alignment: left;
+-fx-border-color: lightgray;
+-fx-background-color: transparent;
 }
 
 .db-side-menu{
@@ -45,11 +47,12 @@
 }
 
 .db-application-header-text{
--fx-font-size: 16pt;
+-fx-font-size: 1.8em;
 -fx-font-style: oblique;
+-fx-font-weight: bold;
 }
 
 .db-user-name{
--fx-font-size: 10pt;
+-fx-font-size: 1.2em;
 -fx-font-weight: bold;
 }
