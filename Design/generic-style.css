@@ -1,0 +1,14 @@
+.root{
+-fx-font-family:  Neue Helvetica Roman;
+-fx-font-smoothing-type: lcd; 
+}
+.text { -fx-font-smoothing-type: lcd; } 
+
+.h1 {
+-fx-font-size: 20pt;
+}
+.h3 {
+-fx-font-size: 14pt;
+
+}
+  
