@@ -11,6 +11,7 @@
 -fx-border-width: 0.5;
 -fx-cursor: hand;
 -fx-alignment: left;
+-fx-background-color: gainsboro;
 }
 
 .db-side-menu-subphase{
