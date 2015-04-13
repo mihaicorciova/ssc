@@ -10,7 +10,7 @@
 -fx-border-color: black;
 -fx-border-width: 0.5;
 -fx-cursor: hand;
--fx-alignment: left;
+-fx-alignment: BASELINE_LEFT;
 -fx-background-color: gainsboro;
 }
 
@@ -21,7 +21,7 @@
 -fx-max-width: 190;
 -fx-border-width: 0.5;
 -fx-cursor: hand;
--fx-alignment: left;
+-fx-alignment: BASELINE_LEFT;
 -fx-border-color: lightgray;
 -fx-background-color: transparent;
 }
