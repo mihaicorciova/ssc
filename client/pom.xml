@@ -9,7 +9,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>client</artifactId>
-	<name>container</name>
+	<name>client</name>
 
 	<packaging>jar</packaging>
 
@@ -37,7 +37,7 @@
 				<groupId>com.zenjava</groupId>
 				<artifactId>javafx-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.asml.lis.container.MainApp</mainClass>
+					<mainClass>com.asml.lis.client.MainApp</mainClass>
 					<!-- only required if signing the jar file -->
 					<keyStoreAlias>example-user</keyStoreAlias>
 					<keyStorePassword>example-password</keyStorePassword>
