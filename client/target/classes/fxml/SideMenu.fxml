@@ -8,163 +8,95 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="433.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <AnchorPane prefHeight="114.0" prefWidth="200.0">
-         <children>
-            <ImageView fitHeight="66.0" fitWidth="92.0" layoutX="67.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@/images/user.png" />
-               </image>
-            </ImageView>
-            <Label layoutX="65.0" layoutY="80.0" text="John Doe">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font></Label>
-            <MenuButton layoutX="39.0" layoutY="105.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="123.0" text="process engineer">
-              <items>
-                <MenuItem mnemonicParsing="false" text="Settings" />
-                <MenuItem mnemonicParsing="false" text="Logout" />
-              </items>
-            </MenuButton>
-         </children>
-      </AnchorPane>
-      <AnchorPane prefHeight="40.0" prefWidth="200.0">
-         <children>
-            <Label layoutX="14.0" layoutY="12.0" text="Node Project">
-               <font>
-                  <Font size="16.0" />
-               </font></Label>
-         </children>
-      </AnchorPane>
-      <AnchorPane prefHeight="382.0" prefWidth="201.0">
-         <children>
-            <Accordion layoutX="-1.0">
-              <panes>
-                <TitledPane animated="false" prefWidth="202.0" text="System Performance">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="191.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="Metrology Setup">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <AnchorPane prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                    <Label layoutY="4.0" text="Target Design">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutY="25.0" prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                    <Label layoutY="4.0" text="YieldStar recipe preparation">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutY="50.0" prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                    <Label layoutY="4.0" text="YieldStar data analysis">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutY="78.0" prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                 	<Label layoutY="4.0" text="Stack verification">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutY="103.0" prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                 	<Label layoutY="4.0" text="Accuracy qualification">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutY="128.0" prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                 	<Label layoutY="4.0" text="Multi-YieldStar qualification">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                           </children></AnchorPane>
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="Static Control Setup">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <AnchorPane layoutY="25.0" prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                    <Label layoutY="4.0" text="Sample scheme optimizer">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutY="50.0" prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                    <Label layoutY="4.0" text="Budget breakdown">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                           </children></AnchorPane>
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="Dynamic Control Setup">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <AnchorPane prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                    <Label layoutY="4.0" text="Shadow mode analysis">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutY="25.0" prefHeight="25.0" prefWidth="200.0">
-                                 <children>
-                                    <Label layoutY="4.0" text="KPI limit advisor">
-                                       <padding>
-                                          <Insets left="25.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </AnchorPane>
-                           </children></AnchorPane>
-                  </content>
-                </TitledPane>
-                <TitledPane animated="false" text="HVM Monitoring and Control">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-              </panes>
-            </Accordion>
-         </children>
-      </AnchorPane>
-   </children>
-</VBox>
+<AnchorPane prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.40"
+	xmlns:fx="http://javafx.com/fxml/1">
+	<children>
+		<AnchorPane prefHeight="120.0" prefWidth="200.0"
+			AnchorPane.topAnchor="0.0">
+			<children>
+				<ImageView fitHeight="66.0" fitWidth="92.0" layoutX="67.0"
+					layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+					<image>
+						<Image url="/images/user.png" />
+					</image>
+				</ImageView>
+				<Label layoutX="65.0" layoutY="80.0" text="John Doe">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+				</Label>
+				<MenuButton layoutX="39.0" layoutY="105.0"
+					mnemonicParsing="false" prefHeight="25.0" prefWidth="123.0"
+					text="process engineer">
+					<items>
+						<MenuItem mnemonicParsing="false" text="Settings" />
+						<MenuItem mnemonicParsing="false" text="Logout" />
+					</items>
+				</MenuButton>
+			</children>
+		</AnchorPane>
+		<AnchorPane layoutY="141.0" prefHeight="399.0" prefWidth="200.0"
+			AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="141.0">
+			<children>
+				<TreeView prefWidth="200.0" style="-fx-background-color: transparent;"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+					AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+					<TreeItem expanded="true" value="Node Project">
+						<graphic>
+							<ImageView fitHeight="20.0" fitWidth="20.0"
+								preserveRatio="true">
+								<image>
+									<Image url="/images/project3.png" />
+								</image>
+							</ImageView>
+						</graphic>
+						<children>
+							<TreeItem fx:id="child1" expanded="false" value="System Performance">
+								<children>
+								</children>
+							</TreeItem>
+							<TreeItem expanded="false" value="Metrology Setup">
+								<children>
+									<TreeItem expanded="false" value="Target Design">
+									</TreeItem>
+									<TreeItem expanded="false" value="YieldStar recipe preparation">
+									</TreeItem>
+									<TreeItem expanded="false" value="YieldStar data analysis">
+									</TreeItem>
+									<TreeItem expanded="false" value="Stack verification">
+									</TreeItem>
+									<TreeItem expanded="false" value="Accuracy qualification">
+									</TreeItem>
+									<TreeItem expanded="false" value="Multi-YieldStar qualification">
+									</TreeItem>
+								</children>
+							</TreeItem>
+							<TreeItem expanded="false" value="Static Control Setup">
+								<children>
+									<TreeItem expanded="false" value="Model and sampling advisor">
+									</TreeItem>
+									<TreeItem expanded="false" value="Sample scheme optimizer">
+									</TreeItem>
+									<TreeItem expanded="false" value="Budget breakdown">
+									</TreeItem>
+								</children>
+							</TreeItem>
+							<TreeItem expanded="false" value="Dynamic Control Setup">
+								<children>
+									<TreeItem expanded="false" value="Shadow mode analysis">
+									</TreeItem>
+									<TreeItem expanded="false" value="KPI limit advisor">
+									</TreeItem>
+								</children>
+							</TreeItem>
+							<TreeItem expanded="false" value="HVM Monitoring and Control">
+								<children>
+								</children>
+							</TreeItem>
+						</children>
+					</TreeItem>
+				</TreeView>
+			</children>
+		</AnchorPane>
+	</children>
+</AnchorPane>
