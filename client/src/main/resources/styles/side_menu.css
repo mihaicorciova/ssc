@@ -1,0 +1,5 @@
+/* Application wide styles */
+
+.label:hover {
+    -fx-text-fill: gray; 
+}
