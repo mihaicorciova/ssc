@@ -32,8 +32,10 @@ public class SideMenuNoImagesController implements Initializable {
     /**
      * Initializes the controller class.
      *
-     * @param url URL
-     * @param rb resource bundle
+     * @param url
+     *            URL
+     * @param rb
+     *            resource bundle
      */
     @Override
     public void initialize(final URL url, final ResourceBundle rb) {
