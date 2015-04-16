@@ -9,86 +9,86 @@
 <?import javafx.scene.layout.BorderPane?>
 
 <AnchorPane prefWidth="200.0" xmlns="http://javafx.com/javafx/8.0.40"
-	xmlns:fx="http://javafx.com/fxml/1">
-	<children>
-		<AnchorPane prefHeight="120.0" prefWidth="200.0"
-			AnchorPane.topAnchor="0.0">
-			<children>
-				<ImageView fitHeight="66.0" fitWidth="92.0" layoutX="67.0"
-					layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-					<image>
-						<Image url="/images/user.png" />
-					</image>
-				</ImageView>
-				<Label layoutX="65.0" layoutY="80.0" text="John Doe">
-					<font>
-						<Font name="System Bold" size="16.0" />
-					</font>
-				</Label>
-				<MenuButton layoutX="39.0" layoutY="105.0"
-					mnemonicParsing="false" prefHeight="25.0" prefWidth="123.0"
-					text="process engineer">
-					<items>
-						<MenuItem mnemonicParsing="false" text="         Settings         " />
-						<MenuItem mnemonicParsing="false" text="         Logout           " />
-					</items>
-				</MenuButton>
-			</children>
-		</AnchorPane>
-		<AnchorPane layoutY="141.0" prefHeight="399.0" prefWidth="200.0"
-			AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="141.0">
-			<children>
-				<TreeView fx:id="sideMenuTree" prefWidth="200.0" style="-fx-background-color: transparent;"
-					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-					AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-					<TreeItem expanded="true" value="Node Project">
-						<children>
-							<TreeItem fx:id="child1" expanded="false" value="System Performance">
-								<children>
-								</children>
-							</TreeItem>
-							<TreeItem expanded="false" value="Metrology Setup">
-								<children>
-									<TreeItem expanded="false" value="Target Design">
-									</TreeItem>
-									<TreeItem expanded="false" value="YieldStar recipe preparation">
-									</TreeItem>
-									<TreeItem expanded="false" value="YieldStar data analysis">
-									</TreeItem>
-									<TreeItem expanded="false" value="Stack verification">
-									</TreeItem>
-									<TreeItem expanded="false" value="Accuracy qualification">
-									</TreeItem>
-									<TreeItem expanded="false" value="Multi-YieldStar qualification">
-									</TreeItem>
-								</children>
-							</TreeItem>
-							<TreeItem expanded="false" value="Static Control Setup">
-								<children>
-									<TreeItem expanded="false" value="Model and sampling advisor">
-									</TreeItem>
-									<TreeItem expanded="false" value="Sample scheme optimizer">
-									</TreeItem>
-									<TreeItem expanded="false" value="Budget breakdown">
-									</TreeItem>
-								</children>
-							</TreeItem>
-							<TreeItem expanded="false" value="Dynamic Control Setup">
-								<children>
-									<TreeItem expanded="false" value="Shadow mode analysis">
-									</TreeItem>
-									<TreeItem expanded="false" value="KPI limit advisor">
-									</TreeItem>
-								</children>
-							</TreeItem>
-							<TreeItem expanded="false" value="HVM Monitoring and Control">
-								<children>
-								</children>
-							</TreeItem>
-						</children>
-					</TreeItem>
-				</TreeView>
-			</children>
-		</AnchorPane>
-	</children>
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.asml.lis.client.sidemenu.SideMenuNoImagesController">
+    <children>
+        <AnchorPane prefHeight="120.0" prefWidth="200.0"
+                    AnchorPane.topAnchor="0.0">
+            <children>
+                <ImageView fitHeight="66.0" fitWidth="92.0" layoutX="67.0"
+                           layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="/images/user.png" />
+                    </image>
+                </ImageView>
+                <Label layoutX="65.0" layoutY="80.0" text="John Doe">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+                <MenuButton layoutX="39.0" layoutY="105.0"
+                            mnemonicParsing="false" prefHeight="25.0" prefWidth="123.0"
+                            text="process engineer">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="         Settings         " />
+                        <MenuItem mnemonicParsing="false" text="         Logout           " />
+                    </items>
+                </MenuButton>
+            </children>
+        </AnchorPane>
+        <AnchorPane layoutY="141.0" prefHeight="399.0" prefWidth="200.0"
+                    AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="141.0">
+            <children>
+                <TreeView fx:id="sideMenuTree" prefWidth="200.0" style="-fx-background-color: transparent;"
+                          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <TreeItem expanded="true" value="Node Project">
+                        <children>
+                            <TreeItem fx:id="child1" expanded="false" value="System Performance">
+                                <children>
+                                </children>
+                            </TreeItem>
+                            <TreeItem expanded="false" value="Metrology Setup">
+                                <children>
+                                    <TreeItem expanded="false" value="Target Design">
+                                    </TreeItem>
+                                    <TreeItem expanded="false" value="YieldStar recipe preparation">
+                                    </TreeItem>
+                                    <TreeItem expanded="false" value="YieldStar data analysis">
+                                    </TreeItem>
+                                    <TreeItem expanded="false" value="Stack verification">
+                                    </TreeItem>
+                                    <TreeItem expanded="false" value="Accuracy qualification">
+                                    </TreeItem>
+                                    <TreeItem expanded="false" value="Multi-YieldStar qualification">
+                                    </TreeItem>
+                                </children>
+                            </TreeItem>
+                            <TreeItem expanded="false" value="Static Control Setup">
+                                <children>
+                                    <TreeItem expanded="false" value="Model and sampling advisor">
+                                    </TreeItem>
+                                    <TreeItem expanded="false" value="Sample scheme optimizer">
+                                    </TreeItem>
+                                    <TreeItem expanded="false" value="Budget breakdown">
+                                    </TreeItem>
+                                </children>
+                            </TreeItem>
+                            <TreeItem expanded="false" value="Dynamic Control Setup">
+                                <children>
+                                    <TreeItem expanded="false" value="Shadow mode analysis">
+                                    </TreeItem>
+                                    <TreeItem expanded="false" value="KPI limit advisor">
+                                    </TreeItem>
+                                </children>
+                            </TreeItem>
+                            <TreeItem expanded="false" value="HVM Monitoring and Control">
+                                <children>
+                                </children>
+                            </TreeItem>
+                        </children>
+                    </TreeItem>
+                </TreeView>
+            </children>
+        </AnchorPane>
+    </children>
 </AnchorPane>

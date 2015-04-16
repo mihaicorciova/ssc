@@ -7,18 +7,18 @@
 <?import javafx.scene.layout.BorderPane?>
 
 <BorderPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.asml.lis.client.MainController">
-   <center>
-      <AnchorPane prefHeight="720.0" prefWidth="1280.0" BorderPane.alignment="CENTER">
-         <children>
-            <AnchorPane id="menuContainer" fx:id="menuContainer" prefHeight="25.0" style="-fx-background-color: #7E17D5;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-            <AnchorPane id="statusBarContainer" fx:id="statusBarContainer" prefHeight="20.0" style="-fx-border-color: derive(-fx-base, 80%);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-            <AnchorPane id="sideMenuContainer" fx:id="sideMenuContainer" prefWidth="200.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="25.0" />
-            <AnchorPane id="contentContainer" fx:id="contentContainer" style="-fx-background-color: white;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
-               <children>
-					<fx:include source="/fxml/metrology_setup/MultiYieldStarQualification.fxml" />     
-               </children>
-			</AnchorPane>
-         </children>
-      </AnchorPane>
-   </center>
+    <center>
+        <AnchorPane prefHeight="720.0" prefWidth="1280.0" BorderPane.alignment="CENTER">
+            <children>
+                <AnchorPane id="menuContainer" fx:id="menuContainer" prefHeight="25.0" style="-fx-background-color: #7E17D5;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                <AnchorPane id="statusBarContainer" fx:id="statusBarContainer" prefHeight="20.0" style="-fx-border-color: derive(-fx-base, 80%);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                <AnchorPane id="sideMenuContainer" fx:id="sideMenuContainer" prefWidth="200.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="25.0" />
+                <AnchorPane id="contentContainer" fx:id="contentContainer" style="-fx-background-color: white;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+                    <children>
+                        <fx:include source="/fxml/metrology_setup/MultiYieldStarQualification.fxml" />     
+                    </children>
+                </AnchorPane>
+            </children>
+        </AnchorPane>
+    </center>
 </BorderPane>
