@@ -31,8 +31,8 @@ public enum SideMenuTreeType {
 
     private final String title;
 
-    private SideMenuTreeType(final String pTitle) {
-        this.title = pTitle;
+    private SideMenuTreeType(final String title) {
+        this.title = title;
     }
 
     public static SideMenuTreeType parse(final String pValue) {
