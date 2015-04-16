@@ -1,4 +1,8 @@
 com\asml\lis\client\MainController.class
+com\asml\lis\client\sidemenu\SideMenuNoImagesController.class
 com\asml\lis\client\ui\common\DialogManager.class
-com\asml\lis\client\sidemenu\SideMenuController.class
+com\asml\lis\client\sidemenu\SideMenuNoImagesController$2.class
 com\asml\lis\client\MainApp.class
+com\asml\lis\client\sidemenu\SideMenuTreeType.class
+com\asml\lis\client\metrologysetup\MultiYieldStarQualificationController.class
+com\asml\lis\client\sidemenu\SideMenuNoImagesController$1.class

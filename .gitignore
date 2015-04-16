@@ -1,13 +1,9 @@
+target
 .settings
 .project
-target
 .classpath
-*/target/**
 .idea
 *.iml
-client/target
-.classpath
-target
 nb-configuration.xml
 nbactions.xml
 format.bat
