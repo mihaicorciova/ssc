@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.asml.lis.client.controller.dashboard.DashboardController">
+    <center>
+        <AnchorPane prefHeight="720.0" prefWidth="1280.0" BorderPane.alignment="CENTER">
+            <children>
+                <AnchorPane fx:id="menuContainer" prefHeight="25.0" style="-fx-background-color: #7E17D5;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                <AnchorPane fx:id="statusBarContainer" prefHeight="20.0" style="-fx-border-color: derive(-fx-base, 80%);" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                <AnchorPane fx:id="contentContainer" layoutX="540.0" layoutY="260.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+               <children>
+                  <Button layoutX="112.0" layoutY="80.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="145.0" text="Create New Project" />
+                  <Button layoutX="112.0" layoutY="117.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="145.0" text="Open Existing Project" />
+                  <Label layoutX="112.0" layoutY="202.0" text="Recent Projects">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Separator layoutX="801.0" layoutY="49.0" orientation="VERTICAL" prefHeight="604.0" />
+                  <ListView layoutX="112.0" layoutY="227.0" prefHeight="428.0" prefWidth="656.0" />
+                  <Label layoutX="112.0" layoutY="49.0" text="Getting Started">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="820.0" layoutY="49.0" text="Documentation">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Hyperlink layoutX="904.0" layoutY="142.0" text="User Guide">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Hyperlink>
+                  <ImageView fitHeight="64.0" fitWidth="58.0" layoutX="846.0" layoutY="142.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../../../../../../../Users/catudora/Desktop/1429628177_add-128.png" />
+                     </image>
+                  </ImageView>
+                  <Label layoutX="912.0" layoutY="177.0" text="Lorem Ipsum" />
+               </children></AnchorPane>
+            </children>
+        </AnchorPane>
+    </center>
+</BorderPane>
