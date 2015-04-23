@@ -5,7 +5,6 @@ import com.asml.lis.client.controller.sidemenu.SideMenuNoImagesController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.layout.AnchorPane;
 import org.slf4j.Logger;
@@ -28,8 +27,8 @@ public class MainController implements Initializable {
     private static final String MULTI_YIELDSTAR_QUALIFICATION_LAYOUT_FILE = "/fxml/metrology_setup/MultiYieldStarQualification.fxml";
 
     // style sheet files
-    private static final String SIDE_MENU_CSS_FILE = "/styles/side_menu.css";
-    private static final String STATUS_BAR_CSS_FILE = "/styles/status_bar.css";
+    private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
+    private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
 
     // main content containers
     @FXML

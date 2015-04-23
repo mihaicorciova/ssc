@@ -6,4 +6,8 @@
 <?import javafx.scene.layout.BorderPane?>
 
 
-<Label text="All items up to date" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" />
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label text="All items up to date" />
+   </children>
+</AnchorPane>

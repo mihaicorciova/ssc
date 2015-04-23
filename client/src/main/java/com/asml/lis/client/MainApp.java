@@ -13,7 +13,7 @@ public class MainApp extends Application {
 
     private static final Logger log = LoggerFactory.getLogger(MainApp.class);
     private static final String ROOT_LAYOUT_FILE = "/fxml/RootLayout.fxml";
-    private static final String MAIN_CSS_FILE = "/styles/main.css";
+    private static final String MAIN_CSS_FILE = "/styles/Main.css";
     private static final double SCENE_MIN_WIDTH = 1280;
     private static final double SCENE_MIN_HEIGHT = 720;
 
