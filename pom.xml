@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.asml.wfa.applications.lis</groupId>
-	<artifactId>lismanagement-parent</artifactId>
+	<artifactId>lis-parent</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Litho InSight Project Management - ${project.artifactId}</name>
+	<name>Litho InSight</name>
 
 	<properties>
 		<!-- PLUGIN VERSIONS -->

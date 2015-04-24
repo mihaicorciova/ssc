@@ -6,11 +6,11 @@
 
     <parent>
         <groupId>com.asml.wfa.applications.lis</groupId>
-        <artifactId>lismanagement-parent</artifactId>
+        <artifactId>lis-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>client</artifactId>
-    <name>container</name>
+    <name>Client</name>
 
     <packaging>jar</packaging>
 
