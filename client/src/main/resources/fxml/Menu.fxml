@@ -8,16 +8,38 @@
     <menus>
         <Menu mnemonicParsing="false" text="File">
             <items>
-                <MenuItem mnemonicParsing="false" text="Close" />
+                <MenuItem mnemonicParsing="false" text="New Project" />
+                <MenuItem mnemonicParsing="false" text="Open Project" />
+                <SeparatorMenuItem  />
+                <MenuItem mnemonicParsing="false" text="Logout" />
+                <SeparatorMenuItem  />
+                <MenuItem mnemonicParsing="false" text="Exit" />
             </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Edit">
             <items>
-                <MenuItem mnemonicParsing="false" text="Delete" />
+                <MenuItem mnemonicParsing="false" text="Cut" />
+                <MenuItem mnemonicParsing="false" text="Copy" />
+                <MenuItem mnemonicParsing="false" text="Paste" />
+            </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="View">
+            <items>
+                <MenuItem mnemonicParsing="false" text="Full Screen" />
+            </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Tools">
+            <items>
+                <MenuItem mnemonicParsing="false" text="Export Data" />
             </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
             <items>
+                <MenuItem mnemonicParsing="false" text="Feature Overview" />
+                <MenuItem mnemonicParsing="false" text="User Guide" />
+                <MenuItem mnemonicParsing="false" text="User Manual" />
+                <MenuItem mnemonicParsing="false" text="Visit ASML Website" />
+                <SeparatorMenuItem />
                 <MenuItem mnemonicParsing="false" text="About" />
             </items>
         </Menu>
