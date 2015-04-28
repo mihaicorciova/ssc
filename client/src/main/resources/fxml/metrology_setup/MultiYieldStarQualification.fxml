@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.embed.swing.*?>
+<?import javafx.scene.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.layout.*?>
@@ -7,55 +9,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<TabPane fx:id="contentTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.asml.lis.client.controller.content.metrologysetup.MultiYieldStarQualificationController">
-    <tabs>
-        <Tab text="Overview">
-            <content>
-                <AnchorPane>
-                    <children>
-                        <Label fx:id="contentPlaceholderLabel" opacity="0.5" text="Overview Content Goes Here">
-                            <font>
-                                <Font size="20.0" />
-                            </font>
-                            <padding>
-                                <Insets left="100.0" top="100.0" />
-                            </padding>
-                        </Label>
-                    </children>
-                </AnchorPane>
-            </content>
-        </Tab>
-        <Tab text="Data">
-            <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                    <children>
-                        <Label fx:id="contentPlaceholderLabel1" opacity="0.5" text="Data Content Goes Here">
-                            <font>
-                                <Font size="20.0" />
-                            </font>
-                            <padding>
-                                <Insets left="100.0" top="100.0" />
-                            </padding>
-                        </Label>
-                    </children>
-                </AnchorPane>
-            </content>
-        </Tab>
-        <Tab text="Result">
-            <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                    <children>
-                        <Label fx:id="contentPlaceholderLabel11" opacity="0.5" text="Result Content Goes Here">
-                            <font>
-                                <Font size="20.0" />
-                            </font>
-                            <padding>
-                                <Insets left="100.0" top="100.0" />
-                            </padding>
-                        </Label>
-                    </children>
-                </AnchorPane>
-            </content>
-        </Tab>
-    </tabs>
-</TabPane>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ListView layoutX="14.0" layoutY="45.0" prefHeight="123.0" prefWidth="200.0" />
+      <Button layoutX="140.0" layoutY="14.0" mnemonicParsing="false" text="Select Files" />
+      <SwingNode fx:id="waferPlotContainer" layoutX="413.0" layoutY="129.0" />
+      <Label layoutX="14.0" layoutY="18.0" text="Data preparation" />
+      <Label layoutX="20.0" layoutY="204.0" text="Mean Spec" />
+      <Label layoutX="20.0" layoutY="238.0" text="P2P Spec" />
+      <Label layoutX="20.0" layoutY="275.0" text="Aperture" />
+      <TextField layoutX="148.0" layoutY="200.0" prefHeight="25.0" prefWidth="60.0" />
+      <TextField layoutX="148.0" layoutY="234.0" prefHeight="25.0" prefWidth="60.0" />
+      <TextField layoutX="148.0" layoutY="271.0" prefHeight="25.0" prefWidth="60.0" />
+      <Label layoutX="20.0" layoutY="175.0" text="Matching settings" />
+   </children>
+</AnchorPane>

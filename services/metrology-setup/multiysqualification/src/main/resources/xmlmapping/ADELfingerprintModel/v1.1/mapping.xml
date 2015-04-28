@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<xml-bindings xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.eclipse.org/eclipselink/xsds/persistence/oxm http://www.eclipse.org/eclipselink/xsds/eclipselink_oxm_2_3.xsd"
+  version="2.3" xml-accessor-type="NONE" xml-mapping-metadata-complete="false">
+
+  <xml-schema element-form-default="QUALIFIED">
+    <xml-ns prefix="ADELfingerprintModel" namespace-uri="http://www.asml.com/XMLSchema/MT/Generic/ADELfingerprintModel/v1.1"  />
+    <xml-ns prefix="xsi" namespace-uri="http://www.w3.org/2001/XMLSchema-instance" />
+  </xml-schema>
+
+  <java-types>
+    <java-type name="com.asml.wfa.adel.fingerprintmodel.ADELfingerprintModel" xml-accessor-type="NONE">
+      <xml-root-element name="FingerprintModel" namespace="http://www.asml.com/XMLSchema/MT/Generic/ADELfingerprintModel/v1.1" />
+    </java-type>
+  </java-types>
+</xml-bindings>
