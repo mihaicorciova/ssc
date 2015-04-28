@@ -21,6 +21,7 @@
 
 	<modules>
 		<module>client</module>
+		<module>services</module>
 	</modules>
 
 	<build>
