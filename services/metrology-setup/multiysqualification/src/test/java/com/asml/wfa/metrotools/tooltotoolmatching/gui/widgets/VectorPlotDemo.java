@@ -12,6 +12,7 @@ public class VectorPlotDemo extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private final VectorWaferPlot waferPlot;
+  private final VectorWaferPlot waferPlot2;
 
     public VectorPlotDemo() {
 
@@ -21,10 +22,18 @@ public class VectorPlotDemo extends JFrame {
         initPlot1();
 
         waferPlot.addAll();
+        
+        waferPlot2 = new VectorWaferPlot("Plot", "nm", true);
+        waferPlot2.resetZoomingAndScalingDelayed();
+
+        initPlot2();
+
+        waferPlot2.addAll();
 
         final DatasetSelector dsSel = new DatasetSelector();
         dsSel.addDatasetSelectorComponent(waferPlot);
-
+        dsSel.addDatasetSelectorComponent(waferPlot2);
+        
         this.setTitle("Vector Plot Demo");
         this.setSize(1280, 800);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -43,6 +52,17 @@ public class VectorPlotDemo extends JFrame {
         waferPlot.addField(20, 0, 20, 20, 2, 3);
         waferPlot.addField(0, 20, 20, 20, 2, 3);
     }
+    
+    private void initPlot2() {
+        waferPlot2.addVectorValue(8, 8, 8, 8, 20, -20, true);
+
+        waferPlot2.addField(0, 0, 20, 20, 2, 3);
+        waferPlot2.addField(-10, 0, 10, 20, 2, 3);
+        waferPlot2.addField(0, -10, 20, 20, 2, 3);
+        waferPlot2.addField(10, 0, 20, 20, 2, 3);
+        waferPlot2.addField(0, 10, 20, 20, 2, 3);
+    }
+
 
     public static void main(final String[] args) {
         LookAndFeelFactory.installDefaultLookAndFeelAndExtension();

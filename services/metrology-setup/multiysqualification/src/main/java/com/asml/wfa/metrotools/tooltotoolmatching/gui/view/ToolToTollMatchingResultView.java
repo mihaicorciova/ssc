@@ -63,6 +63,7 @@ public class ToolToTollMatchingResultView extends JPanel {
 
         waferPlot.addAll();
         ds.addDatasetSelectorComponent(waferPlot);
+         ds.addDatasetSelectorComponent(waferPlot);
         ds.forceThumbnailUpdate();
 
         this.validate();

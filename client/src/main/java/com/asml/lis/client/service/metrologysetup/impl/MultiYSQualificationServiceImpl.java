@@ -26,7 +26,7 @@ import java.util.List;
 public class MultiYSQualificationServiceImpl implements MultiYSQualificationService {
 
     @Override
-    public List<PlotData> parseMetrologyFiles(File file) {
+    public  List<PlotData> parseMetrologyFiles(File file) {
 
         List<PlotData> pl = new ArrayList<>();
          

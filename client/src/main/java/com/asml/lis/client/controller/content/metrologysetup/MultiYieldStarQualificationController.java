@@ -28,6 +28,7 @@ import javafx.scene.control.ListView;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.Pair;
+import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class MultiYieldStarQualificationController implements Initializable {
     private Button matchSelectedButton;
 
     private VectorWaferPlot waferPlot;
-
+   
     private MultiYSQualificationServiceImpl service;
 
     private List<List<PlotData>> plotContent;
@@ -66,7 +67,8 @@ public class MultiYieldStarQualificationController implements Initializable {
     public void initialize(final URL url, final ResourceBundle rb) {
         log.info("Initializing MultiYieldStarQualification controller");
 
-        plotContent = new ArrayList<>();
+        service= new MultiYSQualificationServiceImpl();
+       
         final FileChooser fileChooser = new FileChooser();
 
         selectFilesButton.setOnAction(
@@ -75,23 +77,27 @@ public class MultiYieldStarQualificationController implements Initializable {
                     public void handle(final ActionEvent e) {
                         configureFileChooser(fileChooser);
                         List<File> files = fileChooser.showOpenMultipleDialog(selectFilesButton.getContextMenu());
-
+                        plotContent = new ArrayList<>();
                         // populate selected files list view
                         populateListView(files);
 
                         // parse file   
                         //      
                         for (File file : files) {
+                            
+                            
                             List<PlotData> plotData = service.parseMetrologyFiles(file);
                             plotContent.add(plotData);
                         }
                     }
                 });
 
+       
         matchSelectedButton.setOnAction(
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent e) {
+                        
                         createSwingContent(waferPlotContainer, plotContent);
 
                     }
@@ -145,7 +151,7 @@ public class MultiYieldStarQualificationController implements Initializable {
     private void initPlot(List<PlotData> plotData, List<PlotData> plotData2) {
 
         for (int i = 0; i < plotData.size(); i++) {
-            waferPlot.addVectorValue(plotData.get(i).getFieldPositionX(), plotData.get(i).getFieldPositionY(), plotData.get(i).getTargetPositionX(), plotData.get(i).getTargetPositionY(), plotData.get(i).getOverlayX() - plotData2.get(i).getOverlayX(), plotData.get(i).getOverlayY() - plotData2.get(i).getOverlayY(), true);
+            waferPlot.addVectorValue(plotData.get(i).getFieldPositionX()+plotData.get(i).getTargetPositionX(), plotData.get(i).getFieldPositionY()+ plotData.get(i).getTargetPositionY(), plotData.get(i).getFieldPositionX()+plotData.get(i).getTargetPositionX(), plotData.get(i).getFieldPositionY()+ plotData.get(i).getTargetPositionY(), plotData.get(i).getOverlayX() - plotData2.get(i).getOverlayX(), plotData.get(i).getOverlayY() - plotData2.get(i).getOverlayY(), true);
 
             waferPlot.addField(plotData.get(i).getFieldPositionX(), plotData.get(i).getFieldPositionY(), 20, 20, 0, 0);
 
