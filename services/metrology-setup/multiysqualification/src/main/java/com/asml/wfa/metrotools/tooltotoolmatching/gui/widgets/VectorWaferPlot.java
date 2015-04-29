@@ -14,8 +14,7 @@ import javax.swing.JFileChooser;
 
 import org.apache.commons.math.util.FastMath;
 
-import com.asml.wfa.common.guicomponents.widgets.plots.ExportEvent;
-import com.asml.wfa.common.guicomponents.widgets.plots.ExportListener;
+
 import com.asml.wfa.common.guicomponents.widgets.plots.dataplot2d.v2.DP2DMeanPlus3SigmaValueRangeProvider;
 import com.asml.wfa.common.guicomponents.widgets.plots.dataplot2d.v2.DataPlot2D;
 import com.asml.wfa.common.guicomponents.widgets.plots.dataplot2d.v2.DataPlot2DGlobalComponentDockPosition;

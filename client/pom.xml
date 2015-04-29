@@ -51,6 +51,14 @@
 
     <dependencies>
         <!-- Logging -->
+        
+        
+        <dependency>
+            <groupId>com.asml.wfa.applications.lis</groupId>
+            <artifactId>multiysqualification</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>

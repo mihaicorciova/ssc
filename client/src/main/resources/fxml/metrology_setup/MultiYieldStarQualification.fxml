@@ -9,19 +9,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <ListView layoutX="14.0" layoutY="45.0" prefHeight="123.0" prefWidth="200.0" />
-      <Button layoutX="140.0" layoutY="14.0" mnemonicParsing="false" text="Select Files" />
-      <SwingNode fx:id="waferPlotContainer" layoutX="413.0" layoutY="129.0" />
-      <Label layoutX="14.0" layoutY="18.0" text="Data preparation" />
-      <Label layoutX="20.0" layoutY="204.0" text="Mean Spec" />
-      <Label layoutX="20.0" layoutY="238.0" text="P2P Spec" />
-      <Label layoutX="20.0" layoutY="275.0" text="Aperture" />
-      <TextField layoutX="148.0" layoutY="200.0" prefHeight="25.0" prefWidth="60.0" />
-      <TextField layoutX="148.0" layoutY="234.0" prefHeight="25.0" prefWidth="60.0" />
-      <TextField layoutX="148.0" layoutY="271.0" prefHeight="25.0" prefWidth="60.0" />
-      <Label layoutX="20.0" layoutY="175.0" text="Matching settings" />
-   </children>
+<AnchorPane fx:id="mYSQContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.asml.lis.client.controller.content.metrologysetup.MultiYieldStarQualificationController">
+    <children>
+        <ListView fx:id="selectedFilesListView" layoutX="14.0" layoutY="45.0" prefHeight="123.0" prefWidth="200.0" />
+        <Button fx:id="selectFilesButton" layoutX="140.0" layoutY="14.0" mnemonicParsing="false" text="Select Files" />
+        <SwingNode fx:id="waferPlotContainer" layoutX="225.0" layoutY="17.0" />
+        <Label layoutX="14.0" layoutY="18.0" text="Data preparation" />
+        <Label layoutX="20.0" layoutY="204.0" text="Mean Spec" />
+        <Label layoutX="20.0" layoutY="238.0" text="P2P Spec" />
+        <Label layoutX="20.0" layoutY="275.0" text="Aperture" />
+        <TextField layoutX="148.0" layoutY="200.0" prefHeight="25.0" prefWidth="60.0" />
+        <TextField layoutX="148.0" layoutY="234.0" prefHeight="25.0" prefWidth="60.0" />
+        <TextField layoutX="148.0" layoutY="271.0" prefHeight="25.0" prefWidth="60.0" />
+        <Label layoutX="20.0" layoutY="175.0" text="Matching settings" />
+      <Button fx:id="matchSelectedButton" layoutX="117.0" layoutY="336.0" mnemonicParsing="false" text="Match selected" />
+    </children>
 </AnchorPane>

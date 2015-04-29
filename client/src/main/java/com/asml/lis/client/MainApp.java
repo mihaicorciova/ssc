@@ -1,5 +1,6 @@
 package com.asml.lis.client;
 
+import com.asml.lis.client.controller.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -7,7 +8,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;;
+import org.slf4j.LoggerFactory;
+
+;
 
 public class MainApp extends Application {
 
@@ -16,6 +19,7 @@ public class MainApp extends Application {
     private static final String MAIN_CSS_FILE = "/styles/Main.css";
     private static final double SCENE_MIN_WIDTH = 1280;
     private static final double SCENE_MIN_HEIGHT = 720;
+    private Stage stage;
 
     public static void main(String[] args) throws Exception {
         launch(args);
@@ -25,12 +29,15 @@ public class MainApp extends Application {
     public void start(Stage stage) throws Exception {
 
         log.info("Starting Litho InSight");
+        this.stage = stage;
 
         log.debug("Loading FXML for main view from: {}", ROOT_LAYOUT_FILE);
         FXMLLoader loader = new FXMLLoader();
 
         Parent rootNode = (Parent) loader.load(getClass().getResourceAsStream(ROOT_LAYOUT_FILE));
-
+ 
+      
+            
         log.debug("Showing JFX scene");
         Scene scene = new Scene(rootNode, SCENE_MIN_WIDTH, SCENE_MIN_HEIGHT);
         // scene.getStylesheets().add(MAIN_CSS_FILE);
@@ -39,7 +46,12 @@ public class MainApp extends Application {
         stage.setMinWidth(SCENE_MIN_WIDTH);
         stage.setMinHeight(SCENE_MIN_HEIGHT);
         stage.setScene(scene);
-
+        
         stage.show();
     }
+
+    public Stage getStage() {
+        return stage;
+    }
+
 }

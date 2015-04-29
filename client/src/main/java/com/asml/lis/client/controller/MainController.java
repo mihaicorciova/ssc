@@ -1,5 +1,6 @@
 package com.asml.lis.client.controller;
 
+import com.asml.lis.client.MainApp;
 import com.asml.lis.client.controller.content.metrologysetup.MultiYieldStarQualificationController;
 import com.asml.lis.client.controller.sidemenu.SideMenuNoImagesController;
 import javafx.fxml.FXML;
@@ -12,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.scene.control.TabPane;
 
 public class MainController implements Initializable {
 
@@ -29,6 +29,8 @@ public class MainController implements Initializable {
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
+    
+    private MainApp mainApp;
 
     // main content containers
     @FXML
@@ -40,7 +42,7 @@ public class MainController implements Initializable {
     @FXML
     private AnchorPane statusBarContainer;
     @FXML
-    private TabPane contentTabPane;
+    private AnchorPane contentTabPane;
 
     // controllers
     private MultiYieldStarQualificationController multiYieldStarQualificationController;
@@ -81,10 +83,12 @@ public class MainController implements Initializable {
             final FXMLLoader multiYieldStarQaulifLoader = new FXMLLoader();
             contentTabPane = multiYieldStarQaulifLoader.load(getClass().getResourceAsStream(MULTI_YIELDSTAR_QUALIFICATION_LAYOUT_FILE));
             contentContainer.getChildren().add(contentTabPane);
+            
+           
             multiYieldStarQualificationController = multiYieldStarQaulifLoader.getController();
             ((SideMenuNoImagesController) sideMenuLoader.getController())
                     .setMultiYieldStarQualificationController(multiYieldStarQualificationController);
-
+           
         } catch (Exception ex) {
             log.error("Failed to load components", ex);
         }
@@ -95,8 +99,13 @@ public class MainController implements Initializable {
      *
      * @return content TabPane
      */
-    public TabPane getContentTabPane() {
+    public AnchorPane getContentTabPane() {
         return contentTabPane;
+    }
+    
+    public void setMainApp(final MainApp pMainApp) {
+         log.debug("Main app title"+pMainApp.getStage().getTitle());
+        mainApp = pMainApp;
     }
 
 }
