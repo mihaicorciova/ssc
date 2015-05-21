@@ -82,6 +82,10 @@ public class MainController implements Initializable {
             // load Multi YieldStar Qualification
             final FXMLLoader multiYieldStarQaulifLoader = new FXMLLoader();
             contentTabPane = multiYieldStarQaulifLoader.load(getClass().getResourceAsStream(MULTI_YIELDSTAR_QUALIFICATION_LAYOUT_FILE));
+             AnchorPane.setRightAnchor(contentTabPane, 0.0);
+            AnchorPane.setBottomAnchor(contentTabPane, 0.0);
+             AnchorPane.setLeftAnchor(contentTabPane, 0.0);
+            AnchorPane.setTopAnchor(contentTabPane, 0.0);
             contentContainer.getChildren().add(contentTabPane);
             
            

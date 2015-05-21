@@ -1,34 +1,25 @@
 package com.asml.lis.client.controller.content.metrologysetup;
 
-import com.asml.lis.client.MainApp;
-import com.asml.lis.client.service.metrologysetup.MultiYSQualificationService;
 import com.asml.lis.client.service.metrologysetup.impl.MultiYSQualificationServiceImpl;
 import com.asml.lis.client.service.metrologysetup.model.PlotData;
 import com.asml.wfa.common.guicomponents.widgets.datasetselector.DatasetSelector;
 import com.asml.wfa.metrotools.tooltotoolmatching.gui.widgets.VectorWaferPlot;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
-import javafx.util.Pair;
-import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +41,9 @@ public class MultiYieldStarQualificationController implements Initializable {
     private ListView selectedFilesListView;
     @FXML
     private Button matchSelectedButton;
+    
+    @FXML
+    private AnchorPane mYSQContainer;
 
     private VectorWaferPlot waferPlot;
    
@@ -92,7 +86,8 @@ public class MultiYieldStarQualificationController implements Initializable {
                     }
                 });
 
-       
+        
+          
         matchSelectedButton.setOnAction(
                 new EventHandler<ActionEvent>() {
                     @Override

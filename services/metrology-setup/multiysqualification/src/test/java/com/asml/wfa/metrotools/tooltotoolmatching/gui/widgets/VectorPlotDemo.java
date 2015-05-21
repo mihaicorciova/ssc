@@ -24,23 +24,28 @@ public class VectorPlotDemo extends JFrame {
         waferPlot.addAll();
         
         waferPlot2 = new VectorWaferPlot("Plot", "nm", true);
-        waferPlot2.resetZoomingAndScalingDelayed();
+  
 
         initPlot2();
 
+        
         waferPlot2.addAll();
 
         final DatasetSelector dsSel = new DatasetSelector();
         dsSel.addDatasetSelectorComponent(waferPlot);
         dsSel.addDatasetSelectorComponent(waferPlot2);
         
+          dsSel.forceThumbnailUpdate();
         this.setTitle("Vector Plot Demo");
         this.setSize(1280, 800);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
         this.add(dsSel);
+        
         this.setVisible(true);
+        
+
     }
 
     private void initPlot1() {
@@ -54,7 +59,7 @@ public class VectorPlotDemo extends JFrame {
     }
     
     private void initPlot2() {
-        waferPlot2.addVectorValue(8, 8, 8, 8, 20, -20, true);
+        waferPlot2.addVectorValue(3, 3, 8, 8, 20, -20, true);
 
         waferPlot2.addField(0, 0, 20, 20, 2, 3);
         waferPlot2.addField(-10, 0, 10, 20, 2, 3);
