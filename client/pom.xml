@@ -47,13 +47,13 @@
                 <configuration>
                     
                   
-        <archive>
-          <manifest>
-            <addClasspath>true</addClasspath>
-            <classpathPrefix>lib/</classpathPrefix>
-            <mainClass>com.asml.lis.client.MainApp</mainClass>
-          </manifest>
-        </archive>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.asml.lis.client.MainApp</mainClass>
+                        </manifest>
+                    </archive>
      
                     
                     <descriptorRefs>
