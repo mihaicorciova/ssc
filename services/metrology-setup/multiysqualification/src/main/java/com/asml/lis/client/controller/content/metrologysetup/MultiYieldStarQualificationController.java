@@ -7,23 +7,29 @@ import com.asml.wfa.common.guicomponents.widgets.datasetselector.DatasetSelector
 import com.asml.wfa.metrotools.tooltotoolmatching.gui.widgets.VectorWaferPlot;
 import java.awt.Dimension;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Catalin Tudorache <catalin.tudorache@asml.com>
  */
-public class MultiYieldStarQualificationController implements Initializable {
+public class MultiYieldStarQualificationController extends Application implements Initializable {
 
     private static final Logger log = LoggerFactory.getLogger(MultiYieldStarQualificationController.class);
     @FXML
@@ -51,6 +57,9 @@ public class MultiYieldStarQualificationController implements Initializable {
     private VectorWaferPlot waferPlot;
     private MultiYSQualificationServiceImpl service;
     private Map<String, MachineData> plotContent;
+    private static final String MYSQ_LAYOUT_FILE = "/fxml/MultiYieldStarQualification.fxml";
+    private static final double SCENE_MIN_WIDTH = 1280;
+    private static final double SCENE_MIN_HEIGHT = 720;
 
     /**
      * Initializes the controller class.
@@ -58,6 +67,25 @@ public class MultiYieldStarQualificationController implements Initializable {
      * @param url URL
      * @param rb resource bundle
      */
+
+    @Override
+    public void start(Stage stage) throws Exception {
+
+        FXMLLoader loader = new FXMLLoader();
+
+        Parent rootNode = (AnchorPane) loader.load(getClass().getResourceAsStream(MYSQ_LAYOUT_FILE));
+        Scene scene = new Scene(rootNode, SCENE_MIN_WIDTH, SCENE_MIN_HEIGHT);
+        // scene.getStylesheets().add(MAIN_CSS_FILE);
+        stage.setTitle("Litho InSight");
+
+        stage.setMinWidth(SCENE_MIN_WIDTH);
+        stage.setMinHeight(SCENE_MIN_HEIGHT);
+        stage.setScene(scene);
+
+        stage.show();
+
+    }
+
     @Override
     public void initialize(final URL url, final ResourceBundle rb) {
         log.info("Initializing MultiYieldStarQualification controller");
@@ -107,7 +135,7 @@ public class MultiYieldStarQualificationController implements Initializable {
 
     private void populateReferenceMachineChoiceBox(Map<String, MachineData> plotContent) {
 
-        referenceMachineChoiceBox.setItems(FXCollections.observableArrayList("dada","dadad"));
+        referenceMachineChoiceBox.setItems(FXCollections.observableArrayList("dada", "dadad"));
 
     }
 
@@ -159,6 +187,10 @@ public class MultiYieldStarQualificationController implements Initializable {
 
     public void setPlaceholderLabel(final String text) {
 
+    }
+
+    public AnchorPane getMYSQModuleView() throws IOException {
+        return (AnchorPane) new FXMLLoader().load(getClass().getResourceAsStream(MYSQ_LAYOUT_FILE));
     }
 
 }
