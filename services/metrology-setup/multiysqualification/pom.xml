@@ -14,190 +14,36 @@
         <setuptooling.version>0.0.1-SNAPSHOT</setuptooling.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.asml.wfa.applications</groupId>
-                <artifactId>bom.standalone-gui</artifactId>
-                <version>${setuptooling.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-                
-            </dependency>
-            <dependency>
-                <groupId>com.asml.wfa.applications</groupId>
-                <artifactId>bom.ovl-automation-se</artifactId>
-                <version>${setuptooling.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.asml.wfa.applications</groupId>
-                <artifactId>bom.test</artifactId>
-                <version>${setuptooling.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
+   
     <dependencies>
    
-        <dependency>
-            <groupId>com.asml.wfa.applications</groupId>
-            <artifactId>localfacilities.beanprovider</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.asml.wfa.applications</groupId>
-            <artifactId>localfacilities.eventreporter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.asml.wfa.applications</groupId>
-            <artifactId>localfacilities.genericlogger</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.asml.wfa.applications</groupId>
-            <artifactId>gui-commons</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.asml.wfa.applications</groupId>
-            <artifactId>adel</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.asml.wfa.applications</groupId>
-            <artifactId>common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.asml.wfa.applications</groupId>
-            <artifactId>services</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.asml.wfa.applications</groupId>
-            <artifactId>sso.impl</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+       
  
-        <dependency>
-            <groupId>com.asml.lcp.wfa.guicomponents</groupId>
-            <artifactId>widgets</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.asml.lcp.wfa.shared</groupId>
-            <artifactId>logic</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>jfxrt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>jre</artifactId>
-            <type>zip</type>
-        </dependency>
-
-        <dependency>
-            <groupId>com.asml.lcp.wfa.domainmodel</groupId>
-            <artifactId>model</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>com.asml.lcp.wfa.domainmodel</groupId>
             <artifactId>readers.documentparser</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>2.0.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.asml.lcp.wfa.domainmodel</groupId>
             <artifactId>readers.documentreader</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>2.0.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
- 
+    
         <dependency>
-            <groupId>com.asml.lcp.wfa.ovlo</groupId>
-            <artifactId>client.gui</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.asml.wfa.applications</groupId>
+            <artifactId>gui-commons</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.asml.wfa.applications</groupId>
+            <artifactId>adel</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        
   
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -217,91 +63,12 @@
         </dependency>
         <!-- Test scoped dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <scope>test</scope>
+            <groupId>com.asml.lcp.wfa.domainmodel</groupId>
+            <artifactId>readers.adelmetrology</artifactId>
+            <version>2.0.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-
-            <plugin>
-                <!-- deprecated, will be moved to the dashboard project -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <excludes>
-                        <exclude>META-INF/*.SF</exclude>
-                        <exclude>META-INF/*.DSA</exclude>
-                        <exclude>META-INF/*.RSA</exclude>
-                        <exclude>*.domainmodel</exclude>
-                    </excludes>
-                    <archive>
-                        <!-- <index>true</index> -->
-                        <manifest>
-                            <mainClass>com.asml.wfa.metrotools.tooltotoolmatching.gui.MultiYSMatchingClient</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathLayoutType>custom</classpathLayoutType>
-                            <customClasspathLayout>$${artifact.groupId}.$${artifact.artifactId}-$${artifact.version}$${dashClassifier?}.$${artifact.extension}</customClasspathLayout>
-                        </manifest>
-                        <manifestEntries>
-                            <SplashScreen-Image>images/splashscreen.png</SplashScreen-Image>
-                            <!--todo: remove splash screen image once completed (KOEO) -->
-                            <Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-jre1_7_0_65</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeGroupIds>com.oracle</includeGroupIds>
-                            <includeArtifactIds>jre</includeArtifactIds>
-                            <outputDirectory>target/jre_1_7_0_65</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5</version>
-                <executions>
-                    <execution>
-                        <id>attach-distribution</id>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <descriptor>src/main/assembly/distribution.xml</descriptor>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
+    
 </project>
