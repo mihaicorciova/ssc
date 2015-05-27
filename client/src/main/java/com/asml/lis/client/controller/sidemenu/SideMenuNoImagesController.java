@@ -22,8 +22,7 @@ public class SideMenuNoImagesController implements Initializable {
 
     // content controllers
     private MainController mainController;
-    private MultiYieldStarQualificationController multiYieldStarQualificationController;
-
+   
     @FXML
     private TreeView<String> navigationTree;
 
@@ -46,11 +45,7 @@ public class SideMenuNoImagesController implements Initializable {
         // add side menu listener
         navigationTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             log.debug("Clicked on " + newValue.getValue());
-            if (multiYieldStarQualificationController == null) {
-                log.warn("Null content TabPane");
-                return;
-            }
-            multiYieldStarQualificationController.setPlaceholderLabel(newValue.getValue());
+           mainController.handleMYSQViewLaunch();
         });
     }
 
@@ -63,13 +58,5 @@ public class SideMenuNoImagesController implements Initializable {
         mainController = pController;
     }
 
-    /**
-     * Set Multi YieldStar Qualification Controller.
-     *
-     * @param pController multi YieldStar qualification controller
-     */
-    public void setMultiYieldStarQualificationController(final MultiYieldStarQualificationController pController) {
-        multiYieldStarQualificationController = pController;
-    }
-
+  
 }

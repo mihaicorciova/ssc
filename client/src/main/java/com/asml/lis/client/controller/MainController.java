@@ -3,6 +3,7 @@ package com.asml.lis.client.controller;
 import com.asml.lis.client.MainApp;
 import com.asml.lis.client.controller.content.metrologysetup.MultiYieldStarQualificationController;
 import com.asml.lis.client.controller.sidemenu.SideMenuNoImagesController;
+import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 
 public class MainController implements Initializable {
 
@@ -29,7 +31,7 @@ public class MainController implements Initializable {
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
-    
+
     private MainApp mainApp;
 
     // main content containers
@@ -44,6 +46,7 @@ public class MainController implements Initializable {
     @FXML
     private AnchorPane contentTabPane;
 
+    private AnchorPane mysqView;
     // controllers
     private MultiYieldStarQualificationController multiYieldStarQualificationController;
 
@@ -80,19 +83,16 @@ public class MainController implements Initializable {
             statusBarContainer.getStylesheets().add(STATUS_BAR_CSS_FILE);
 
             // load Multi YieldStar Qualification
-            final FXMLLoader multiYieldStarQaulifLoader = new FXMLLoader();
-            contentTabPane = multiYieldStarQaulifLoader.load(getClass().getResourceAsStream(MULTI_YIELDSTAR_QUALIFICATION_LAYOUT_FILE));
-             AnchorPane.setRightAnchor(contentTabPane, 0.0);
-            AnchorPane.setBottomAnchor(contentTabPane, 0.0);
-             AnchorPane.setLeftAnchor(contentTabPane, 0.0);
-            AnchorPane.setTopAnchor(contentTabPane, 0.0);
-            contentContainer.getChildren().add(contentTabPane);
-            
-           
-            multiYieldStarQualificationController = multiYieldStarQaulifLoader.getController();
-            ((SideMenuNoImagesController) sideMenuLoader.getController())
-                    .setMultiYieldStarQualificationController(multiYieldStarQualificationController);
-           
+            try {
+                mysqView = (AnchorPane) new MultiYieldStarQualificationController().getMYSQModuleView();
+                AnchorPane.setRightAnchor(mysqView, 0.0);
+                AnchorPane.setBottomAnchor(mysqView, 0.0);
+                AnchorPane.setLeftAnchor(mysqView, 0.0);
+                AnchorPane.setTopAnchor(mysqView, 0.0);
+            } catch (IOException e) {
+
+            }
+
         } catch (Exception ex) {
             log.error("Failed to load components", ex);
         }
@@ -106,10 +106,14 @@ public class MainController implements Initializable {
     public AnchorPane getContentTabPane() {
         return contentTabPane;
     }
-    
+
     public void setMainApp(final MainApp pMainApp) {
-         log.debug("Main app title"+pMainApp.getStage().getTitle());
+        log.debug("Main app title" + pMainApp.getStage().getTitle());
         mainApp = pMainApp;
+    }
+
+    public void handleMYSQViewLaunch() {
+        contentContainer.getChildren().setAll(mysqView);
     }
 
 }
