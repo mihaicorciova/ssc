@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
  */
 public class GenericModel {
 
-   private static final Logger log = LoggerFactory.getLogger(MultiYieldStarQualificationController.class);
-   
+    private static final Logger log = LoggerFactory.getLogger(MultiYieldStarQualificationController.class);
+
     private Object one;
     private Object two;
     private Object three;
@@ -41,7 +41,7 @@ public class GenericModel {
             try {
                 fields[i++].set(this, arg);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                log.error( "Exception:", ex);
+                log.error("Exception:", ex);
             }
         }
     }
