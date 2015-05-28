@@ -22,7 +22,7 @@ public class SideMenuNoImagesController implements Initializable {
 
     // content controllers
     private MainController mainController;
-   
+
     @FXML
     private TreeView<String> navigationTree;
 
@@ -45,7 +45,7 @@ public class SideMenuNoImagesController implements Initializable {
         // add side menu listener
         navigationTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             log.debug("Clicked on " + newValue.getValue());
-           mainController.handleMYSQViewLaunch();
+            mainController.handleMYSQViewLaunch();
         });
     }
 
@@ -58,5 +58,4 @@ public class SideMenuNoImagesController implements Initializable {
         mainController = pController;
     }
 
-  
 }

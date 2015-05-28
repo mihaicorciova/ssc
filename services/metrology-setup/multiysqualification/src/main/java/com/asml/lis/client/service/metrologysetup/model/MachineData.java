@@ -15,13 +15,13 @@ import java.util.Map;
 public class MachineData {
 
     private final String machineName;
-    private Map<String,ProfileData> profileData;
+    private Map<String, ProfileData> profileData;
 
-    public  Map<String,ProfileData> getProfileData() {
+    public Map<String, ProfileData> getProfileData() {
         return profileData;
     }
 
-    public void setProfileData(Map<String,ProfileData> profileData) {
+    public void setProfileData(Map<String, ProfileData> profileData) {
         this.profileData = profileData;
     }
 
@@ -29,7 +29,7 @@ public class MachineData {
         return machineName;
     }
 
-    public MachineData(String machineName, Map<String,ProfileData> profileData) {
+    public MachineData(String machineName, Map<String, ProfileData> profileData) {
         this.machineName = machineName;
         this.profileData = profileData;
     }

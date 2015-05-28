@@ -167,20 +167,19 @@ public class MultiYieldStarQualificationController extends Application implement
 
     private void populateMatchingTable(Map<String, MachineData> plotContent) {
 
-        machineNamesTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("one"));
-        meanXTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("two"));
-        p2PXTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("three"));
-        meanYTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("four"));
-        p2PYTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("five"));
+        machineNamesTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
+        meanXTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
+        p2PXTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
+        meanYTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
+        p2PYTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
 
         ObservableList data = FXCollections.observableArrayList();
 
         for (Map.Entry<String, MachineData> entry : plotContent.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString())) {
                 data.add(new GenericModel(entry.getKey(), "REF", "REF", "REF", "REF"));
-            }
-            else{
-         //   if(entry.getValue().getProfileData().get(targetLabelChoiceBox.getSelectionModel().getSelectedItem().toString()).getPlotData().)
+            } else {
+                data.add(new GenericModel(entry.getKey(), "0", "0", "0", "0"));
             }
 
         }

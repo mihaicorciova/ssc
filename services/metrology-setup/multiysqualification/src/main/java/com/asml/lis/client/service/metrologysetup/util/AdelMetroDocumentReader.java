@@ -4,14 +4,12 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
-
 import com.asml.wfa.commons.domainmodel.DomainModelFactory;
 import com.asml.wfa.xml.adel.adelmetrology.AdelMetrology;
 import com.asml.wfa.xml.adel.adelmetrology.reader.ADELmetrologyProducer;
 import com.asml.wfa.xml.adel.jaxb.JaxbHelper;
 import com.asml.wfa.xml.adel.jaxb.XMLException;
 import com.asml.wfa.xml.adel.reader.ADELmetrologyReader;
-
 
 public class AdelMetroDocumentReader {
 
@@ -24,7 +22,5 @@ public class AdelMetroDocumentReader {
         final AdelMetrology adelmetrology = JaxbHelper.parse(AdelMetrology.class, ADELmetrologyProducer.CTX, JaxbHelper.EMPTY_NAMESPACE, stream);
         return adelmetrology;
     }
-
-   
 
 }
