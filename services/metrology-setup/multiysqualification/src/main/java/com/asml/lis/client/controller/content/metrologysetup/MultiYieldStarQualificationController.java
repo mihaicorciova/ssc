@@ -1,8 +1,10 @@
 package com.asml.lis.client.controller.content.metrologysetup;
 
 import com.asml.lis.client.service.metrologysetup.impl.MultiYSQualificationServiceImpl;
+import com.asml.lis.client.service.metrologysetup.model.GenericModel;
 import com.asml.lis.client.service.metrologysetup.model.MachineData;
 import com.asml.lis.client.service.metrologysetup.model.PlotData;
+import com.asml.lis.client.service.metrologysetup.model.ProfileData;
 import com.asml.wfa.common.guicomponents.widgets.datasetselector.DatasetSelector;
 import com.asml.wfa.metrotools.tooltotoolmatching.gui.widgets.VectorWaferPlot;
 import java.awt.Dimension;
@@ -15,7 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -27,9 +33,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,12 +65,31 @@ public class MultiYieldStarQualificationController extends Application implement
     private ChoiceBox apertureChoiceBox;
     @FXML
     private ChoiceBox referenceMachineChoiceBox;
+    @FXML
+    private ChoiceBox targetLabelChoiceBox;
+    @FXML
+    private ChoiceBox matchingTypeMachineChoiceBox;
+    @FXML
+    private TableView matchingTableView;
+    @FXML
+    TableColumn<GenericModel, Object> machineNamesTableColumn;
+    @FXML
+    TableColumn<GenericModel, Object> meanXTableColumn;
+    @FXML
+    TableColumn<GenericModel, Object> p2PXTableColumn;
+    @FXML
+    TableColumn<GenericModel, Object> meanYTableColumn;
+    @FXML
+    TableColumn<GenericModel, Object> p2PYTableColumn;
+
     private VectorWaferPlot waferPlot;
     private MultiYSQualificationServiceImpl service;
     private Map<String, MachineData> plotContent;
     private static final String MYSQ_LAYOUT_FILE = "/fxml/MultiYieldStarQualification.fxml";
     private static final double SCENE_MIN_WIDTH = 1280;
     private static final double SCENE_MIN_HEIGHT = 720;
+    private static final String[] APERTURE_TYPE = {"0 deg", "180 deg", "TIS"};
+    private static final String[] MATCHING_TYPE = {"Mean", "Abs(Mean)+3S"};
 
     /**
      * Initializes the controller class.
@@ -67,7 +97,6 @@ public class MultiYieldStarQualificationController extends Application implement
      * @param url URL
      * @param rb resource bundle
      */
-
     @Override
     public void start(Stage stage) throws Exception {
 
@@ -107,18 +136,21 @@ public class MultiYieldStarQualificationController extends Application implement
                         // parse file   
                         //      
                         plotContent = service.parseMetrologyFiles(files);
-
+                        populateReferenceMachineChoiceBox(plotContent);
+                        populateTargetLabelChoiceBox(plotContent.get(referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString()).getProfileData());
                     }
                 });
 
-        populateReferenceMachineChoiceBox(plotContent);
+        populateApertureChoiceBox();
+        populateMatchingTypeMachineChoiceBox();
+
         matchSelectedButton.setOnAction(
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent e) {
 
                         createSwingContent(waferPlotContainer, plotContent);
-
+                        populateMatchingTable(plotContent);
                     }
                 });
     }
@@ -133,10 +165,50 @@ public class MultiYieldStarQualificationController extends Application implement
 
     }
 
+    private void populateMatchingTable(Map<String, MachineData> plotContent) {
+
+        machineNamesTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("one"));
+        meanXTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("two"));
+        p2PXTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("three"));
+        meanYTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("four"));
+        p2PYTableColumn.setCellValueFactory(new PropertyValueFactory<GenericModel, Object>("five"));
+
+        ObservableList data = FXCollections.observableArrayList();
+
+        for (Map.Entry<String, MachineData> entry : plotContent.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString())) {
+                data.add(new GenericModel(entry.getKey(), "REF", "REF", "REF", "REF"));
+            }
+            else{
+         //   if(entry.getValue().getProfileData().get(targetLabelChoiceBox.getSelectionModel().getSelectedItem().toString()).getPlotData().)
+            }
+
+        }
+        matchingTableView.getItems().setAll(data);
+    }
+
     private void populateReferenceMachineChoiceBox(Map<String, MachineData> plotContent) {
 
-        referenceMachineChoiceBox.setItems(FXCollections.observableArrayList("dada", "dadad"));
+        referenceMachineChoiceBox.setItems(FXCollections.observableArrayList(plotContent.keySet()));
+        referenceMachineChoiceBox.getSelectionModel().selectFirst();
+    }
 
+    private void populateTargetLabelChoiceBox(Map<String, ProfileData> plotContent) {
+
+        targetLabelChoiceBox.setItems(FXCollections.observableArrayList(plotContent.keySet()));
+        targetLabelChoiceBox.getSelectionModel().selectFirst();
+    }
+
+    private void populateApertureChoiceBox() {
+
+        apertureChoiceBox.setItems(FXCollections.observableArrayList(APERTURE_TYPE));
+        apertureChoiceBox.getSelectionModel().selectFirst();
+    }
+
+    private void populateMatchingTypeMachineChoiceBox() {
+
+        matchingTypeMachineChoiceBox.setItems(FXCollections.observableArrayList(MATCHING_TYPE));
+        matchingTypeMachineChoiceBox.getSelectionModel().selectFirst();
     }
 
     private static void configureFileChooser(final FileChooser fileChooser) {
@@ -183,10 +255,6 @@ public class MultiYieldStarQualificationController extends Application implement
             waferPlot.addField(plotData.get(i).getFieldPositionX(), plotData.get(i).getFieldPositionY(), 20, 20, 0, 0);
 
         }
-    }
-
-    public void setPlaceholderLabel(final String text) {
-
     }
 
     public AnchorPane getMYSQModuleView() throws IOException {
