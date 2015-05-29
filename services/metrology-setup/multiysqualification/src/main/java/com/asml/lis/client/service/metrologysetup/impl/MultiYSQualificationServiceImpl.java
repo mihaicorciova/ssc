@@ -56,9 +56,9 @@ public class MultiYSQualificationServiceImpl implements MultiYSQualificationServ
                                         && pdt.getPlotData().get(i).getFieldPositionX() == wf.getMeasurements().get(i).getFieldPosition().getX()
                                         && pdt.getPlotData().get(i).getFieldPositionY() == wf.getMeasurements().get(i).getFieldPosition().getY()
                                         && pdt.getPlotData().get(i).getAperture().equals(wf.getMeasurements().get(i).getTargetRotation().toString())) {
-                                    pl.add(new PlotData(wf.getMeasurements().get(i).getTargetRotation().toString(), wf.getMeasurements().get(i).getFieldPosition().getX(), wf.getMeasurements().get(i).getFieldPosition().getY(), wf.getMeasurements().get(i).getTargetPosition().getX(), wf.getMeasurements().get(i).getTargetPosition().getY(), (pdt.getNoComponentFiles()*pdt.getPlotData().get(i).getOverlayX()+ wf.getMeasurements().get(i).getOverlay().getX())/ (pdt.getNoComponentFiles()+1),(pdt.getNoComponentFiles()*pdt.getPlotData().get(i).getOverlayY()+ wf.getMeasurements().get(i).getOverlay().getY())/ (pdt.getNoComponentFiles()+1)));
+                                    pl.add(new PlotData(wf.getMeasurements().get(i).getTargetRotation(), wf.getMeasurements().get(i).getFieldPosition().getX(), wf.getMeasurements().get(i).getFieldPosition().getY(), wf.getMeasurements().get(i).getTargetPosition().getX(), wf.getMeasurements().get(i).getTargetPosition().getY(), (pdt.getNoComponentFiles()*pdt.getPlotData().get(i).getOverlayX()+ wf.getMeasurements().get(i).getOverlay().getX())/ (pdt.getNoComponentFiles()+1),(pdt.getNoComponentFiles()*pdt.getPlotData().get(i).getOverlayY()+ wf.getMeasurements().get(i).getOverlay().getY())/ (pdt.getNoComponentFiles()+1)));
                                 } else {
-                                    pl.add(new PlotData(wf.getMeasurements().get(i).getTargetRotation().toString(), wf.getMeasurements().get(i).getFieldPosition().getX(), wf.getMeasurements().get(i).getFieldPosition().getY(), wf.getMeasurements().get(i).getTargetPosition().getX(), wf.getMeasurements().get(i).getTargetPosition().getY(), wf.getMeasurements().get(i).getOverlay().getX(), wf.getMeasurements().get(i).getOverlay().getY()));
+                                    pl.add(new PlotData(wf.getMeasurements().get(i).getTargetRotation(), wf.getMeasurements().get(i).getFieldPosition().getX(), wf.getMeasurements().get(i).getFieldPosition().getY(), wf.getMeasurements().get(i).getTargetPosition().getX(), wf.getMeasurements().get(i).getTargetPosition().getY(), wf.getMeasurements().get(i).getOverlay().getX(), wf.getMeasurements().get(i).getOverlay().getY()));
                                 }
                             }
                             pdt.setPlotData(pl);
@@ -66,7 +66,7 @@ public class MultiYSQualificationServiceImpl implements MultiYSQualificationServ
                             
                         } else {
                             for (XmlMeasurement ms : wf.getMeasurements()) {
-                                pl.add(new PlotData(ms.getTargetRotation().toString(), ms.getFieldPosition().getX(), ms.getFieldPosition().getY(), ms.getTargetPosition().getX(), ms.getTargetPosition().getY(), ms.getOverlay().getX(), ms.getOverlay().getY()));
+                                pl.add(new PlotData(ms.getTargetRotation(), ms.getFieldPosition().getX(), ms.getFieldPosition().getY(), ms.getTargetPosition().getX(), ms.getTargetPosition().getY(), ms.getOverlay().getX(), ms.getOverlay().getY()));
                             }
                             pd.put(wf.getMeasurements().get(0).getTargetLabel(), new ProfileData(1, wf.getMeasurements().get(0).getTargetLabel(), pl));
                             
@@ -78,7 +78,7 @@ public class MultiYSQualificationServiceImpl implements MultiYSQualificationServ
                 } else {
                     for (XmlMetrologyWafer wf : xml.getWafers()) {
                         for (XmlMeasurement ms : wf.getMeasurements()) {
-                            pl.add(new PlotData(ms.getTargetRotation().toString(), ms.getFieldPosition().getX(), ms.getFieldPosition().getY(), ms.getTargetPosition().getX(), ms.getTargetPosition().getY(), ms.getOverlay().getX(), ms.getOverlay().getY()));
+                            pl.add(new PlotData(ms.getTargetRotation(), ms.getFieldPosition().getX(), ms.getFieldPosition().getY(), ms.getTargetPosition().getX(), ms.getTargetPosition().getY(), ms.getOverlay().getX(), ms.getOverlay().getY()));
                         }
                         pd.put(wf.getMeasurements().get(0).getTargetLabel(), new ProfileData(1, wf.getMeasurements().get(0).getTargetLabel(), pl));
                         pl = new ArrayList();

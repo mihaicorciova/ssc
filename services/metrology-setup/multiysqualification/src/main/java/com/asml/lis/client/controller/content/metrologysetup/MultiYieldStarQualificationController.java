@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -151,6 +153,38 @@ public class MultiYieldStarQualificationController extends Application implement
 
                         createSwingContent(waferPlotContainer, plotContent);
                         populateMatchingTable(plotContent);
+
+                        referenceMachineChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+                            public void changed(ObservableValue ov, String value, String new_value) {
+                                populateMatchingTable(plotContent);
+                                createSwingContent(waferPlotContainer, plotContent);
+
+                            }
+
+                        }
+                        );
+                        matchingTypeMachineChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+                            public void changed(ObservableValue ov, String value, String new_value) {
+                                populateMatchingTable(plotContent);
+                                createSwingContent(waferPlotContainer, plotContent);
+
+                            }
+
+                        }
+                        );
+
+                        apertureChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+                            public void changed(ObservableValue ov, String value, String new_value) {
+                                populateMatchingTable(plotContent);
+                                createSwingContent(waferPlotContainer, plotContent);
+
+                            }
+
+                        }
+                        );
                     }
                 });
     }
@@ -174,16 +208,60 @@ public class MultiYieldStarQualificationController extends Application implement
         p2PYTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
 
         ObservableList data = FXCollections.observableArrayList();
+        List<PlotData> refpd = new ArrayList<>();
 
+        refpd = plotContent.get(referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString()).getProfileData().get(targetLabelChoiceBox.getSelectionModel().getSelectedItem().toString()).getPlotData();
+        log.debug("Creqate table" + referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString());
         for (Map.Entry<String, MachineData> entry : plotContent.entrySet()) {
+
             if (entry.getKey().equalsIgnoreCase(referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString())) {
+
                 data.add(new GenericModel(entry.getKey(), "REF", "REF", "REF", "REF"));
             } else {
-                data.add(new GenericModel(entry.getKey(), "0", "0", "0", "0"));
+
+                List<Double> dovx = new ArrayList<>();
+                List<Double> dovy = new ArrayList<>();
+                Double sumx = 0d;
+                Double sumy = 0d;
+                Double tempx = 0d;
+                Double tempy = 0d;
+
+                List<PlotData> pd = entry.getValue().getProfileData().get(targetLabelChoiceBox.getSelectionModel().getSelectedItem().toString()).getPlotData();
+
+                for (int i = 0; i < pd.size(); i++) {
+                    if (apertureChoiceBox.getSelectionModel().getSelectedItem().toString().startsWith(String.valueOf(pd.get(i).getAperture().intValue()))) {
+                        sumx += refpd.get(i).getOverlayX() - pd.get(i).getOverlayX();
+                        sumy += refpd.get(i).getOverlayY() - pd.get(i).getOverlayY();
+                        dovx.add(Math.abs(refpd.get(i).getOverlayX() - pd.get(i).getOverlayX()));
+                        dovy.add(Math.abs(refpd.get(i).getOverlayY() - pd.get(i).getOverlayY()));
+                    }
+                }
+                Collections.sort(dovx);
+                Collections.sort(dovy);
+                if (dovx.size() > 0) {
+                    if (matchingTypeMachineChoiceBox.getSelectionModel().getSelectedItem().toString().contains("Abs")) {
+
+                        for (int i = 0; i < dovx.size(); i++) {
+                            tempx += (Math.abs(sumx / dovx.size()) - dovx.get(i)) * (Math.abs(sumx / dovx.size()) - dovx.get(i)) / dovx.size();
+                            tempy += (Math.abs(sumy / dovx.size()) - dovy.get(i)) * (Math.abs(sumy / dovx.size()) - dovy.get(i)) / dovx.size();
+
+                        }
+
+                        data.add(new GenericModel(entry.getKey(), String.valueOf(Math.abs(sumx / pd.size()) + 3 * Math.sqrt(tempx)), dovx.get(dovx.size() - 1 - (int) Math.round(dovx.size() * 0.003d)), String.valueOf(Math.abs(sumy / pd.size()) + 3 * Math.sqrt(tempy)), dovy.get(dovy.size() - 1 - (int) Math.round(dovy.size() * 0.003d))));
+                    } else {
+                        data.add(new GenericModel(entry.getKey(), String.valueOf(sumx / pd.size()), dovx.get(dovx.size() - 1 - (int) Math.round(dovx.size() * 0.003d)), String.valueOf(sumy / pd.size()), dovy.get(dovy.size() - 1 - (int) Math.round(dovy.size() * 0.003d))));
+
+                    }
+                }
+                else{
+                data.add(new GenericModel(entry.getKey(), "NaN", "NaN", "NaN", "NaN"));
+                }
             }
 
         }
-        matchingTableView.getItems().setAll(data);
+
+        matchingTableView.setItems(data);
+
     }
 
     private void populateReferenceMachineChoiceBox(Map<String, MachineData> plotContent) {
@@ -224,20 +302,19 @@ public class MultiYieldStarQualificationController extends Application implement
                 log.debug("Creating Swing content");
 
                 final DatasetSelector dsSel = new DatasetSelector();
-                for (String key : plotContent.keySet()) {
-                    for (String key2 : plotContent.keySet()) {
+                log.debug("Creqate sw" + referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString());
+                for (String key2 : plotContent.keySet()) {
 
-                        if (!key.equals(key2)) {
-                            waferPlot = new VectorWaferPlot("Plot" + key + key2, "nm", true);
-                            waferPlot.resetZoomingAndScalingDelayed();
-                            for (String key3 : plotContent.get(key).getProfileData().keySet()) {
-                                initPlot(plotContent.get(key).getProfileData().get(key3).getPlotData(), plotContent.get(key2).getProfileData().get(key3).getPlotData());
-                            }
-                            waferPlot.addAll();
-                            dsSel.addDatasetSelectorComponent(waferPlot);
+                    if (!key2.equalsIgnoreCase(referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString())) {
+                        waferPlot = new VectorWaferPlot("Plot" + referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString() + key2, "nm", true);
+                        waferPlot.resetZoomingAndScalingDelayed();
+                        for (String key3 : plotContent.get(key2).getProfileData().keySet()) {
+                            initPlot(plotContent.get(referenceMachineChoiceBox.getSelectionModel().getSelectedItem().toString()).getProfileData().get(key3).getPlotData(), plotContent.get(key2).getProfileData().get(key3).getPlotData());
                         }
-
+                        waferPlot.addAll();
+                        dsSel.addDatasetSelectorComponent(waferPlot);
                     }
+
                 }
 
                 dsSel.setPreferredSize(new Dimension(800, 600));
@@ -249,10 +326,11 @@ public class MultiYieldStarQualificationController extends Application implement
     private void initPlot(List<PlotData> plotData, List<PlotData> plotData2) {
 
         for (int i = 0; i < plotData.size(); i++) {
-            waferPlot.addVectorValue(plotData.get(i).getFieldPositionX() + plotData.get(i).getTargetPositionX(), plotData.get(i).getFieldPositionY() + plotData.get(i).getTargetPositionY(), plotData.get(i).getFieldPositionX() + plotData.get(i).getTargetPositionX(), plotData.get(i).getFieldPositionY() + plotData.get(i).getTargetPositionY(), plotData.get(i).getOverlayX() - plotData2.get(i).getOverlayX(), plotData.get(i).getOverlayY() - plotData2.get(i).getOverlayY(), true);
+            if (apertureChoiceBox.getSelectionModel().getSelectedItem().toString().startsWith(String.valueOf(plotData.get(i).getAperture().intValue()))) {
+                waferPlot.addVectorValue(plotData.get(i).getFieldPositionX() + plotData.get(i).getTargetPositionX(), plotData.get(i).getFieldPositionY() + plotData.get(i).getTargetPositionY(), plotData.get(i).getFieldPositionX() + plotData.get(i).getTargetPositionX(), plotData.get(i).getFieldPositionY() + plotData.get(i).getTargetPositionY(), plotData.get(i).getOverlayX() - plotData2.get(i).getOverlayX(), plotData.get(i).getOverlayY() - plotData2.get(i).getOverlayY(), true);
 
-            waferPlot.addField(plotData.get(i).getFieldPositionX(), plotData.get(i).getFieldPositionY(), 20, 20, 0, 0);
-
+                waferPlot.addField(plotData.get(i).getFieldPositionX(), plotData.get(i).getFieldPositionY(), 20, 20, 0, 0);
+            }
         }
     }
 

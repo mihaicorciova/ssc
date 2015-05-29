@@ -11,7 +11,7 @@ package com.asml.lis.client.service.metrologysetup.model;
  */
 public class PlotData {
 
-    private final String aperture;
+    private final Double aperture;
     private final Double fieldPositionX;
     private final Double fieldPositionY;
     private final Double targetPositionX;
@@ -43,11 +43,11 @@ public class PlotData {
         return overlayY;
     }
 
-    public String getAperture() {
+    public Double getAperture() {
         return aperture;
     }
 
-    public PlotData(final String aperture, final Double fieldPositionX, final Double fieldPositionY, final Double targetPositionX, final Double targetPositionY, final Double overlayX, final Double overlayY) {
+    public PlotData(final Double aperture, final Double fieldPositionX, final Double fieldPositionY, final Double targetPositionX, final Double targetPositionY, final Double overlayX, final Double overlayY) {
         this.aperture = aperture;
         this.fieldPositionX = fieldPositionX;
         this.fieldPositionY = fieldPositionY;
