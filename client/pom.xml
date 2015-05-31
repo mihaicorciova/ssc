@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.asml.wfa.applications.lis</groupId>
-        <artifactId>lis-parent</artifactId>
+        <groupId>com.ro.ssc.app</groupId>
+        <artifactId>ssc-app-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>client</artifactId>
@@ -16,7 +16,7 @@
 
     <organization>
         <!-- Used as the 'Vendor' for JNLP generation -->
-        <name>ASML</name>
+        <name>SSC.RO</name>
     </organization>
 
     <properties>
@@ -78,16 +78,13 @@
 
 
     <dependencies>
-        <!-- Logging -->
-        
+       
         
         <dependency>
-            <groupId>com.asml.wfa.applications.lis</groupId>
-            <artifactId>multiysqualification</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
         </dependency>
-
+         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
