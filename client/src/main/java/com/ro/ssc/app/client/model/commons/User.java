@@ -1,6 +1,6 @@
 package com.ro.ssc.app.client.model.commons;
 
-import com.ro.ssc.app.client.model.commons.enums.UserProfileType;
+import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -10,96 +10,58 @@ import javafx.beans.property.StringProperty;
  */
 public class User {
 
-    private StringProperty username;
-    private StringProperty firstName;
-    private StringProperty lastName;
-    private UserProfileType profile;
-    private StringProperty email;
+    String name;
+    String userId;
+    String cardNo;
+    String department;
+    List<Event> events;
 
-    /**
-     *
-     * @param pUsername username
-     * @param pFirstName first name
-     * @param pLastName last name
-     * @param pProfile user profile
-     * @param pEmail email
-     */
-    public User(final String pUsername, final String pFirstName, final String pLastName, final UserProfileType pProfile, final String pEmail) {
-        username = new SimpleStringProperty(pUsername);
-        firstName = new SimpleStringProperty(pFirstName);
-        lastName = new SimpleStringProperty(pLastName);
-        profile = pProfile;
-        email = new SimpleStringProperty(pEmail);
+    public User(String name, String userId, String cardNo, String department, List<Event> events) {
+        this.name = name;
+        this.userId = userId;
+        this.cardNo = cardNo;
+        this.events = events;
+        this.department = department;
     }
 
-    /**
-     * @return username
-     */
-    public StringProperty getUsername() {
-        return username;
+    public String getDepartment() {
+        return department;
     }
 
-    /**
-     * @param pUsername username
-     */
-    public void setUsername(final StringProperty pUsername) {
-        username = pUsername;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
-    /**
-     * @return first name
-     */
-    public StringProperty getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    /**
-     * @param pName first name
-     */
-    public void setFirstName(final StringProperty pName) {
-        firstName = pName;
+    public String getUserId() {
+        return userId;
     }
 
-    /**
-     * @return last name
-     */
-    public StringProperty getLastName() {
-        return lastName;
+    public String getCardNo() {
+        return cardNo;
     }
 
-    /**
-     * @param pName last name
-     */
-    public void setLastName(final StringProperty pName) {
-        lastName = pName;
+    public List<Event> getEvents() {
+        return events;
     }
 
-    /**
-     * @return user profile
-     */
-    public UserProfileType getProfile() {
-        return profile;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    /**
-     * @param profile user profile
-     */
-    public void setProfile(final UserProfileType profile) {
-        this.profile = profile;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    /**
-     * @return email
-     */
-    public StringProperty getEmail() {
-        return email;
+    public void setCardNo(String cardNo) {
+        this.cardNo = cardNo;
     }
 
-    /**
-     * @param pEmail email
-     */
-    public void setEmail(final StringProperty pEmail) {
-        email = pEmail;
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 
 }

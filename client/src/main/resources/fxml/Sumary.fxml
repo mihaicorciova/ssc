@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" fx:id="sumaryAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.sumary.SumaryController">
+    <children>
+        <Button fx:id="selectButton" layoutX="29.0" layoutY="32.0" mnemonicParsing="false" text="Selectie fisier" />
+        <ListView fx:id="filesListView" layoutX="29.0" layoutY="76.0" prefHeight="72.0" prefWidth="187.0" />
+        <TableView fx:id="sumaryTableView" layoutX="29.0" layoutY="162.0" prefHeight="200.0" prefWidth="717.0">
+            <columns>
+                <TableColumn fx:id="dateTableColumn" prefWidth="92.0" text="Data" />
+                <TableColumn fx:id="hourTableColumn" prefWidth="87.0" text="Ora" />
+                <TableColumn fx:id="nameTableColumn" prefWidth="118.0" text="Nume" />
+                <TableColumn fx:id="cardNoTableColumn" prefWidth="113.0" text="Nr Card" />
+                <TableColumn fx:id="departmentTableColumn" prefWidth="127.0" text="Departament" />
+                <TableColumn fx:id="eventTableColumn" minWidth="6.0" prefWidth="115.0" text="Eveniment" />
+                <TableColumn fx:id="statusTableColumn" minWidth="0.0" prefWidth="64.0" text="Status" />
+            </columns>
+            <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+        </TableView>
+    </children>
+</AnchorPane>

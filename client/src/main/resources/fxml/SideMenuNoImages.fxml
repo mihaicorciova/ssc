@@ -14,13 +14,13 @@
 <AnchorPane prefHeight="592.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.sidemenu.SideMenuNoImagesController">
     <children>
         <AnchorPane prefHeight="20.0" prefWidth="200.0" style="-fx-background-color: #86CEF4;">
-         <children>
-            <Label layoutX="54.0" text="Soft Pontaj" textFill="#515151">
-               <font>
-                  <Font name="System Bold" size="19.0" />
-               </font>
-            </Label>
-         </children>
+            <children>
+                <Label layoutX="54.0" text="Soft Pontaj" textFill="#515151">
+                    <font>
+                        <Font name="System Bold" size="19.0" />
+                    </font>
+                </Label>
+            </children>
         </AnchorPane>
         <AnchorPane layoutY="28.0" prefHeight="90.0" prefWidth="200.0" style="-fx-background-color: light-gray;">
             <children>

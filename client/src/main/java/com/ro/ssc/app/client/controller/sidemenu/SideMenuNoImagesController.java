@@ -1,6 +1,7 @@
 package com.ro.ssc.app.client.controller.sidemenu;
 
 import com.ro.ssc.app.client.controller.MainController;
+import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +13,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -58,24 +60,29 @@ public class SideMenuNoImagesController implements Initializable {
         navigationTree.getRoot().getChildren().stream().forEach((item) -> {
             item.setExpanded(true);
         });
-final Timeline digitalTime = new Timeline(
-      new KeyFrame(Duration.seconds(0),
-        new EventHandler<ActionEvent>() {
-          @Override public void handle(ActionEvent actionEvent) {
-           dateSideMenuLabel.setText(DateTime.now().toLocalDate().toString());
-        timeSideMenuLabel.setText(DateTime.now().toLocalTime().toString());
-          }
-        }
-      ),
-      new KeyFrame(Duration.seconds(5))
-    );
-  digitalTime.setCycleCount(Animation.INDEFINITE);
- digitalTime.play();
-        
+        final Timeline digitalTime = new Timeline(
+                new KeyFrame(Duration.seconds(0),
+                        new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent actionEvent) {
+                                dateSideMenuLabel.setText(DateTime.now().toLocalDate().toString());
+                                timeSideMenuLabel.setText(DateTime.now().toLocalTime().toString());
+                            }
+                        }
+                ),
+                new KeyFrame(Duration.seconds(5))
+        );
+        digitalTime.setCycleCount(Animation.INDEFINITE);
+        digitalTime.play();
+
         // add side menu listener
         navigationTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             log.debug("Clicked on " + newValue.getValue());
-            mainController.handleMYSQViewLaunch();
+            try {
+                mainController.handleSumaryViewLaunch();
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 
