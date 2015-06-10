@@ -73,7 +73,13 @@
                 <version>${joda.version}</version>
             </dependency>
        
-            <dependency>
+           <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.9</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-contrib</artifactId>
                 <version>3.12</version>

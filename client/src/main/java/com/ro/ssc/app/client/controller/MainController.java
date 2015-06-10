@@ -1,6 +1,7 @@
 package com.ro.ssc.app.client.controller;
 
 import com.ro.ssc.app.client.controller.sidemenu.SideMenuNoImagesController;
+import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,7 +22,7 @@ public class MainController implements Initializable {
     private static final String MENU_LAYOUT_FILE = "/fxml/Menu.fxml";
     private static final String SIDE_MENU_LAYOUT_FILE = "/fxml/SideMenuNoImages.fxml";
     private static final String STATUS_BAR_LAYOUT_FILE = "/fxml/StatusBar.fxml";
-
+    private static final String SUMARY_FILE = "/fxml/Sumary.fxml";
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
@@ -38,7 +39,7 @@ public class MainController implements Initializable {
     @FXML
     private AnchorPane contentTabPane;
 
-    private AnchorPane mysqView;
+    private AnchorPane sumaryPane;
     // controllers
 
     @Override
@@ -87,8 +88,16 @@ public class MainController implements Initializable {
         return contentTabPane;
     }
 
-    public void handleMYSQViewLaunch() {
-        contentContainer.getChildren().setAll(mysqView);
+    public void handleSumaryViewLaunch() throws IOException {
+
+        // load side menu
+        final FXMLLoader sumaryPaneLoader = new FXMLLoader();
+        sumaryPane = sumaryPaneLoader.load(getClass().getResourceAsStream(SUMARY_FILE));
+        AnchorPane.setLeftAnchor(sumaryPane, 0.0);
+        AnchorPane.setTopAnchor(sumaryPane, 0.0);
+        AnchorPane.setRightAnchor(sumaryPane, 0.0);
+        AnchorPane.setBottomAnchor(sumaryPane, 0.0);
+                contentContainer.getChildren().setAll(sumaryPane);
     }
 
 }

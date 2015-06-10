@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Catalin Tudorache <catalin.tudorache@asml.com>
+ * @author DauBufu
  */
 public class StatusBarController implements Initializable {
 

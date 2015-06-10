@@ -1,9 +1,6 @@
 package com.ro.ssc.app.client.controller.startpage;
 
 import com.ro.ssc.app.client.model.commons.User;
-import com.ro.ssc.app.client.model.commons.enums.UserProfileType;
-import com.ro.ssc.app.client.services.ProjectService;
-import com.ro.ssc.app.client.services.impl.ProjectServiceImpl;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Catalin Tudorache <catalin.tudorache@asml.com>
+ * @author DauBufu
  */
 public class StartPageController implements Initializable {
 
@@ -44,9 +41,6 @@ public class StartPageController implements Initializable {
         // load menu
         loadMenu();
 
-        // load dashboard view
-        loadProjects();
-
         // TODO: recent projects should contain custom components
     }
 
@@ -60,12 +54,6 @@ public class StartPageController implements Initializable {
         } catch (IOException ex) {
             log.error("Failed to load Dashboard menu", ex);
         }
-    }
-
-    private void loadProjects() {
-        final User user = new User("john.doe", "John", "Doe", UserProfileType.PROCESS_ENGINEER, "john.doe@asml.com");
-        final ProjectService projectService = new ProjectServiceImpl();
-        final ObservableList<String> userProjects = projectService.getProjectsByUser(user);
     }
 
     /**
