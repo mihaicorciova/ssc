@@ -12,11 +12,15 @@ import com.ro.ssc.app.client.model.commons.User;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -69,9 +73,7 @@ public class SumaryController implements Initializable {
     private TableColumn<GenericModel, Object> departmentTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> eventTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> statusTableColumn;
-
+    
     /**
      * Initializes the controller class.
      *
@@ -128,12 +130,26 @@ public class SumaryController implements Initializable {
         cardNoTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
         departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         eventTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
-        statusTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
-
+        
+        dateTableColumn.setStyle("-fx-alignment:CENTER;");
+        hourTableColumn.setStyle("-fx-alignment:CENTER;");
+        nameTableColumn.setStyle("-fx-alignment:CENTER;");
+        cardNoTableColumn.setStyle("-fx-alignment:CENTER;");
+        departmentTableColumn.setStyle("-fx-alignment:CENTER;");
+        eventTableColumn.setStyle("-fx-alignment:CENTER;");
+        
+        DateTimeFormatter dtf =  DateTimeFormat.forPattern("HH:mm:ss");
+         DateTimeFormatter dtf2 =  DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+         DecimalFormat df = new DecimalFormat();
+         
         ObservableList data = FXCollections.observableArrayList();
         for (Map.Entry<String, User> entry : pair.entrySet()) {
             for (Event ev : entry.getValue().getEvents()) {
-                data.add(new GenericModel(ev.getEventDateTime().toDate(), ev.getEventDateTime().toLocalTime(), entry.getValue().getName(), entry.getValue().getCardNo(), entry.getValue().getDepartment(), ev.getDescription(), ev.getPassed()));
+                try {
+                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In")?"Intrare":"Iesire"));
+                } catch (ParseException ex) {
+                    java.util.logging.Logger.getLogger(SumaryController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         sumaryTableView.getItems().setAll(data);
