@@ -32,12 +32,17 @@ import org.slf4j.LoggerFactory;
  */
 
 
-public class DataProviderImpl implements DataProvider {
+public enum DataProviderImpl implements DataProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(DataProviderImpl.class);
-    private Map<String, User> userData;
+    
+    
+    
+     INSTANCE {
+         private Map<String, User> userData;
+      private  final Logger log = LoggerFactory.getLogger(DataProviderImpl.class);
+     
 
-    @Override
+         @Override
     public Map<String, User> getUserData() {
         return userData;
     }
@@ -101,4 +106,23 @@ public class DataProviderImpl implements DataProvider {
         }
         return result;
     }
+
+         @Override
+         public void enrichUserData(String location) {
+         readMSAccessFile(location); 
+         }
+
+         private void readMSAccessFile(String location) {
+             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+         }
+
+     
+            };
+     
+     public static DataProvider getInstance() {
+    return DataProviderImpl.INSTANCE;
 }
+   
+
+}
+

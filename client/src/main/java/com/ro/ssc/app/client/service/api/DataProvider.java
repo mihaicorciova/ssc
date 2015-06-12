@@ -19,5 +19,7 @@ public interface DataProvider {
     public Map<String, User> getUserData();
 
     public void importUserData(File file);
+    
+    public void enrichUserData(String location);
 
 }

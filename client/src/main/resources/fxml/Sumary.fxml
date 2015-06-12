@@ -17,7 +17,7 @@
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="291.0" minHeight="10.0" prefHeight="86.0" vgrow="NEVER" />
-          <RowConstraints maxHeight="531.0" minHeight="10.0" prefHeight="514.0" valignment="CENTER" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="1200.0" minHeight="10.0" prefHeight="514.0" valignment="CENTER" vgrow="ALWAYS" />
         </rowConstraints>
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0">
@@ -34,7 +34,7 @@
                   </ListView>
                </children>
             </HBox>
-              <TableView fx:id="sumaryTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="392.0" prefWidth="679.0" GridPane.rowIndex="1">
+              <TableView fx:id="sumaryTableView" prefHeight="392.0" prefWidth="679.0" GridPane.rowIndex="1">
                   <columns>
                       <TableColumn fx:id="dateTableColumn" prefWidth="92.0" text="Data" />
                       <TableColumn fx:id="hourTableColumn" prefWidth="87.0" text="Ora" />

@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 public class SumaryController implements Initializable {
 
     private static final Logger log = LoggerFactory.getLogger(SumaryController.class);
-
     @FXML
     private Button selectButton;
     @FXML
@@ -63,10 +62,8 @@ public class SumaryController implements Initializable {
     private TableColumn<GenericModel, Object> departmentTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> eventTableColumn;
-    @Inject
-    private DataProviderImpl service;
-    
-    
+
+
     /**
      * Initializes the controller class.
      *
@@ -78,28 +75,21 @@ public class SumaryController implements Initializable {
         log.info("Initializing Sumary controller");
 
         final FileChooser fileChooser = new FileChooser();
-        
-        service=new DataProviderImpl();
 
+      
         selectButton.setOnAction(
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(final ActionEvent e) {
                         configureFileChooser(fileChooser);
                         List<File> files = fileChooser.showOpenMultipleDialog(selectButton.getContextMenu());
-
-                        // populate selected files list view
                         populateListView(files);
 
-                        // parse file   
-                        //      
                         for (File file : files) {
-
-                           service.importUserData(file);
+                            DataProviderImpl.getInstance().importUserData(file);
                         }
-
-                        if (!service.getUserData().isEmpty()) {
-                            populateMyTable(service.getUserData());
+                        if (! DataProviderImpl.getInstance().getUserData().isEmpty()) {
+                            populateMyTable( DataProviderImpl.getInstance().getUserData());
                             log.debug("not emp");
                         }
                     }
@@ -117,7 +107,7 @@ public class SumaryController implements Initializable {
 
     }
 
-    public void populateMyTable( Map<String, User> pair ) {
+    public void populateMyTable(Map<String, User> pair) {
 
         dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         hourTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
@@ -125,23 +115,23 @@ public class SumaryController implements Initializable {
         cardNoTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
         departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         eventTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
-        
+
         dateTableColumn.setStyle("-fx-alignment:CENTER;");
         hourTableColumn.setStyle("-fx-alignment:CENTER;");
         nameTableColumn.setStyle("-fx-alignment:CENTER;");
         cardNoTableColumn.setStyle("-fx-alignment:CENTER;");
         departmentTableColumn.setStyle("-fx-alignment:CENTER;");
         eventTableColumn.setStyle("-fx-alignment:CENTER;");
-        
-        DateTimeFormatter dtf =  DateTimeFormat.forPattern("HH:mm:ss");
-         DateTimeFormatter dtf2 =  DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
-         DecimalFormat df = new DecimalFormat();
-         
+
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
+        DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+        DecimalFormat df = new DecimalFormat();
+
         ObservableList data = FXCollections.observableArrayList();
         for (Map.Entry<String, User> entry : pair.entrySet()) {
             for (Event ev : entry.getValue().getEvents()) {
                 try {
-                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In")?"Intrare":"Iesire"));
+                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
                 } catch (ParseException ex) {
                     java.util.logging.Logger.getLogger(SumaryController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -155,5 +145,8 @@ public class SumaryController implements Initializable {
         fileChooser.setInitialDirectory(
                 new File(System.getProperty("user.home"))
         );
+        FileChooser.ExtensionFilter extFilter
+                = new FileChooser.ExtensionFilter("Excel files (*.xls)", "*.xls");
+        fileChooser.getExtensionFilters().add(extFilter);
     }
 }

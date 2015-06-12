@@ -18,12 +18,21 @@ public class Event {
     String description;
     String addr;
     Boolean passed;
+    Boolean isAccountable;
 
     public Event(DateTime eventDateTime, String description, String addr, Boolean passed) {
         this.eventDateTime = eventDateTime;
         this.description = description;
         this.addr = addr;
         this.passed = passed;
+            }
+
+    public Boolean getIsAccountable() {
+        return isAccountable;
+    }
+
+    public void setIsAccountable(Boolean isAccountable) {
+        this.isAccountable = isAccountable;
     }
 
     public DateTime getEventDateTime() {
