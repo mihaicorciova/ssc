@@ -22,6 +22,8 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * FXML Controller class
@@ -65,8 +67,10 @@ public class SideMenuNoImagesController implements Initializable {
                         new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent actionEvent) {
-                                dateSideMenuLabel.setText(DateTime.now().toLocalDate().toString());
-                                timeSideMenuLabel.setText(DateTime.now().toLocalTime().toString());
+                                DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
+                                DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+                                dateSideMenuLabel.setText(DateTime.now().toLocalDate().toString(dtf2));
+                                timeSideMenuLabel.setText(DateTime.now().toLocalTime().toString(dtf));
                             }
                         }
                 ),
