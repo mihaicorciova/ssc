@@ -20,6 +20,6 @@ public interface DataProvider {
 
     public void importUserData(File file);
     
-    public void enrichUserData(String location);
+    public void enrichUserData(File files);
 
 }

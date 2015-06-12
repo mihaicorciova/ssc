@@ -83,15 +83,24 @@ public class SumaryController implements Initializable {
                     public void handle(final ActionEvent e) {
                         configureFileChooser(fileChooser);
                         List<File> files = fileChooser.showOpenMultipleDialog(selectButton.getContextMenu());
+                       if(files!=null){
                         populateListView(files);
-
+                        
                         for (File file : files) {
+                            if(file.getName().contains("mdb"))
+                            {
+                                DataProviderImpl.getInstance().enrichUserData(file); 
+                            }
+                            else                            {
                             DataProviderImpl.getInstance().importUserData(file);
                         }
+                        }
+                        
                         if (! DataProviderImpl.getInstance().getUserData().isEmpty()) {
                             populateMyTable( DataProviderImpl.getInstance().getUserData());
                             log.debug("not emp");
                         }
+                    }
                     }
                 });
 
@@ -146,7 +155,7 @@ public class SumaryController implements Initializable {
                 new File(System.getProperty("user.home"))
         );
         FileChooser.ExtensionFilter extFilter
-                = new FileChooser.ExtensionFilter("Excel files (*.xls)", "*.xls");
+                = new FileChooser.ExtensionFilter("Files (*.xls,*.mdb)", "*.xls;*.mdb");
         fileChooser.getExtensionFilters().add(extFilter);
     }
 }

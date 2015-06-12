@@ -14,6 +14,9 @@ public class User {
     String userId;
     String cardNo;
     String department;
+
+   
+    Boolean isNghtShift;
     List<Event> events;
 
     public User(String name, String userId, String cardNo, String department, List<Event> events) {
@@ -24,6 +27,14 @@ public class User {
         this.department = department;
     }
 
+    
+     public Boolean getIsNghtShift() {
+        return isNghtShift;
+    }
+
+    public void setIsNghtShift(Boolean isNghtShift) {
+        this.isNghtShift = isNghtShift;
+    }
     public String getDepartment() {
         return department;
     }
