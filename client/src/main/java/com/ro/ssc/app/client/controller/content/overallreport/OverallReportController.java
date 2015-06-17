@@ -15,6 +15,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -111,35 +112,57 @@ public class OverallReportController implements Initializable {
         ObservableList data = FXCollections.observableArrayList();
         for (Map.Entry<String, User> entry : pair.entrySet()) {
             Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
-            List<Event> events = entry.getValue().getEvents();
-            DateTime firstevent = entry.getValue().getEvents().get(0).getEventDateTime();
-            DateTime inevent = null;
-            DateTime outevent = null;
-            Integer k = 0;
+            log.debug("User" + entry.getValue().getName());
+            Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applayExcludeLogic(entry.getValue().getEvents()).get(0));
+            Long tduration = 0l;
+            Long tpause = 0l;
+
+            for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+                List<Event> events = day.getValue();
             Long duration = 0l;
             Long pause = 0l;
-            for (int i = 0; i < events.size(); i++) {
+            log.debug("Duration "+ formatMillis(duration)+ "  Pause "+ formatMillis(pause) +"  after day"+day.getKey().toString());
+                DateTime firstevent = null;
+                if (!events.isEmpty()) {
+                    firstevent = events.get(0).getEventDateTime();
+                    log.debug("First event"+firstevent.toString());
+                
 
-                if (events.get(i).getAddr().contains("In")) {
-                    inevent = events.get(i).getEventDateTime();
-                    if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
-                        pause += events.get(k).getEventDateTime().getMillis() - firstevent.getMillis();
-                    } else {
-                        firstevent = inevent;
+                DateTime inevent = null;
+                DateTime outevent = null;
+                Integer k = 0;
+
+                for (int i = 0; i < events.size(); i++) {
+
+                    if (events.get(i).getAddr().contains("In")) {
+                        if (inevent != null && outevent != null) {
+                            if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
+                                pause += outevent.getMillis() - inevent.getMillis();
+
+                            } else {
+                                firstevent = inevent;
+                            }
+                        }
+                         
+                        inevent = events.get(i).getEventDateTime();
+   log.debug("In event"+inevent.toString());
+                    } else if (events.get(i).getAddr().contains("Exit")) {
+
+                        if (inevent != null) {
+                            duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
+
+                            outevent = events.get(i).getEventDateTime();
+                            log.debug("In event"+outevent.toString());
+                        }
+
                     }
-                } else if (events.get(i).getAddr().contains("Exit")) {
-
-                    if (events.get(i + 1).getAddr().contains("Exit")) {
-                        i++;
-                    } else if (inevent != null) {
-                        duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
-                        k = i;
-                    }
-
                 }
+                }
+                log.debug("Duration "+ formatMillis(duration)+ "  Pause "+ formatMillis(pause) +"  after day"+day.getKey().toString());
+                tduration+=duration;
+                tpause+=pause;
             }
-
-            data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(duration), formatMillis(pause), formatMillis(6000000l)));
+            data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration)));
         }
 
         overallReportTableView.getItems().setAll(data);
@@ -152,4 +175,67 @@ public class OverallReportController implements Initializable {
         return hms;
     }
 
+    public List<List<Event>> applayExcludeLogic(List<Event> events) {
+        List<List<Event>> result = new ArrayList<>();
+        List<Event> trimedEvents = new ArrayList<>();
+        List<Event> remainingEvents = new ArrayList<>();
+        Boolean shouldAdd = false;
+        for (int i = 0; i < events.size() - 1; i++) {
+
+            if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
+                shouldAdd = true;
+                trimedEvents.add(events.get(i));
+
+            } else if (events.get(i).getAddr().contains("Exit") && shouldAdd) {
+
+                shouldAdd = false;
+                trimedEvents.add(events.get(i));
+
+            } else {
+                shouldAdd = false;
+                remainingEvents.add(events.get(i));
+                //  log.debug("Adding " + events.get(i).getAddr() + "to rem events");
+            }
+
+        }
+        if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
+
+            shouldAdd = false;
+            trimedEvents.add(events.get(events.size() - 1));
+
+        } else {
+            shouldAdd = false;
+            remainingEvents.add(events.get(events.size() - 1));
+            //  log.debug("Adding " + events.get(events.size() - 1).getAddr() + "to rem events");
+        }
+
+        result.add(trimedEvents);
+        result.add(remainingEvents);
+        return result;
+    }
+
+    public Map<DateTime, List<Event>> splitPerDay(List<Event> events) {
+        Map<DateTime, List<Event>> result = new HashMap<>();
+        List<Event> perDayList = new ArrayList<>();
+        if (!events.isEmpty())
+        {
+        DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+        for (Event ev : events) {
+            if (ev.getEventDateTime().isAfter(dt)) {
+
+                result.put(dt.minusDays(1), perDayList);
+                dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+                perDayList=null;
+                perDayList = new ArrayList<>();
+                perDayList.add(ev);
+
+            } else {
+                perDayList.add(ev);
+
+            }
+        }
+        result.put(dt.minusDays(1),perDayList);
+        }
+        return result;
+    }
 }
