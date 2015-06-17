@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -77,7 +78,7 @@ public class ExcelReader {
                             result.get(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString()).setEvents(events);
                            
                         } else {
-
+                            events = new ArrayList();
                             events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString(), Boolean.valueOf(row.getCell(ExcelEnum.PASSED.getAsInteger()).toString())));
                             result.put(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString(), new User(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().toLowerCase(), row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString(), row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString(), row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString(), events));
                         }
@@ -91,4 +92,6 @@ public class ExcelReader {
         }
         return result;
     }
+    
+   
 }

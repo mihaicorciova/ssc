@@ -82,11 +82,21 @@ public class SideMenuNoImagesController implements Initializable {
         // add side menu listener
         navigationTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             log.debug("Clicked on " + newValue.getValue());
-            try {
+            switch(newValue.getValue()){
+           case "Sumar" : try {
                 mainController.handleSumaryViewLaunch();
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
             }
+            break;
+           case "Raport Cumulativ" :  try {
+                mainController.handleOverallReportViewLaunch();
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           break;
+            }
+           
         });
     }
 

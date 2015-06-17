@@ -6,7 +6,6 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.MenuBar;
 import javafx.scene.layout.AnchorPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ public class MainController implements Initializable {
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
     // main component fxml files
-    private static final String MENU_LAYOUT_FILE = "/fxml/Menu.fxml";
+    private static final String OVERALLREPORT_LAYOUT_FILE = "/fxml/OverallReport.fxml";
     private static final String SIDE_MENU_LAYOUT_FILE = "/fxml/SideMenuNoImages.fxml";
     private static final String STATUS_BAR_LAYOUT_FILE = "/fxml/StatusBar.fxml";
     private static final String SUMARY_FILE = "/fxml/Sumary.fxml";
@@ -28,8 +27,6 @@ public class MainController implements Initializable {
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
 
     // main content containers
-    @FXML
-    private AnchorPane menuContainer;
     @FXML
     private AnchorPane sideMenuContainer;
     @FXML
@@ -40,6 +37,8 @@ public class MainController implements Initializable {
     private AnchorPane contentTabPane;
 
     private AnchorPane sumaryPane;
+
+    private AnchorPane overallReportPane;
     // controllers
 
     @Override
@@ -48,13 +47,6 @@ public class MainController implements Initializable {
 
         // load components
         try {
-
-            // load menu
-            final FXMLLoader menuLoader = new FXMLLoader();
-            final MenuBar menuBar = menuLoader.load(getClass().getResourceAsStream(MENU_LAYOUT_FILE));
-            AnchorPane.setLeftAnchor(menuBar, 0.0);
-            AnchorPane.setRightAnchor(menuBar, 0.0);
-            menuContainer.getChildren().add(menuBar);
 
             // load side menu
             final FXMLLoader sideMenuLoader = new FXMLLoader();
@@ -91,13 +83,28 @@ public class MainController implements Initializable {
     public void handleSumaryViewLaunch() throws IOException {
 
         // load side menu
-        final FXMLLoader sumaryPaneLoader = new FXMLLoader();
-        sumaryPane = sumaryPaneLoader.load(getClass().getResourceAsStream(SUMARY_FILE));
-        AnchorPane.setLeftAnchor(sumaryPane, 0.0);
-        AnchorPane.setTopAnchor(sumaryPane, 0.0);
-        AnchorPane.setRightAnchor(sumaryPane, 0.0);
-        AnchorPane.setBottomAnchor(sumaryPane, 0.0);
-                contentContainer.getChildren().setAll(sumaryPane);
+        if (sumaryPane == null) {
+            final FXMLLoader sumaryPaneLoader = new FXMLLoader();
+            sumaryPane = sumaryPaneLoader.load(getClass().getResourceAsStream(SUMARY_FILE));
+            AnchorPane.setLeftAnchor(sumaryPane, 0.0);
+            AnchorPane.setTopAnchor(sumaryPane, 0.0);
+            AnchorPane.setRightAnchor(sumaryPane, 0.0);
+            AnchorPane.setBottomAnchor(sumaryPane, 0.0);
+        }
+        contentContainer.getChildren().setAll(sumaryPane);
+    }
+
+    public void handleOverallReportViewLaunch() throws IOException {
+        // load side menu
+        if (overallReportPane == null) {
+            final FXMLLoader overallReportPaneLoader = new FXMLLoader();
+            overallReportPane = overallReportPaneLoader.load(getClass().getResourceAsStream(OVERALLREPORT_LAYOUT_FILE));
+            AnchorPane.setLeftAnchor(overallReportPane, 0.0);
+            AnchorPane.setTopAnchor(overallReportPane, 0.0);
+            AnchorPane.setRightAnchor(overallReportPane, 0.0);
+            AnchorPane.setBottomAnchor(overallReportPane, 0.0);
+        }
+        contentContainer.getChildren().setAll(overallReportPane);
     }
 
 }

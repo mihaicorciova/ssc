@@ -14,6 +14,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,8 +139,9 @@ public class SumaryController implements Initializable {
 
         ObservableList data = FXCollections.observableArrayList();
         for (Map.Entry<String, User> entry : pair.entrySet()) {
-            for (Event ev : entry.getValue().getEvents()) {
+                      for (Event ev : entry.getValue().getEvents()) {
                 try {
+                    
                     data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
                 } catch (ParseException ex) {
                     java.util.logging.Logger.getLogger(SumaryController.class.getName()).log(Level.SEVERE, null, ex);
