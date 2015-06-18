@@ -27,15 +27,21 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -72,13 +78,12 @@ public class OverallReportController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(OverallReportController.class);
-    private DateCell iniCell = null;
-    private DateCell endCell = null;
 
     private LocalDate iniDate;
     private LocalDate endDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
-    ;
+    private final org.joda.time.format.DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
+
     @FXML
     private Button exportButton;
     @FXML
@@ -112,6 +117,34 @@ public class OverallReportController implements Initializable {
 
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
+
+            Set<DateTime> set = getSelectionDaysSet(DataProviderImpl.getInstance().getUserData());
+            iniDate = LocalDate.parse(set.iterator().next().toString(dtf), formatter);
+            DateTime last = null;
+            for (DateTime dt : set) {
+                last = dt;
+            }
+            endDate = LocalDate.parse(last.toString(dtf), formatter);
+            iniDatePicker.setValue(iniDate);
+            iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(final ActionEvent e) {
+
+                    iniDate = iniDatePicker.getValue();
+                    populateMyTable(DataProviderImpl.getInstance().getUserData(), iniDate, endDate);
+
+                }
+            });
+            endDatePicker.setValue(endDate);
+            endDatePicker.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(final ActionEvent e) {
+
+                    endDate = endDatePicker.getValue();
+                    populateMyTable(DataProviderImpl.getInstance().getUserData(), iniDate, endDate);
+
+                }
+            });
             populateMyTable(DataProviderImpl.getInstance().getUserData(), iniDate, endDate);
 
             log.debug("not emp");
@@ -157,7 +190,7 @@ public class OverallReportController implements Initializable {
         ObservableList data = FXCollections.observableArrayList();
         for (Map.Entry<String, User> entry : pair.entrySet()) {
             Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
-            log.debug("User" + entry.getValue().getName());
+
             Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(entry.getValue().getEvents()).get(0), iniDate, endDate);
             Long tduration = 0l;
             Long tpause = 0l;
@@ -166,11 +199,9 @@ public class OverallReportController implements Initializable {
                 List<Event> events = day.getValue();
                 Long duration = 0l;
                 Long pause = 0l;
-                log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
                 DateTime firstevent = null;
                 if (!events.isEmpty()) {
                     firstevent = events.get(0).getEventDateTime();
-                    log.debug("First event" + firstevent.toString());
 
                     DateTime inevent = null;
                     DateTime outevent = null;
@@ -189,14 +220,14 @@ public class OverallReportController implements Initializable {
                             }
 
                             inevent = events.get(i).getEventDateTime();
-                            log.debug("In event" + inevent.toString());
+
                         } else if (events.get(i).getAddr().contains("Exit")) {
 
                             if (inevent != null) {
                                 duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
 
                                 outevent = events.get(i).getEventDateTime();
-                                log.debug("In event" + outevent.toString());
+
                             }
 
                         }
@@ -307,8 +338,6 @@ public class OverallReportController implements Initializable {
         if (!events.isEmpty()) {
             DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
 
-           
-
             for (Event ev : events) {
                 if (ev.getEventDateTime().isAfter(dt)) {
 
@@ -324,12 +353,24 @@ public class OverallReportController implements Initializable {
                 }
             }
 
-            if (iniDate != null && endDate != null && dt.minusDays(1).isAfter(DateTime.parse(iniDate.toString())) && dt.minusDays(1).isBefore(DateTime.parse(endDate.toString()))) {
+            if (iniDate != null && endDate != null && dt.minusDays(1).isAfter(DateTime.parse(iniDate.format(formatter), dtf)) && dt.minusDays(1).isBefore(DateTime.parse(endDate.format(formatter), dtf))) {
                 result.put(dt.minusDays(1), perDayList);
             } else if (iniDate == null || endDate == null) {
                 result.put(dt.minusDays(1), perDayList);
             }
         }
+        return result;
+    }
+
+    private Set<DateTime> getSelectionDaysSet(Map<String, User> data) {
+        Set<DateTime> result = new LinkedHashSet<>();
+        for (Map.Entry<String, User> entry : data.entrySet()) {
+            Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+
+            Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(entry.getValue().getEvents()).get(0), null, null);
+            result.addAll(eventsPerDay.keySet());
+        }
+
         return result;
     }
 
