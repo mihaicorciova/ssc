@@ -96,14 +96,14 @@ public class MainController implements Initializable {
 
     public void handleOverallReportViewLaunch() throws IOException {
         // load side menu
-        if (overallReportPane == null) {
+        
             final FXMLLoader overallReportPaneLoader = new FXMLLoader();
             overallReportPane = overallReportPaneLoader.load(getClass().getResourceAsStream(OVERALLREPORT_LAYOUT_FILE));
             AnchorPane.setLeftAnchor(overallReportPane, 0.0);
             AnchorPane.setTopAnchor(overallReportPane, 0.0);
             AnchorPane.setRightAnchor(overallReportPane, 0.0);
             AnchorPane.setBottomAnchor(overallReportPane, 0.0);
-        }
+        
         contentContainer.getChildren().setAll(overallReportPane);
     }
 
