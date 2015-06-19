@@ -71,6 +71,7 @@ public class SideMenuNoImagesController implements Initializable {
                                 DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
                                 dateSideMenuLabel.setText(DateTime.now().toLocalDate().toString(dtf2));
                                 timeSideMenuLabel.setText(DateTime.now().toLocalTime().toString(dtf));
+                                
                             }
                         }
                 ),

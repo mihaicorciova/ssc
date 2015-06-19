@@ -1,6 +1,10 @@
 package com.ro.ssc.app.client.controller;
 
 import com.ro.ssc.app.client.controller.sidemenu.SideMenuNoImagesController;
+import com.ro.ssc.app.client.licensing.LicenseStatus;
+import com.ro.ssc.app.client.licensing.TrialKeyValidator;
+import com.ro.ssc.app.client.model.commons.Configuration;
+import com.ro.ssc.app.client.ui.commons.UiCommonTools;
 import java.io.IOException;
 
 import javafx.fxml.FXML;
@@ -12,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainController implements Initializable {
 
@@ -26,7 +32,7 @@ public class MainController implements Initializable {
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
-
+    private static final Long MILLIS_PER_MINUTE=1000l;
     // main content containers
     @FXML
     private AnchorPane sideMenuContainer;
@@ -36,16 +42,34 @@ public class MainController implements Initializable {
     private AnchorPane statusBarContainer;
     @FXML
     private AnchorPane contentTabPane;
-    
+    private LicenseStatus licenseStatus;
+    private TrialKeyValidator licenseService =new TrialKeyValidator();
     private AnchorPane sumaryPane;
     private AnchorPane overallReportPane;
      private AnchorPane singleReportPane;
     // controllers
 
+      private Timer licenseTimer;
+    private TimerTask licenseRefreshTask = new TimerTask() {
+        @Override
+        public void run() {
+            licenseStatus = licenseService.getLicenseStatus();
+        }
+    };
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info("Initializing main controller");
-
+        
+licenseStatus = licenseService.getLicenseStatus();
+        licenseTimer = new Timer("LicenseCheckThread", true);
+        long interval = Configuration.LICENSE_CHECK_INTERVAL.getAsInteger() * MILLIS_PER_MINUTE;
+        licenseTimer.schedule(licenseRefreshTask, interval, interval);
+        if (licenseStatus.isExpired()) {
+            // don't initialize importing if the license is expired
+            
+           UiCommonTools.getInstance().showInfoDialogStatus("Licenta Expirata", "Data expirarii "+licenseStatus.getExpireDate(), "Va rugam contactati vanzatorul softului.");
+        return;
+        }
         // load components
         try {
 

@@ -247,7 +247,7 @@ public enum DataProviderImpl implements DataProvider {
                         Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
                      
                         for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
-                            List<Event> events = day.getValue();
+                            List<Event> events = applyExcludeLogic(day.getValue()).get(0);
                             Long duration = 0l;
                             Long pause = 0l;
                             DateTime firstevent = null;
@@ -286,7 +286,7 @@ public enum DataProviderImpl implements DataProvider {
                             }
                              log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
                             
-                             data.add(new GenericModel(day.getKey().toString(dtf2), firstevent.toString(dtf), outevent!=null?outevent.toString(dtf):"",formatMillis(duration), formatMillis(pause), formatMillis(pause + duration)));
+                             data.add(new GenericModel(day.getKey().toString(dtf2),firstevent!=null? firstevent.toString(dtf):"", outevent!=null?outevent.toString(dtf):"",formatMillis(duration), formatMillis(pause), formatMillis(pause + duration)));
                 
                         }
                          }

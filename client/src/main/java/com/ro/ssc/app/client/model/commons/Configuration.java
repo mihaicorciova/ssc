@@ -28,7 +28,7 @@ public enum Configuration {
     // license check interval in minutes
     LICENSE_CHECK_INTERVAL(Configuration.NON_CONFIGURABLE, "60"),
     // encrypted expiration date of the application
-    TRIAL_KEY("productivitymonitor.licensing.trialKey", null),
+    TRIAL_KEY("ssc.licensing.trialKey", null),
     // application version (value has to be set by another object)
     VERSION(Configuration.NON_CONFIGURABLE, "2.0");
 
