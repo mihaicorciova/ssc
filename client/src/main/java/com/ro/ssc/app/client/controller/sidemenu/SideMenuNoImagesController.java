@@ -95,6 +95,12 @@ public class SideMenuNoImagesController implements Initializable {
                 java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
             }
            break;
+                case "Raport Individual" :  try {
+                mainController.handleSingleReportViewLaunch();
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           break;
             }
            
         });

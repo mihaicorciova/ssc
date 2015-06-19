@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang.WordUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -71,16 +72,16 @@ public class ExcelReader {
 
                 if (row != null) {
                     try {
-
-                        if (result.containsKey(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString())) {
-                            events = result.get(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString()).getEvents();
+                        String user=WordUtils.capitalizeFully(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString());
+                        if (result.containsKey(user)) {
+                            events = result.get(user).getEvents();
                             events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString(), Boolean.valueOf(row.getCell(ExcelEnum.PASSED.getAsInteger()).toString())));
-                            result.get(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString()).setEvents(events);
+                            result.get(user).setEvents(events);
                            
                         } else {
                             events = new ArrayList();
                             events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString(), Boolean.valueOf(row.getCell(ExcelEnum.PASSED.getAsInteger()).toString())));
-                            result.put(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString(), new User(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().toLowerCase(), row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString(), row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString(), row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString(), events));
+                            result.put(user, new User(user, row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString(), row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString()), events));
                         }
                     } catch (Exception e) {
                         log.error("Exception" + e.getMessage());

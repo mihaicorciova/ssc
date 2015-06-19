@@ -22,6 +22,7 @@ public class MainController implements Initializable {
     private static final String SIDE_MENU_LAYOUT_FILE = "/fxml/SideMenuNoImages.fxml";
     private static final String STATUS_BAR_LAYOUT_FILE = "/fxml/StatusBar.fxml";
     private static final String SUMARY_FILE = "/fxml/Sumary.fxml";
+    private static final String SINGLEREPORT_LAYOUT_FILE="/fxml/SingleReport.fxml";
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
@@ -35,10 +36,10 @@ public class MainController implements Initializable {
     private AnchorPane statusBarContainer;
     @FXML
     private AnchorPane contentTabPane;
-
+    
     private AnchorPane sumaryPane;
-
     private AnchorPane overallReportPane;
+     private AnchorPane singleReportPane;
     // controllers
 
     @Override
@@ -105,6 +106,18 @@ public class MainController implements Initializable {
             AnchorPane.setBottomAnchor(overallReportPane, 0.0);
         
         contentContainer.getChildren().setAll(overallReportPane);
+    }
+
+    public void handleSingleReportViewLaunch() throws IOException {
+       
+            final FXMLLoader singleReportPaneLoader = new FXMLLoader();
+            singleReportPane = singleReportPaneLoader.load(getClass().getResourceAsStream(SINGLEREPORT_LAYOUT_FILE));
+            AnchorPane.setLeftAnchor(singleReportPane, 0.0);
+            AnchorPane.setTopAnchor(singleReportPane, 0.0);
+            AnchorPane.setRightAnchor(singleReportPane, 0.0);
+            AnchorPane.setBottomAnchor(singleReportPane, 0.0);
+        
+        contentContainer.getChildren().setAll(singleReportPane);
     }
 
 }

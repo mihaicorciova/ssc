@@ -5,10 +5,14 @@
  */
 package com.ro.ssc.app.client.service.api;
 
+import com.ro.ssc.app.client.model.commons.Event;
+import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.model.commons.User;
 import java.io.File;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -22,4 +26,15 @@ public interface DataProvider {
     
     public void enrichUserData(File files);
 
+    public List<GenericModel> getTableData (DateTime iniDate,DateTime endDate,String department);
+     
+    public List<GenericModel> getUTableData (String user,DateTime iniDate,DateTime endDate);
+    
+    public DateTime getPossibleDateStart();
+    
+     public DateTime getPossibleDateEnd(); 
+     
+     public List<String> getUsers();
+     
+     public List<String> getDepartments();
 }

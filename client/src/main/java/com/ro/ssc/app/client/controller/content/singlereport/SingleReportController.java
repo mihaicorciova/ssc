@@ -3,73 +3,43 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ro.ssc.app.client.controller.content.overallreport;
+package com.ro.ssc.app.client.controller.content.singlereport;
 
-import com.ro.ssc.app.client.exporter.Column;
-import com.ro.ssc.app.client.exporter.PDFTableGenerator;
-import com.ro.ssc.app.client.exporter.Table;
-import com.ro.ssc.app.client.exporter.TableBuilder;
-import com.ro.ssc.app.client.model.commons.Event;
 import com.ro.ssc.app.client.model.commons.GenericModel;
-import com.ro.ssc.app.client.model.commons.User;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
-import com.sun.javafx.scene.control.skin.DatePickerContent;
-import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
-import javafx.scene.text.Text;
-import javafx.util.StringConverter;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,10 +47,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author DauBufu
  */
-public class OverallReportController implements Initializable {
+public class SingleReportController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
-    private static final Logger log = LoggerFactory.getLogger(OverallReportController.class);
+    private static final Logger log = LoggerFactory.getLogger(SingleReportController.class);
 
     private DateTime iniDate;
     private DateTime endDate;
@@ -88,27 +58,28 @@ public class OverallReportController implements Initializable {
     private final org.joda.time.format.DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
     @FXML
-    private ChoiceBox departmentChoiceBox;
+    private ChoiceBox userChoiceBox;
     @FXML
     private Button exportButton;
     @FXML
     private DatePicker iniDatePicker;
     @FXML
     private DatePicker endDatePicker;
+
     @FXML
-    private ListView filesListView;
-    @FXML
-    private TableView overallReportTableView;
+    private TableView singleReportTableView;
     @FXML
     private TableColumn<GenericModel, Object> offTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> totalTimeTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object> nameTableColumn;
+    private TableColumn<GenericModel, Object> dateTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> workTimeTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object> departmentTableColumn;
+    private TableColumn<GenericModel, Object> entryTimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> exitTimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -141,16 +112,16 @@ public class OverallReportController implements Initializable {
 
                 }
             });
-departmentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            userChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 
                 @Override
                 public void changed(ObservableValue observable, String oldValue, String newValue) {
                     populateMyTable();
                 }
             });
-        
-            departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
-            
+
+            userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
+            userChoiceBox.getSelectionModel().selectFirst();
             iniDate = DataProviderImpl.getInstance().getPossibleDateStart();
             endDate = DataProviderImpl.getInstance().getPossibleDateEnd();
 
@@ -162,31 +133,31 @@ departmentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new C
                 endDatePicker.setValue(LocalDate.parse(endDate.toString(dtf), formatter));
             }
 
-            populateMyTable();
-
         }
 
     }
 
     @FXML
     private void exportTableToPDF() throws IOException, COSVisitorException {
-        exportTableBySnapshoot(overallReportTableView, null);
+        exportTableBySnapshoot(singleReportTableView, null);
     }
 
     public void populateMyTable() {
-        nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
-        departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
-        workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
-        offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
-        totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
 
+        dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
+        entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
+        exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
+        workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
+        offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
+        totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
+        dateTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-        nameTableColumn.setStyle("-fx-alignment:CENTER;");
+        entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-        departmentTableColumn.setStyle("-fx-alignment:CENTER;");
+        exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
-        overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getTableData(iniDate, endDate,departmentChoiceBox.getSelectionModel().getSelectedItem()==null?null:departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
+        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
     }
 
     private void exportTableBySnapshoot(TableView<GenericModel> javaFxTableComponent, String filePath) throws IOException, COSVisitorException {

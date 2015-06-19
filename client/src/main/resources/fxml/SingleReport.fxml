@@ -9,7 +9,7 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="overalReportAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.overallreport.OverallReportController">
+<AnchorPane id="AnchorPane" fx:id="singleReportAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.singlereport.SingleReportController">
     <children>
       <GridPane layoutX="149.0" layoutY="418.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -33,7 +33,7 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </DatePicker>
-                  <ChoiceBox fx:id="departmentChoiceBox" prefWidth="150.0">
+                  <ChoiceBox fx:id="userChoiceBox" prefWidth="150.0">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -45,10 +45,11 @@
                   </Button>
                </children>
             </HBox>
-              <TableView fx:id="overallReportTableView" prefHeight="392.0" prefWidth="679.0" GridPane.rowIndex="2">
+              <TableView fx:id="singleReportTableView" prefHeight="392.0" prefWidth="679.0" GridPane.rowIndex="2">
                   <columns>
-                      <TableColumn fx:id="nameTableColumn" prefWidth="118.0" text="Nume" />
-                      <TableColumn fx:id="departmentTableColumn" prefWidth="127.0" text="Departament" />
+                      <TableColumn fx:id="dateTableColumn" prefWidth="118.0" text="Data" />
+                  <TableColumn fx:id="entryTimeTableColumn" prefWidth="75.0" text="Intrare" />
+                      <TableColumn fx:id="exitTimeTableColumn" prefWidth="127.0" text="Iesire" />
                       <TableColumn fx:id="workTimeTableColumn" prefWidth="92.0" text="Timp Lucru" />
                       <TableColumn fx:id="offTimeTableColumn" prefWidth="87.0" text="Timp Pauza" />
                   <TableColumn fx:id="totalTimeTableColumn" prefWidth="75.0" text="Timp Total" />
@@ -70,7 +71,7 @@
                   <Insets left="240.0" />
                </GridPane.margin>
             </Label>
-            <Label text="Departament">
+            <Label text="Utilizator">
                <GridPane.margin>
                   <Insets left="470.0" />
                </GridPane.margin>
