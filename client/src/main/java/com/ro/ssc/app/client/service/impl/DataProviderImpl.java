@@ -140,7 +140,7 @@ public enum DataProviderImpl implements DataProvider {
                         Long tpause = 0l;
 
                         for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
-                            List<Event> events = day.getValue();
+                            List<Event> events = applyExcludeLogic(day.getValue()).get(0);
                             Long duration = 0l;
                             Long pause = 0l;
                             DateTime firstevent = null;
