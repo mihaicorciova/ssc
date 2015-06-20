@@ -40,7 +40,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(rootNode, SCENE_MIN_WIDTH, SCENE_MIN_HEIGHT);
         // scene.getStylesheets().add(MAIN_CSS_FILE);
 
-        stage.setTitle("Soft Pontaj");
+        stage.setTitle("Soft Pontaj v2.0");
         stage.setMinWidth(SCENE_MIN_WIDTH);
         stage.setMinHeight(SCENE_MIN_HEIGHT);
         stage.setScene(scene);

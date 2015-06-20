@@ -90,7 +90,9 @@ public class SumaryController implements Initializable {
                         for (File file : files) {
                             if(file.getName().contains("mdb"))
                             {
-                                DataProviderImpl.getInstance().enrichUserData(file); 
+                                
+                                DataProviderImpl.getInstance().saveMdbFile(file); 
+                                
                             }
                             else                            {
                             DataProviderImpl.getInstance().importUserData(file);
@@ -98,7 +100,7 @@ public class SumaryController implements Initializable {
                         }
                         
                         if (! DataProviderImpl.getInstance().getUserData().isEmpty()) {
-                            populateMyTable( DataProviderImpl.getInstance().getUserData());
+                            populateMyTable( );
                             log.debug("not emp");
                         }
                     }
@@ -117,7 +119,7 @@ public class SumaryController implements Initializable {
 
     }
 
-    public void populateMyTable(Map<String, User> pair) {
+    public void populateMyTable() {
 
         dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         hourTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
@@ -133,21 +135,10 @@ public class SumaryController implements Initializable {
         departmentTableColumn.setStyle("-fx-alignment:CENTER;");
         eventTableColumn.setStyle("-fx-alignment:CENTER;");
 
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
-        DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
-        DecimalFormat df = new DecimalFormat();
+       
 
-        ObservableList data = FXCollections.observableArrayList();
-        for (Map.Entry<String, User> entry : pair.entrySet()) {
-                      for (Event ev : entry.getValue().getEvents()) {
-                try {
-                    
-                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
-                } catch (ParseException ex) {
-                    java.util.logging.Logger.getLogger(SumaryController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
+        ObservableList data = FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserData());
+        
         sumaryTableView.getItems().setAll(data);
     }
 

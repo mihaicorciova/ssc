@@ -20,14 +20,12 @@ import org.joda.time.DateTime;
  */
 public interface DataProvider {
 
-    public Map<String, User> getUserData();
+    public  List<GenericModel>  getUserData();
 
     public void importUserData(File file);
-    
-    public void enrichUserData(File files);
-
+       
     public List<GenericModel> getTableData (DateTime iniDate,DateTime endDate,String department);
-     
+      
     public List<GenericModel> getUTableData (String user,DateTime iniDate,DateTime endDate);
     
     public DateTime getPossibleDateStart();
@@ -37,4 +35,6 @@ public interface DataProvider {
      public List<String> getUsers();
      
      public List<String> getDepartments();
+     
+     public void saveMdbFile(File file);
 }

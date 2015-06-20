@@ -6,6 +6,7 @@
 package com.ro.ssc.app.client.service.impl;
 
 import com.ro.ssc.app.client.controller.content.overallreport.OverallReportController;
+import com.ro.ssc.app.client.controller.content.sumary.SumaryController;
 import com.ro.ssc.app.client.model.commons.Event;
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.model.commons.User;
@@ -13,7 +14,9 @@ import com.ro.ssc.app.client.service.api.DataProvider;
 import static com.ro.ssc.app.client.utils.ExcelReader.readExcel;
 import static com.ro.ssc.app.client.utils.AccessReader.updateUserMap;
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,9 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -39,22 +44,53 @@ import org.slf4j.LoggerFactory;
 public enum DataProviderImpl implements DataProvider {
 
     INSTANCE {
+                private String MDB_PATH = "mdb";
                 private Map<String, User> userData;
+                private Set<String> nighShiftUsers;
+                private Set<String> excludedGates;
+                private Set<String> excludedUsers;
+                private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
+                private DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+                private DecimalFormat df = new DecimalFormat();
                 private final Logger log = LoggerFactory.getLogger(DataProviderImpl.class);
 
                 @Override
-                public Map<String, User> getUserData() {
-                    return userData;
+                public List<GenericModel> getUserData() {
+                    List<GenericModel> data = new ArrayList<>();
+                    for (Map.Entry<String, User> entry : userData.entrySet()) {
+                        for (Event ev : entry.getValue().getEvents()) {
+                            try {
+                                if (nighShiftUsers.contains(entry.getValue().getUserId())) {
+                                    log.debug("night shift" + entry.getValue().getUserId());
+                                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase() + "*", df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
+                                } else {
+                                    log.debug("normal shift" + entry.getValue().getUserId() + "\\n");
+                                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
+
+                                }
+                            } catch (ParseException ex) {
+                                java.util.logging.Logger.getLogger(SumaryController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                    return data;
                 }
 
                 @Override
                 public void importUserData(File file) {
                     userData = readExcel(file);
+                    enrichUserData();
                 }
 
-                @Override
-                public void enrichUserData(File file) {
-                    userData = updateUserMap(userData, file);
+                public void enrichUserData() {
+
+                    File dir = new File(MDB_PATH);
+                    if (dir.exists()) {
+                        log.debug("File from " + MDB_PATH + "  " + dir.listFiles()[0].getName());
+                        nighShiftUsers = updateUserMap(dir.listFiles()[0]).get(0);
+                        excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
+                        excludedUsers = updateUserMap(dir.listFiles()[0]).get(2);
+                    }
                 }
 
                 public List<List<Event>> applyExcludeLogic(List<Event> events) {
@@ -63,37 +99,36 @@ public enum DataProviderImpl implements DataProvider {
                     List<Event> remainingEvents = new ArrayList<>();
                     Boolean shouldAdd = false;
                     for (int i = 0; i < events.size() - 1; i++) {
+                        if (!excludedGates.contains(events.get(i).getAddr())) {
+                            if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
+                                shouldAdd = true;
+                                trimedEvents.add(events.get(i));
+                            } else if (events.get(i).getAddr().contains("Exit") && shouldAdd) {
+                                shouldAdd = false;
+                                trimedEvents.add(events.get(i));
 
-                        if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
-                            shouldAdd = true;
-                            trimedEvents.add(events.get(i));
-
-                        } else if (events.get(i).getAddr().contains("Exit") && shouldAdd) {
-
+                            } else {
+                                shouldAdd = false;
+                                remainingEvents.add(events.get(i));
+                                //  log.debug("Adding " + events.get(i).getAddr() + "to rem events");
+                            }
+                        }
+                    }
+                    if (!excludedGates.contains(events.get(events.size() - 1).getAddr())) {
+                        if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
                             shouldAdd = false;
-                            trimedEvents.add(events.get(i));
+                            trimedEvents.add(events.get(events.size() - 1));
 
                         } else {
                             shouldAdd = false;
-                            remainingEvents.add(events.get(i));
-                            //  log.debug("Adding " + events.get(i).getAddr() + "to rem events");
+                            remainingEvents.add(events.get(events.size() - 1));
                         }
 
                     }
-                    if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
-
-                        shouldAdd = false;
-                        trimedEvents.add(events.get(events.size() - 1));
-
-                    } else {
-                        shouldAdd = false;
-                        remainingEvents.add(events.get(events.size() - 1));
-                        //  log.debug("Adding " + events.get(events.size() - 1).getAddr() + "to rem events");
-                    }
-
                     result.add(trimedEvents);
                     result.add(remainingEvents);
                     return result;
+
                 }
 
                 public Map<DateTime, List<Event>> splitPerDay(List<Event> events, DateTime iniDate, DateTime endDate) {
@@ -105,7 +140,7 @@ public enum DataProviderImpl implements DataProvider {
                         for (Event ev : events) {
                             if (ev.getEventDateTime().isAfter(dt)) {
                                 if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-                                  
+
                                     result.put(dt.minusDays(1), perDayList);
                                 }
                                 dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
@@ -120,7 +155,7 @@ public enum DataProviderImpl implements DataProvider {
                         }
 
                         if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-                           
+
                             result.put(dt.minusDays(1), perDayList);
                         }
                     }
@@ -128,60 +163,87 @@ public enum DataProviderImpl implements DataProvider {
                 }
 
                 @Override
-                public List<GenericModel> getTableData(DateTime iniDate, DateTime endDate,String department) {
+                public List<GenericModel> getTableData(DateTime iniDate, DateTime endDate, String department) {
 
                     List<GenericModel> data = new ArrayList<>();
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
-                      
-                        if(department==null||(department!=null&& entry.getValue().getDepartment().equals(department))){
-                              Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
-                        Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(entry.getValue().getEvents()).get(0), iniDate, endDate);
-                        Long tduration = 0l;
-                        Long tpause = 0l;
+                        if (!excludedUsers.contains(entry.getKey())) {
+                            if (department == null || (department != null && entry.getValue().getDepartment().equals(department))) {
+                                if (!nighShiftUsers.contains(entry.getValue().getUserId())) {
+                                    Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+                                    Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(entry.getValue().getEvents()).get(0), iniDate, endDate);
+                                    Long tduration = 0l;
+                                    Long tpause = 0l;
+                                    for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+                                        List<Event> events = applyExcludeLogic(day.getValue()).get(0);
+                                        Long duration = 0l;
+                                        Long pause = 0l;
+                                        DateTime firstevent = null;
+                                        if (!events.isEmpty()) {
+                                            firstevent = events.get(0).getEventDateTime();
+                                            DateTime inevent = null;
+                                            DateTime outevent = null;
+                                            for (int i = 0; i < events.size(); i++) {
 
-                        for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
-                            List<Event> events = applyExcludeLogic(day.getValue()).get(0);
-                            Long duration = 0l;
-                            Long pause = 0l;
-                            DateTime firstevent = null;
-                            if (!events.isEmpty()) {
-                                firstevent = events.get(0).getEventDateTime();
-
-                                DateTime inevent = null;
-                                DateTime outevent = null;
-
-                                for (int i = 0; i < events.size(); i++) {
-
-                                    if (events.get(i).getAddr().contains("In")) {
-                                        if (inevent != null && outevent != null) {
-                                            if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
-                                                pause += outevent.getMillis() - inevent.getMillis();
-
-                                            } else {
-                                                firstevent = inevent;
+                                                if (events.get(i).getAddr().contains("In")) {
+                                                    inevent = events.get(i).getEventDateTime();
+                                                } else if (events.get(i).getAddr().contains("Exit")) {
+                                                    if (inevent != null) {
+                                                        duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
+                                                        outevent = events.get(i).getEventDateTime();
+                                                    }
+                                                }
+                                            }
+                                            if (firstevent != null && outevent != null) {
+                                                pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                             }
                                         }
-
-                                        inevent = events.get(i).getEventDateTime();
-
-                                    } else if (events.get(i).getAddr().contains("Exit")) {
-
-                                        if (inevent != null) {
-                                            duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
-
-                                            outevent = events.get(i).getEventDateTime();
-
-                                        }
-
+                                        // log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
+                                        tduration += duration;
+                                        tpause += pause;
                                     }
+                                    data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration)));
+
+                                } else if (nighShiftUsers.contains(entry.getValue().getUserId())) {
+                                    Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+
+                                    List<Event> events = applyExcludeLogic(entry.getValue().getEvents()).get(0);
+                                    Long duration = 0l;
+                                    Long pause = 0l;
+                                    DateTime firstevent = null;
+                                    if (!events.isEmpty()) {
+                                        firstevent = events.get(0).getEventDateTime();
+                                        DateTime inevent = null;
+                                        DateTime outevent = null;
+                                        for (int i = 0; i < events.size(); i++) {
+
+                                            if (events.get(i).getAddr().contains("In")) {
+                                                if (inevent != null && outevent != null) {
+                                                    if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
+                                                        pause += outevent.getMillis() - inevent.getMillis();
+
+                                                    } else {
+                                                        firstevent = inevent;
+                                                    }
+                                                }
+                                                inevent = events.get(i).getEventDateTime();
+                                            } else if (events.get(i).getAddr().contains("Exit")) {
+                                                if (inevent != null) {
+                                                    duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
+                                                    outevent = events.get(i).getEventDateTime();
+                                                }
+                                            }
+                                        }
+                                        if (firstevent != null && outevent != null) {
+                                            //    pause = outevent.getMillis() - firstevent.getMillis() - duration;
+                                        }
+                                    }
+                                    data.add(new GenericModel(entry.getValue().getName().toUpperCase() + "*", entry.getValue().getDepartment(), formatMillis(duration), formatMillis(pause), formatMillis(pause + duration)));
+
                                 }
                             }
-                            // log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
-                            tduration += duration;
-                            tpause += pause;
+
                         }
-                        data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration)));
-                    }
                     }
                     return data;
                 }
@@ -221,78 +283,93 @@ public enum DataProviderImpl implements DataProvider {
                     return result;
                 }
 
-        @Override
-        public List<String> getUsers() {
-            return new ArrayList<>(userData.keySet());
-        }
+                @Override
+                public List<String> getUsers() {
+                    return new ArrayList<>(userData.keySet());
+                }
 
-        @Override
-        public List<String> getDepartments() {
-         Set<String> result=new LinkedHashSet<>();
-            for (Map.Entry<String, User> entry : userData.entrySet()) {
-            result.add(entry.getValue().getDepartment());
-            }
-            return new ArrayList<>(result);
-        }
+                @Override
+                public List<String> getDepartments() {
+                    Set<String> result = new LinkedHashSet<>();
+                    for (Map.Entry<String, User> entry : userData.entrySet()) {
+                        result.add(entry.getValue().getDepartment());
+                    }
+                    return new ArrayList<>(result);
+                }
 
-        @Override
-        public List<GenericModel> getUTableData(String user, DateTime iniDate, DateTime endDate) {
-           
+                @Override
+                public List<GenericModel> getUTableData(String user, DateTime iniDate, DateTime endDate) {
+
                     List<GenericModel> data = new ArrayList<>();
-                            DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
-        DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
-                      
-                        if(user!=null){
-                              Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
-                        Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
-                     
-                        for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
-                            List<Event> events = applyExcludeLogic(day.getValue()).get(0);
-                            Long duration = 0l;
-                            Long pause = 0l;
-                            DateTime firstevent = null;
-                            DateTime outevent = null;
-                            if (!events.isEmpty()) {
-                                firstevent = events.get(0).getEventDateTime();
 
-                                DateTime inevent = null;
-                             
+                    if (user != null && !excludedUsers.contains(user)) {
+                        if (!nighShiftUsers.contains(userData.get(user).getUserId())) {
+                            Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+                            Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
 
-                                for (int i = 0; i < events.size(); i++) {
+                            for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+                                List<Event> events = applyExcludeLogic(day.getValue()).get(0);
+                                Long duration = 0l;
+                                Long pause = 0l;
+                                DateTime firstevent = null;
+                                DateTime outevent = null;
+                                if (!events.isEmpty()) {
+                                    firstevent = events.get(0).getEventDateTime();
 
-                                    if (events.get(i).getAddr().contains("In")) {
-                                        if (inevent != null && outevent != null) {
-                                            if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
-                                                pause += outevent.getMillis() - inevent.getMillis();
+                                    DateTime inevent = null;
 
-                                            } else {
-                                                firstevent = inevent;
+                                    for (int i = 0; i < events.size(); i++) {
+
+                                        if (events.get(i).getAddr().contains("In")) {
+                                            if (inevent != null && outevent != null) {
+                                                if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
+
+                                                } else {
+                                                    firstevent = inevent;
+                                                }
                                             }
+
+                                            inevent = events.get(i).getEventDateTime();
+
+                                        } else if (events.get(i).getAddr().contains("Exit")) {
+
+                                            if (inevent != null) {
+                                                duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
+
+                                                outevent = events.get(i).getEventDateTime();
+
+                                            }
+
                                         }
-
-                                        inevent = events.get(i).getEventDateTime();
-
-                                    } else if (events.get(i).getAddr().contains("Exit")) {
-
-                                        if (inevent != null) {
-                                            duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
-
-                                            outevent = events.get(i).getEventDateTime();
-
-                                        }
-
                                     }
                                 }
+                                log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
+                                if (firstevent != null && outevent != null) {
+                                    pause = outevent.getMillis() - firstevent.getMillis() - duration;
+                                }
+                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), formatMillis(pause + duration)));
+
                             }
-                             log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
-                            
-                             data.add(new GenericModel(day.getKey().toString(dtf2),firstevent!=null? firstevent.toString(dtf):"", outevent!=null?outevent.toString(dtf):"",formatMillis(duration), formatMillis(pause), formatMillis(pause + duration)));
-                
+                        } else if (!nighShiftUsers.contains(userData.get(user).getUserId())) {
+                            Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
                         }
-                         }
-                    
+                    }
                     return data;
-        }
+                }
+
+                @Override
+                public void saveMdbFile(File srcFile) {
+                    File destDir = new File(MDB_PATH);
+                    if (!destDir.exists()) {
+                        destDir.mkdirs();
+                    }
+
+                    try {
+                        FileUtils.copyFileToDirectory(srcFile, destDir);
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(DataProviderImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
 
             };
 
