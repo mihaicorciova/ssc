@@ -91,6 +91,7 @@ licenseStatus = licenseService.getLicenseStatus();
             statusBarContainer.getChildren().add(statusBar);
             statusBarContainer.getStylesheets().add(STATUS_BAR_CSS_FILE);
 
+            handleSumaryViewLaunch();
         } catch (Exception ex) {
             log.error("Failed to load components", ex);
         }

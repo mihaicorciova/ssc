@@ -350,7 +350,7 @@ public enum DataProviderImpl implements DataProvider {
                                 data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), formatMillis(pause + duration)));
 
                             }
-                        } else if (!nighShiftUsers.contains(userData.get(user).getUserId())) {
+                        } else if (nighShiftUsers.contains(userData.get(user).getUserId())) {
                             Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
                         }
                     }

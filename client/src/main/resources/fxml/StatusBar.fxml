@@ -8,6 +8,6 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label text="All items up to date" />
+        <Label text="v2.0" />
     </children>
 </AnchorPane>

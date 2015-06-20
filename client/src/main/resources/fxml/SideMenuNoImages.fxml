@@ -11,18 +11,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane prefHeight="592.0" prefWidth="230.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.sidemenu.SideMenuNoImagesController">
+<AnchorPane prefHeight="592.0" prefWidth="270.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.sidemenu.SideMenuNoImagesController">
     <children>
         <AnchorPane prefHeight="20.0" prefWidth="200.0" style="-fx-background-color: #86CEF4;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
-                <Label layoutX="54.0" text="Soft Pontaj" textFill="#515151">
+                <Label layoutX="80.0" text="Soft Pontaj" textFill="#515151">
                     <font>
                         <Font name="System Bold" size="19.0" />
                     </font>
                 </Label>
             </children>
         </AnchorPane>
-        <AnchorPane layoutY="28.0" prefHeight="90.0" prefWidth="200.0" style="-fx-background-color: light-gray;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <AnchorPane layoutY="28.0" prefHeight="90.0" prefWidth="270.0" style="-fx-background-color: light-gray;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
                 <ImageView fitHeight="60.0" fitWidth="60.0" layoutX="14.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
                     <image>
@@ -45,7 +45,7 @@
                 <Insets bottom="2.0" top="2.0" />
             </padding>
         </AnchorPane>
-        <AnchorPane layoutY="121.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
+        <AnchorPane layoutY="121.0" prefWidth="270.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
             <children>
                 <TreeView fx:id="navigationTree" prefWidth="200.0" style="-fx-control-inner-background: light-gray;" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <root>
@@ -70,7 +70,7 @@
                         </TreeItem>
                     </root>
                 </TreeView>
-                <AnchorPane layoutY="443.0" prefHeight="70.0" prefWidth="200.0" style="-fx-background-color: light-gray;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                <AnchorPane layoutY="443.0" prefHeight="70.0" prefWidth="270.0" style="-fx-background-color: light-gray;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                     <children>
                         <ImageView fitHeight="70.0" fitWidth="113.0" layoutX="94.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="5.0">
                             <image>
