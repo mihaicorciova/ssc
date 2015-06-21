@@ -225,6 +225,11 @@ public enum DataProviderImpl implements DataProvider {
                                     Long duration = 0l;
                                     Long pause = 0l;
                                     DateTime firstevent = null;
+                                    Boolean wrongEvent=false;
+                                    if(applyExcludeLogic(entry.getValue().getEvents()).get(1).size()>0)
+                                   {
+                                       wrongEvent=true;
+                                   }
                                     if (!events.isEmpty()) {
                                         firstevent = events.get(0).getEventDateTime();
                                         DateTime inevent = null;
@@ -252,7 +257,7 @@ public enum DataProviderImpl implements DataProvider {
                                             //    pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                         }
                                     }
-                                    data.add(new GenericModel(entry.getValue().getName().toUpperCase() + "*", entry.getValue().getDepartment(), formatMillis(duration), formatMillis(pause), formatMillis(pause + duration)));
+                                    data.add(new GenericModel(entry.getValue().getName().toUpperCase() + "*", entry.getValue().getDepartment(), formatMillis(duration), formatMillis(pause), wrongEvent==true?formatMillis(pause + duration)+" !":formatMillis(pause + duration)));
 
                                 }
                             }
@@ -320,9 +325,21 @@ public enum DataProviderImpl implements DataProvider {
                         if (!nighShiftUsers.contains(userData.get(user).getUserId())) {
                             Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
                             Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
-
+ 
+                               Map<DateTime, List<Event>> wrongPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);      
                             for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+                             Boolean wrongEvent=false;
                                 List<Event> events = applyExcludeLogic(day.getValue()).get(0);
+                                 if(applyExcludeLogic(userData.get(user).getEvents()).get(1).size()>0)
+                                   {
+                                       wrongEvent=true;
+                                   }
+                                 if(wrongPerDay.containsKey(day.getKey()))
+                                 {
+                                     if(wrongPerDay.get(day.getKey()).size()>0){
+                                         wrongEvent=true;
+                                     }
+                                 }
                                 Long duration = 0l;
                                 Long pause = 0l;
                                 DateTime firstevent = null;
@@ -361,7 +378,7 @@ public enum DataProviderImpl implements DataProvider {
                                 if (firstevent != null && outevent != null) {
                                     pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                 }
-                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), formatMillis(pause + duration)));
+                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent==true?formatMillis(pause + duration)+" !":formatMillis(pause + duration)));
 
                             }
                         } else if (nighShiftUsers.contains(userData.get(user).getUserId())) {
