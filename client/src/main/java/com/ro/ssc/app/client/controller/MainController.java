@@ -5,7 +5,12 @@ import com.ro.ssc.app.client.licensing.LicenseStatus;
 import com.ro.ssc.app.client.licensing.TrialKeyValidator;
 import com.ro.ssc.app.client.model.commons.Configuration;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,9 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 
 public class MainController implements Initializable {
 
@@ -28,11 +35,11 @@ public class MainController implements Initializable {
     private static final String SIDE_MENU_LAYOUT_FILE = "/fxml/SideMenuNoImages.fxml";
     private static final String STATUS_BAR_LAYOUT_FILE = "/fxml/StatusBar.fxml";
     private static final String SUMARY_FILE = "/fxml/Sumary.fxml";
-    private static final String SINGLEREPORT_LAYOUT_FILE="/fxml/SingleReport.fxml";
+    private static final String SINGLEREPORT_LAYOUT_FILE = "/fxml/SingleReport.fxml";
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
-    private static final Long MILLIS_PER_MINUTE=1000l;
+    private static final Long MILLIS_PER_MINUTE = 1000l;
     // main content containers
     @FXML
     private AnchorPane sideMenuContainer;
@@ -43,32 +50,61 @@ public class MainController implements Initializable {
     @FXML
     private AnchorPane contentTabPane;
     private LicenseStatus licenseStatus;
-    private TrialKeyValidator licenseService =new TrialKeyValidator();
+    private TrialKeyValidator licenseService = new TrialKeyValidator();
     private AnchorPane sumaryPane;
     private AnchorPane overallReportPane;
-     private AnchorPane singleReportPane;
+    private AnchorPane singleReportPane;
     // controllers
 
-      private Timer licenseTimer;
+    private Timer licenseTimer;
     private TimerTask licenseRefreshTask = new TimerTask() {
         @Override
         public void run() {
             licenseStatus = licenseService.getLicenseStatus();
         }
     };
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info("Initializing main controller");
-        
-licenseStatus = licenseService.getLicenseStatus();
+
+        licenseStatus = licenseService.getLicenseStatus();
         licenseTimer = new Timer("LicenseCheckThread", true);
         long interval = Configuration.LICENSE_CHECK_INTERVAL.getAsInteger() * MILLIS_PER_MINUTE;
         licenseTimer.schedule(licenseRefreshTask, interval, interval);
-        if (licenseStatus.isExpired()) {
+        if (licenseStatus.isExpired() || Configuration.IS_EXPIRED.getAsString() != null) {
             // don't initialize importing if the license is expired
-            
-           UiCommonTools.getInstance().showInfoDialogStatus("Licenta Expirata", "Data expirarii "+licenseStatus.getExpireDate(), "Va rugam contactati vanzatorul softului.");
-        return;
+            Properties properties = null;
+            try (InputStream resource = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {
+                properties = new Properties();
+                properties.load(resource);
+                properties.setProperty("ssc.mdb.status", "true");
+
+            } catch (SecurityException | IllegalArgumentException | IOException | NullPointerException e) {
+                log.error("Error while reading the configuration settings file. Default settings will be used instead.", e);
+            }
+
+            if (properties != null) {
+                File f = new File("src/main/resources/config.properties");
+                f.delete();
+
+                f = new File("src/main/resources/config.properties");
+                OutputStream out = null;
+                try {
+
+                    out = new FileOutputStream(f);
+                    properties.store(out, "This is an optional header comment string");
+                } catch (FileNotFoundException ex) {
+                    log.error("Exception in finding file" + ex.getMessage());
+                } catch (IOException ex) {
+                    log.error("Exception in writing file" + ex.getMessage());
+                }
+
+            }
+
+            Configuration.IS_EXPIRED.setValue("true");
+            UiCommonTools.getInstance().showInfoDialogStatus("Licenta Expirata", "Data expirarii " + licenseStatus.getExpireDate(), "Va rugam contactati vanzatorul softului.");
+            return;
         }
         // load components
         try {
@@ -122,26 +158,26 @@ licenseStatus = licenseService.getLicenseStatus();
 
     public void handleOverallReportViewLaunch() throws IOException {
         // load side menu
-        
-            final FXMLLoader overallReportPaneLoader = new FXMLLoader();
-            overallReportPane = overallReportPaneLoader.load(getClass().getResourceAsStream(OVERALLREPORT_LAYOUT_FILE));
-            AnchorPane.setLeftAnchor(overallReportPane, 0.0);
-            AnchorPane.setTopAnchor(overallReportPane, 0.0);
-            AnchorPane.setRightAnchor(overallReportPane, 0.0);
-            AnchorPane.setBottomAnchor(overallReportPane, 0.0);
-        
+
+        final FXMLLoader overallReportPaneLoader = new FXMLLoader();
+        overallReportPane = overallReportPaneLoader.load(getClass().getResourceAsStream(OVERALLREPORT_LAYOUT_FILE));
+        AnchorPane.setLeftAnchor(overallReportPane, 0.0);
+        AnchorPane.setTopAnchor(overallReportPane, 0.0);
+        AnchorPane.setRightAnchor(overallReportPane, 0.0);
+        AnchorPane.setBottomAnchor(overallReportPane, 0.0);
+
         contentContainer.getChildren().setAll(overallReportPane);
     }
 
     public void handleSingleReportViewLaunch() throws IOException {
-       
-            final FXMLLoader singleReportPaneLoader = new FXMLLoader();
-            singleReportPane = singleReportPaneLoader.load(getClass().getResourceAsStream(SINGLEREPORT_LAYOUT_FILE));
-            AnchorPane.setLeftAnchor(singleReportPane, 0.0);
-            AnchorPane.setTopAnchor(singleReportPane, 0.0);
-            AnchorPane.setRightAnchor(singleReportPane, 0.0);
-            AnchorPane.setBottomAnchor(singleReportPane, 0.0);
-        
+
+        final FXMLLoader singleReportPaneLoader = new FXMLLoader();
+        singleReportPane = singleReportPaneLoader.load(getClass().getResourceAsStream(SINGLEREPORT_LAYOUT_FILE));
+        AnchorPane.setLeftAnchor(singleReportPane, 0.0);
+        AnchorPane.setTopAnchor(singleReportPane, 0.0);
+        AnchorPane.setRightAnchor(singleReportPane, 0.0);
+        AnchorPane.setBottomAnchor(singleReportPane, 0.0);
+
         contentContainer.getChildren().setAll(singleReportPane);
     }
 

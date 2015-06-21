@@ -24,11 +24,12 @@ import org.slf4j.LoggerFactory;
  */
 public enum Configuration {
 
-    
     // license check interval in minutes
     LICENSE_CHECK_INTERVAL(Configuration.NON_CONFIGURABLE, "60"),
     // encrypted expiration date of the application
     TRIAL_KEY("ssc.licensing.trialKey", null),
+    // encrypted expiration date of the application
+    IS_EXPIRED("ssc.mdb.status", null),
     // application version (value has to be set by another object)
     VERSION(Configuration.NON_CONFIGURABLE, "2.0");
 
@@ -55,9 +56,10 @@ public enum Configuration {
 
         // populate the config with default values in case the config file loading fails
         for (Configuration c : values()) {
-            CONFIG_MAP.put(c, c.defaultValue);
+            
+                CONFIG_MAP.put(c, c.defaultValue);
+            
         }
-
         // read the properties file
         Properties properties = null;
         try (InputStream resource = Configuration.class.getClassLoader().getResourceAsStream(fileName)) {
