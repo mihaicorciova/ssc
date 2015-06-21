@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class MainApp extends Application {
         log.debug("Showing JFX scene");
         Scene scene = new Scene(rootNode, SCENE_MIN_WIDTH, SCENE_MIN_HEIGHT);
         // scene.getStylesheets().add(MAIN_CSS_FILE);
-
+        stage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/images/icon.png")));
         stage.setTitle("Soft Pontaj v2.0");
         stage.setMinWidth(SCENE_MIN_WIDTH);
         stage.setMinHeight(SCENE_MIN_HEIGHT);

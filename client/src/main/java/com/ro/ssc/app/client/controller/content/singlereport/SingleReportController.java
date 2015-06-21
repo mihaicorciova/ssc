@@ -194,7 +194,7 @@ public class SingleReportController implements Initializable {
                 contentStream.close();
                 doc.save(file);
 
-                fxCommonTools.showInfoDialogStatus("PDF Exported", "Export Status", "Exported succesfully to PDF file.");
+                fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PDF.");
 
             } finally {
                 if (doc != null) {
@@ -207,7 +207,7 @@ public class SingleReportController implements Initializable {
     private File getFile(String filePath) {
         File file;
         if (filePath == null) {
-            file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PDF files (*.pdf)", ".pdf");
+            file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "Fisiere PDF (*.pdf)", ".pdf");
         } else {
             file = new File(filePath);
         }

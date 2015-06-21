@@ -38,7 +38,7 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </ChoiceBox>
-                  <Button fx:id="exportButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#exportTableToPDF" text="Export">
+                  <Button fx:id="exportButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#exportTableToPDF" text="Salvare Raport">
                      <HBox.margin>
                         <Insets left="20.0" />
                      </HBox.margin>
