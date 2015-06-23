@@ -5,6 +5,7 @@
  */
 package com.ro.ssc.app.client.controller.content.singlereport;
 
+import com.ro.ssc.app.client.exporter.PptTableExporter;
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
@@ -137,11 +138,8 @@ public class SingleReportController implements Initializable {
 
     }
 
-    @FXML
-    private void exportTableToPDF() throws IOException, COSVisitorException {
-        exportTableBySnapshoot(singleReportTableView, null);
-    }
-
+ 
+   
     public void populateMyTable() {
 
         dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
@@ -160,58 +158,36 @@ public class SingleReportController implements Initializable {
         singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
     }
 
-    private void exportTableBySnapshoot(TableView<GenericModel> javaFxTableComponent, String filePath) throws IOException, COSVisitorException {
-        WritableImage demoTableSnapshot = javaFxTableComponent.snapshot(null, null);
+   @FXML
+    private void exportTableToPPT() {
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt)", ".ppt");
 
-        int width = (int) demoTableSnapshot.getWidth();
-        int height = (int) demoTableSnapshot.getHeight();
+        if (file == null) {
+            return;
+        }
 
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        PptTableExporter pptExporter = new PptTableExporter() {
 
-        File file = getFile(filePath);
-        if (file != null) {
-            PDDocument doc = null;
-            try {
-                doc = new PDDocument();
+            @Override
+            public String[][] getTableContent(TableView<?> fxTable) {
+                String[][] content = new String[fxTable.getItems().size()][fxTable.getColumns().size()];
 
-                PDPage page = new PDPage();
-                doc.addPage(page);
-
-                PDXObjectImage ximage = null;
-                ximage = new PDPixelMap(doc, SwingFXUtils.fromFXImage(demoTableSnapshot, bufferedImage));
-
-                PDPageContentStream contentStream = new PDPageContentStream(doc, page);
-
-                float xMargin = 50;
-                float yMargin = 100;
-                float scale = 0.46f;
-                float xCoordinate = xMargin;
-                float yCoordinate = PDPage.PAGE_SIZE_A4.getUpperRightY() - yMargin - scale * (float) demoTableSnapshot.getHeight();
-
-                // reduce this value if the image is too large
-                contentStream.drawXObject(ximage, xCoordinate, yCoordinate, ximage.getWidth() * scale, ximage.getHeight() * scale);
-
-                contentStream.close();
-                doc.save(file);
-
-                fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PDF.");
-
-            } finally {
-                if (doc != null) {
-                    doc.close();
+                int rowNo = 0;
+                for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
+                    content[rowNo][0] = (String) tableData.getOne();
+                    content[rowNo][1] = (String) tableData.getTwo();
+                    content[rowNo][2] = (String) tableData.getThree();
+                    content[rowNo][3] = (String) tableData.getFour();
+                    content[rowNo][4] = (String) tableData.getFive();
+                     content[rowNo][5] = (String) tableData.getSix();
+                    rowNo++;
                 }
+                return content;
             }
-        }
-    }
+        };
 
-    private File getFile(String filePath) {
-        File file;
-        if (filePath == null) {
-            file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "Fisiere PDF (*.pdf)", ".pdf");
-        } else {
-            file = new File(filePath);
-        }
-        return file;
+        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual pentru "+userChoiceBox.getSelectionModel().getSelectedItem().toString()+" de la "+endDatePicker.getValue().format(formatter)+" pana la "+endDatePicker.getValue().format(formatter));
+        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
     }
 
 }

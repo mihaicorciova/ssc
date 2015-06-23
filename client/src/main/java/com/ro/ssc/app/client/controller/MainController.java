@@ -54,6 +54,7 @@ public class MainController implements Initializable {
     private AnchorPane sumaryPane;
     private AnchorPane overallReportPane;
     private AnchorPane singleReportPane;
+    private String MDB_PATH = "opt";
     // controllers
 
     private Timer licenseTimer;
@@ -72,36 +73,32 @@ public class MainController implements Initializable {
         licenseTimer = new Timer("LicenseCheckThread", true);
         long interval = Configuration.LICENSE_CHECK_INTERVAL.getAsInteger() * MILLIS_PER_MINUTE;
         licenseTimer.schedule(licenseRefreshTask, interval, interval);
-        if (licenseStatus.isExpired() || Configuration.IS_EXPIRED.getAsString() != null) {
+       
+        
+           File destDir = new File(MDB_PATH);
+            if (!destDir.exists()) {
+                        destDir.mkdirs();
+                    }
+        if (licenseStatus.isExpired()&& destDir.exists() || destDir.listFiles().length>0) {
             // don't initialize importing if the license is expired
-            Properties properties = null;
-            try (InputStream resource = Configuration.class.getClassLoader().getResourceAsStream("config.properties")) {
-                properties = new Properties();
-                properties.load(resource);
-                properties.setProperty("ssc.mdb.status", "true");
-
-            } catch (SecurityException | IllegalArgumentException | IOException | NullPointerException e) {
-                log.error("Error while reading the configuration settings file. Default settings will be used instead.", e);
-            }
-
-            if (properties != null) {
-                File f = new File("src/main/resources/config.properties");
-                f.delete();
-
-                f = new File("src/main/resources/config.properties");
+           
+ 
+                File file = new File(MDB_PATH+"/status.txt");
+               
                 OutputStream out = null;
                 try {
 
-                    out = new FileOutputStream(f);
-                    properties.store(out, "This is an optional header comment string");
+                    out = new FileOutputStream(file);
+                   out.write(1);
+                   out.flush();
                 } catch (FileNotFoundException ex) {
                     log.error("Exception in finding file" + ex.getMessage());
                 } catch (IOException ex) {
                     log.error("Exception in writing file" + ex.getMessage());
                 }
 
-            }
-
+            
+        
             Configuration.IS_EXPIRED.setValue("true");
             UiCommonTools.getInstance().showInfoDialogStatus("Licenta Expirata", "Data expirarii " + licenseStatus.getExpireDate(), "Va rugam contactati vanzatorul softului.");
             return;

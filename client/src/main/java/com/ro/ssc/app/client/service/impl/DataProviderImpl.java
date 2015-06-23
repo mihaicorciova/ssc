@@ -108,10 +108,9 @@ public enum DataProviderImpl implements DataProvider {
                                 trimedEvents.add(events.get(i));
 
                             } else {
-                                 shouldAdd = false;
-                                if(events.get(i + 1).getEventDateTime().getMillis()-events.get(i + 1).getEventDateTime().getMillis()>15*1000l)
-                                {
-                                remainingEvents.add(events.get(i));
+                                shouldAdd = false;
+                                if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i + 1).getEventDateTime().getMillis() > 15 * 1000l) {
+                                    remainingEvents.add(events.get(i));
                                 }//  log.debug("Adding " + events.get(i).getAddr() + "to rem events");
                             }
                         }
@@ -123,9 +122,9 @@ public enum DataProviderImpl implements DataProvider {
 
                         } else {
                             shouldAdd = false;
-                             
+
                             remainingEvents.add(events.get(events.size() - 1));
-                                
+
                         }
 
                     }
@@ -178,17 +177,15 @@ public enum DataProviderImpl implements DataProvider {
                                     Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(entry.getValue().getEvents()).get(0), iniDate, endDate);
                                     Long tduration = 0l;
                                     Long tpause = 0l;
-                                    Boolean wrongEvent=false;
-                                    if(applyExcludeLogic(entry.getValue().getEvents()).get(1).size()>0)
-                                   {
-                                       wrongEvent=true;
-                                   }
+                                    Boolean wrongEvent = false;
+                                    if (applyExcludeLogic(entry.getValue().getEvents()).get(1).size() > 0) {
+                                        wrongEvent = true;
+                                    }
                                     for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
                                         List<Event> events = applyExcludeLogic(day.getValue()).get(0);
-                                         if(applyExcludeLogic(day.getValue()).get(1).size()>0)
-                                   {
-                                       wrongEvent=true;
-                                   }
+                                        if (applyExcludeLogic(day.getValue()).get(1).size() > 0) {
+                                            wrongEvent = true;
+                                        }
                                         Long duration = 0l;
                                         Long pause = 0l;
                                         DateTime firstevent = null;
@@ -215,8 +212,8 @@ public enum DataProviderImpl implements DataProvider {
                                         tduration += duration;
                                         tpause += pause;
                                     }
-                                   
-                                    data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), wrongEvent==true?formatMillis(tpause + tduration)+" !":formatMillis(tpause + tduration)));
+
+                                    data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), wrongEvent == true ? formatMillis(tpause + tduration) + " !" : formatMillis(tpause + tduration)));
 
                                 } else if (nighShiftUsers.contains(entry.getValue().getUserId())) {
                                     Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
@@ -225,11 +222,10 @@ public enum DataProviderImpl implements DataProvider {
                                     Long duration = 0l;
                                     Long pause = 0l;
                                     DateTime firstevent = null;
-                                    Boolean wrongEvent=false;
-                                    if(applyExcludeLogic(entry.getValue().getEvents()).get(1).size()>0)
-                                   {
-                                       wrongEvent=true;
-                                   }
+                                    Boolean wrongEvent = false;
+                                    if (applyExcludeLogic(entry.getValue().getEvents()).get(1).size() > 0) {
+                                        wrongEvent = true;
+                                    }
                                     if (!events.isEmpty()) {
                                         firstevent = events.get(0).getEventDateTime();
                                         DateTime inevent = null;
@@ -257,7 +253,7 @@ public enum DataProviderImpl implements DataProvider {
                                             //    pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                         }
                                     }
-                                    data.add(new GenericModel(entry.getValue().getName().toUpperCase() + "*", entry.getValue().getDepartment(), formatMillis(duration), formatMillis(pause), wrongEvent==true?formatMillis(pause + duration)+" !":formatMillis(pause + duration)));
+                                    data.add(new GenericModel(entry.getValue().getName().toUpperCase() + "*", entry.getValue().getDepartment(), formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
 
                                 }
                             }
@@ -325,21 +321,19 @@ public enum DataProviderImpl implements DataProvider {
                         if (!nighShiftUsers.contains(userData.get(user).getUserId())) {
                             Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
                             Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
- 
-                               Map<DateTime, List<Event>> wrongPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);      
+
+                            Map<DateTime, List<Event>> wrongPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
                             for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
-                             Boolean wrongEvent=false;
+                                Boolean wrongEvent = false;
                                 List<Event> events = applyExcludeLogic(day.getValue()).get(0);
-                                 if(applyExcludeLogic(userData.get(user).getEvents()).get(1).size()>0)
-                                   {
-                                       wrongEvent=true;
-                                   }
-                                 if(wrongPerDay.containsKey(day.getKey()))
-                                 {
-                                     if(wrongPerDay.get(day.getKey()).size()>0){
-                                         wrongEvent=true;
-                                     }
-                                 }
+                                if (applyExcludeLogic(userData.get(user).getEvents()).get(1).size() > 0) {
+                                    wrongEvent = true;
+                                }
+                                if (wrongPerDay.containsKey(day.getKey())) {
+                                    if (wrongPerDay.get(day.getKey()).size() > 0) {
+                                        wrongEvent = true;
+                                    }
+                                }
                                 Long duration = 0l;
                                 Long pause = 0l;
                                 DateTime firstevent = null;
@@ -378,11 +372,22 @@ public enum DataProviderImpl implements DataProvider {
                                 if (firstevent != null && outevent != null) {
                                     pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                 }
-                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent==true?formatMillis(pause + duration)+" !":formatMillis(pause + duration)));
+                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
 
                             }
                         } else if (nighShiftUsers.contains(userData.get(user).getUserId())) {
                             Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+
+                            Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
+
+                            Map<DateTime, List<Event>> wrongPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
+                            for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+                               
+                                if(wrongPerDay.containsKey(day.getKey()))
+                                {
+                                log.debug("shift hours"+wrongPerDay.get(day.getKey()).toString());
+                                }
+                            }
                         }
                     }
                     return data;
@@ -394,8 +399,10 @@ public enum DataProviderImpl implements DataProvider {
                     if (!destDir.exists()) {
                         destDir.mkdirs();
                     }
+                   
 
                     try {
+                        FileUtils.cleanDirectory(destDir); 
                         FileUtils.copyFileToDirectory(srcFile, destDir);
                     } catch (IOException ex) {
                         java.util.logging.Logger.getLogger(DataProviderImpl.class.getName()).log(Level.SEVERE, null, ex);
