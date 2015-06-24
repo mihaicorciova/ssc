@@ -77,95 +77,6 @@ public enum DataProviderImpl implements DataProvider {
                 }
 
                 @Override
-                public void importUserData(File file) {
-                    userData = readExcel(file);
-                    enrichUserData();
-                }
-
-                public void enrichUserData() {
-
-                    File dir = new File(MDB_PATH);
-                    if (dir.exists()) {
-                        log.debug("File from " + MDB_PATH + "  " + dir.listFiles()[0].getName());
-                        nighShiftUsers = updateUserMap(dir.listFiles()[0]).get(0);
-                        excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
-                        excludedUsers = updateUserMap(dir.listFiles()[0]).get(2);
-                    }
-                }
-
-                public List<List<Event>> applyExcludeLogic(List<Event> events) {
-                    List<List<Event>> result = new ArrayList<>();
-                    List<Event> trimedEvents = new ArrayList<>();
-                    List<Event> remainingEvents = new ArrayList<>();
-                    Boolean shouldAdd = false;
-                    for (int i = 0; i < events.size() - 1; i++) {
-                        if (!excludedGates.contains(events.get(i).getAddr())) {
-                            if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
-                                shouldAdd = true;
-                                trimedEvents.add(events.get(i));
-                            } else if (events.get(i).getAddr().contains("Exit") && shouldAdd) {
-                                shouldAdd = false;
-                                trimedEvents.add(events.get(i));
-
-                            } else {
-                                shouldAdd = false;
-                                if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i + 1).getEventDateTime().getMillis() > 15 * 1000l) {
-                                    remainingEvents.add(events.get(i));
-                                }//  log.debug("Adding " + events.get(i).getAddr() + "to rem events");
-                            }
-                        }
-                    }
-                    if (!excludedGates.contains(events.get(events.size() - 1).getAddr())) {
-                        if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
-                            shouldAdd = false;
-                            trimedEvents.add(events.get(events.size() - 1));
-
-                        } else {
-                            shouldAdd = false;
-
-                            remainingEvents.add(events.get(events.size() - 1));
-
-                        }
-
-                    }
-                    result.add(trimedEvents);
-                    result.add(remainingEvents);
-                    return result;
-
-                }
-
-                public Map<DateTime, List<Event>> splitPerDay(List<Event> events, DateTime iniDate, DateTime endDate) {
-                    Map<DateTime, List<Event>> result = new LinkedHashMap<>();
-                    List<Event> perDayList = new ArrayList<>();
-                    if (!events.isEmpty()) {
-                        DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-
-                        for (Event ev : events) {
-                            if (ev.getEventDateTime().isAfter(dt)) {
-                                if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-
-                                    result.put(dt.minusDays(1), perDayList);
-                                }
-                                dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-                                perDayList = null;
-                                perDayList = new ArrayList<>();
-                                perDayList.add(ev);
-
-                            } else {
-                                perDayList.add(ev);
-
-                            }
-                        }
-
-                        if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-
-                            result.put(dt.minusDays(1), perDayList);
-                        }
-                    }
-                    return result;
-                }
-
-                @Override
                 public List<GenericModel> getTableData(DateTime iniDate, DateTime endDate, String department) {
 
                     List<GenericModel> data = new ArrayList<>();
@@ -261,13 +172,6 @@ public enum DataProviderImpl implements DataProvider {
                         }
                     }
                     return data;
-                }
-
-                private String formatMillis(Long millis) {
-                    String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-                            TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
-                            TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
-                    return hms;
                 }
 
                 @Override
@@ -378,15 +282,60 @@ public enum DataProviderImpl implements DataProvider {
                         } else if (nighShiftUsers.contains(userData.get(user).getUserId())) {
                             Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
 
-                            Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
+                            Map<DateTime, List<Event>> eventsPerDay = splitPerDayNS(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
 
-                            Map<DateTime, List<Event>> wrongPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
-                            for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
-                               
-                                if(wrongPerDay.containsKey(day.getKey()))
-                                {
-                                log.debug("shift hours"+wrongPerDay.get(day.getKey()).toString());
+                            Map<DateTime, List<Event>> wrongPerDay = splitPerDayNS(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
+                             for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+                                Boolean wrongEvent = false;
+                                List<Event> events = applyExcludeLogic(day.getValue()).get(0);
+                                if (applyExcludeLogic(userData.get(user).getEvents()).get(1).size() > 0) {
+                                    wrongEvent = true;
                                 }
+                                if (wrongPerDay.containsKey(day.getKey())) {
+                                    if (wrongPerDay.get(day.getKey()).size() > 0) {
+                                        wrongEvent = true;
+                                    }
+                                }
+                                Long duration = 0l;
+                                Long pause = 0l;
+                                DateTime firstevent = null;
+                                DateTime outevent = null;
+                                if (!events.isEmpty()) {
+                                    firstevent = events.get(0).getEventDateTime();
+
+                                    DateTime inevent = null;
+
+                                    for (int i = 0; i < events.size(); i++) {
+
+                                        if (events.get(i).getAddr().contains("In")) {
+                                            if (inevent != null && outevent != null) {
+                                                if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
+
+                                                } else {
+                                                    firstevent = inevent;
+                                                }
+                                            }
+
+                                            inevent = events.get(i).getEventDateTime();
+
+                                        } else if (events.get(i).getAddr().contains("Exit")) {
+
+                                            if (inevent != null) {
+                                                duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
+
+                                                outevent = events.get(i).getEventDateTime();
+
+                                            }
+
+                                        }
+                                    }
+                                }
+                                log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
+                                if (firstevent != null && outevent != null) {
+                                    pause = outevent.getMillis() - firstevent.getMillis() - duration;
+                                }
+                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+
                             }
                         }
                     }
@@ -399,16 +348,141 @@ public enum DataProviderImpl implements DataProvider {
                     if (!destDir.exists()) {
                         destDir.mkdirs();
                     }
-                   
 
                     try {
-                        FileUtils.cleanDirectory(destDir); 
+                        FileUtils.cleanDirectory(destDir);
                         FileUtils.copyFileToDirectory(srcFile, destDir);
                     } catch (IOException ex) {
                         java.util.logging.Logger.getLogger(DataProviderImpl.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
+                @Override
+                public void importUserData(File file) {
+                    userData = readExcel(file);
+                    enrichUserData();
+                }
+
+                public void enrichUserData() {
+
+                    File dir = new File(MDB_PATH);
+                    if (dir.exists()) {
+                        log.debug("File from " + MDB_PATH + "  " + dir.listFiles()[0].getName());
+                        nighShiftUsers = updateUserMap(dir.listFiles()[0]).get(0);
+                        excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
+                        excludedUsers = updateUserMap(dir.listFiles()[0]).get(2);
+                    }
+                }
+
+                public List<List<Event>> applyExcludeLogic(List<Event> events) {
+                    List<List<Event>> result = new ArrayList<>();
+                    List<Event> trimedEvents = new ArrayList<>();
+                    List<Event> remainingEvents = new ArrayList<>();
+                    Boolean shouldAdd = false;
+                    for (int i = 0; i < events.size() - 1; i++) {
+                        if (!excludedGates.contains(events.get(i).getAddr())) {
+                            if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
+                                shouldAdd = true;
+                                trimedEvents.add(events.get(i));
+                            } else if (events.get(i).getAddr().contains("Exit") && shouldAdd) {
+                                shouldAdd = false;
+                                trimedEvents.add(events.get(i));
+
+                            } else {
+                                shouldAdd = false;
+                                if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i + 1).getEventDateTime().getMillis() > 15 * 1000l) {
+                                    remainingEvents.add(events.get(i));
+                                }//  log.debug("Adding " + events.get(i).getAddr() + "to rem events");
+                            }
+                        }
+                    }
+                    if (!excludedGates.contains(events.get(events.size() - 1).getAddr())) {
+                        if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
+                            shouldAdd = false;
+                            trimedEvents.add(events.get(events.size() - 1));
+
+                        } else {
+                            shouldAdd = false;
+
+                            remainingEvents.add(events.get(events.size() - 1));
+
+                        }
+
+                    }
+                    result.add(trimedEvents);
+                    result.add(remainingEvents);
+                    return result;
+
+                }
+
+                public Map<DateTime, List<Event>> splitPerDay(List<Event> events, DateTime iniDate, DateTime endDate) {
+                    Map<DateTime, List<Event>> result = new LinkedHashMap<>();
+                    List<Event> perDayList = new ArrayList<>();
+                    if (!events.isEmpty()) {
+                        DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+
+                        for (Event ev : events) {
+                            if (ev.getEventDateTime().isAfter(dt)) {
+                                if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
+
+                                    result.put(dt.minusDays(1), perDayList);
+                                }
+                                dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+                                perDayList = null;
+                                perDayList = new ArrayList<>();
+                                perDayList.add(ev);
+
+                            } else {
+                                perDayList.add(ev);
+
+                            }
+                        }
+
+                        if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
+
+                            result.put(dt.minusDays(1), perDayList);
+                        }
+                    }
+                    return result;
+                }
+
+                public Map<DateTime, List<Event>> splitPerDayNS(List<Event> events, DateTime iniDate, DateTime endDate) {
+                    Map<DateTime, List<Event>> result = new LinkedHashMap<>();
+                    List<Event> perDayList = new ArrayList<>();
+
+                    if (!events.isEmpty()) {
+                        DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+                        perDayList.add(new Event(dt.minusDays(1).minusMillis(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
+                        for (Event ev : events) {
+                            if (ev.getEventDateTime().isAfter(dt)) {
+                                if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
+                                    perDayList.add(new Event(dt.minusMillis(1), "Intermediate exit event for night shift", "Exit", Boolean.TRUE));
+                                    result.put(dt.minusDays(1), perDayList);
+                                }
+                                dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+                                perDayList = null;
+                                perDayList = new ArrayList<>();
+                                perDayList.add(new Event(dt.minusDays(1).minusMillis(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
+                                perDayList.add(ev);
+                            } else {
+                                perDayList.add(ev);
+                            }
+                        }
+
+                        if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
+
+                            result.put(dt.minusDays(1), perDayList);
+                        }
+                    }
+                    return result;
+                }
+
+                private String formatMillis(Long millis) {
+                    String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                            TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
+                            TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1));
+                    return hms;
+                }
             };
 
     public static DataProvider getInstance() {
