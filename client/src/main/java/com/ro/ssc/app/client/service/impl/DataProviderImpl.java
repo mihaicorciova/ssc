@@ -250,13 +250,6 @@ public enum DataProviderImpl implements DataProvider {
                                     for (int i = 0; i < events.size(); i++) {
 
                                         if (events.get(i).getAddr().contains("In")) {
-                                            if (inevent != null && outevent != null) {
-                                                if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
-
-                                                } else {
-                                                    firstevent = inevent;
-                                                }
-                                            }
 
                                             inevent = events.get(i).getEventDateTime();
 
@@ -285,7 +278,7 @@ public enum DataProviderImpl implements DataProvider {
                             Map<DateTime, List<Event>> eventsPerDay = splitPerDayNS(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
 
                             Map<DateTime, List<Event>> wrongPerDay = splitPerDayNS(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
-                             for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+                            for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
                                 Boolean wrongEvent = false;
                                 List<Event> events = applyExcludeLogic(day.getValue()).get(0);
                                 if (applyExcludeLogic(userData.get(user).getEvents()).get(1).size() > 0) {
@@ -300,30 +293,45 @@ public enum DataProviderImpl implements DataProvider {
                                 Long pause = 0l;
                                 DateTime firstevent = null;
                                 DateTime outevent = null;
+                                Integer jumpIndex = 0;
                                 if (!events.isEmpty()) {
                                     firstevent = events.get(0).getEventDateTime();
+                                    Boolean shouldJump = false;
+                                    if (events.get(0).getDescription().contains("night shift")) {
+                                        shouldJump = true;
 
+                                    }
                                     DateTime inevent = null;
 
                                     for (int i = 0; i < events.size(); i++) {
 
                                         if (events.get(i).getAddr().contains("In")) {
-                                            if (inevent != null && outevent != null) {
-                                                if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
-
-                                                } else {
-                                                    firstevent = inevent;
-                                                }
-                                            }
 
                                             inevent = events.get(i).getEventDateTime();
 
+                                            if (inevent != null) {
+                                                if (inevent.isAfter(firstevent.plusHours(8)) && jumpIndex == 0) {
+
+                                                    firstevent = inevent;
+
+                                                }
+                                            }
                                         } else if (events.get(i).getAddr().contains("Exit")) {
 
                                             if (inevent != null) {
                                                 duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
-
+                                                jumpIndex++;
                                                 outevent = events.get(i).getEventDateTime();
+
+                                            }
+                                            if (outevent.isAfter(firstevent.plusHours(8))) {
+                                                if (firstevent != null && outevent != null) {
+                                                    pause = outevent.getMillis() - firstevent.getMillis() - duration;
+                                                }
+                                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+                                                duration = 0l;
+                                                jumpIndex = 0;
+                                                shouldJump = false;
 
                                             }
 
@@ -334,8 +342,9 @@ public enum DataProviderImpl implements DataProvider {
                                 if (firstevent != null && outevent != null) {
                                     pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                 }
-                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
-
+                                if (jumpIndex > 0) {
+                                    data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+                                }
                             }
                         }
                     }
@@ -369,6 +378,7 @@ public enum DataProviderImpl implements DataProvider {
                     if (dir.exists()) {
                         log.debug("File from " + MDB_PATH + "  " + dir.listFiles()[0].getName());
                         nighShiftUsers = updateUserMap(dir.listFiles()[0]).get(0);
+
                         excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
                         excludedUsers = updateUserMap(dir.listFiles()[0]).get(2);
                     }
@@ -452,7 +462,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     if (!events.isEmpty()) {
                         DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-                        perDayList.add(new Event(dt.minusDays(1).minusMillis(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
+                        perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
                         for (Event ev : events) {
                             if (ev.getEventDateTime().isAfter(dt)) {
                                 if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
@@ -462,7 +472,7 @@ public enum DataProviderImpl implements DataProvider {
                                 dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
                                 perDayList = null;
                                 perDayList = new ArrayList<>();
-                                perDayList.add(new Event(dt.minusDays(1).minusMillis(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
+                                perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
                                 perDayList.add(ev);
                             } else {
                                 perDayList.add(ev);
