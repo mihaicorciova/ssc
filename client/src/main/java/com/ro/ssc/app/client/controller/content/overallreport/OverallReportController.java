@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -206,6 +207,7 @@ public class OverallReportController implements Initializable {
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
+        
 
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");

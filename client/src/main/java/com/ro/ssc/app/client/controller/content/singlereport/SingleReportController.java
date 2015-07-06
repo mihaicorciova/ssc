@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
@@ -138,8 +139,6 @@ public class SingleReportController implements Initializable {
 
     }
 
- 
-   
     public void populateMyTable() {
 
         dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
@@ -155,10 +154,23 @@ public class SingleReportController implements Initializable {
         totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
+        dateTableColumn.setComparator(new Comparator<Object>() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+
+                org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+                DateTime d1 = DateTime.parse((String) o1, format);
+                DateTime d2 = DateTime.parse((String) o2, format);
+                return Long.compare(d1.getMillis(), d2.getMillis());
+
+            }
+
+        });
         singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
     }
 
-   @FXML
+    @FXML
     private void exportTableToPPT() {
         File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt)", ".ppt");
 
@@ -179,14 +191,14 @@ public class SingleReportController implements Initializable {
                     content[rowNo][2] = (String) tableData.getThree();
                     content[rowNo][3] = (String) tableData.getFour();
                     content[rowNo][4] = (String) tableData.getFive();
-                     content[rowNo][5] = (String) tableData.getSix();
+                    content[rowNo][5] = (String) tableData.getSix();
                     rowNo++;
                 }
                 return content;
             }
         };
 
-        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual pentru "+userChoiceBox.getSelectionModel().getSelectedItem().toString()+" de la "+endDatePicker.getValue().format(formatter)+" pana la "+endDatePicker.getValue().format(formatter));
+        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
         fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
     }
 
