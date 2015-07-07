@@ -70,9 +70,9 @@
                         </TreeItem>
                     </root>
                 </TreeView>
-                <AnchorPane layoutY="443.0" prefHeight="70.0" prefWidth="270.0" style="-fx-background-color: light-gray;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                <AnchorPane fx:id="imageViewAnchorPane" layoutY="443.0" prefHeight="70.0" prefWidth="270.0" style="-fx-background-color: light-gray;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                     <children>
-                        <ImageView fitHeight="70.0" fitWidth="113.0" layoutX="94.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="5.0">
+                        <ImageView  fitHeight="70.0" fitWidth="113.0" layoutX="94.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="5.0">
                             <image>
                                 <Image url="@/images/ssc.png" />
                             </image>

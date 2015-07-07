@@ -1,6 +1,7 @@
 package com.ro.ssc.app.client.controller.sidemenu;
 
 import com.ro.ssc.app.client.controller.MainController;
+import com.ro.ssc.app.client.model.commons.Configuration;
 import java.io.IOException;
 
 import javafx.fxml.FXML;
@@ -20,6 +21,8 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -45,6 +48,9 @@ public class SideMenuNoImagesController implements Initializable {
 
     @FXML
     private Label dateSideMenuLabel;
+    
+    @FXML
+    private AnchorPane imageViewAnchorPane;
 
     /**
      * Initializes the controller class.
@@ -57,6 +63,9 @@ public class SideMenuNoImagesController implements Initializable {
     public void initialize(final URL url, final ResourceBundle rb) {
         log.debug("Initializing Side Menu Controller");
 
+        if (!Configuration.HAS_LOGO.getAsBoolean()){
+        imageViewAnchorPane.getChildren().clear();
+        }
         // hide root
         navigationTree.setShowRoot(false);
         navigationTree.getRoot().getChildren().stream().forEach((item) -> {
