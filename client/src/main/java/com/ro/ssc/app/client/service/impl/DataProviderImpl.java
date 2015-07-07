@@ -126,45 +126,89 @@ public enum DataProviderImpl implements DataProvider {
 
                                     data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), wrongEvent == true ? formatMillis(tpause + tduration) + " !" : formatMillis(tpause + tduration)));
 
-                                } else if (nighShiftUsers.contains(entry.getValue().getUserId())) {
-                                    Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+                                } else if (nighShiftUsers.contains(userData.get(entry.getKey()).getUserId())) {
+                                    Collections.sort(userData.get(entry.getKey()).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
 
-                                    List<Event> events = applyExcludeLogic(entry.getValue().getEvents()).get(0);
-                                    Long duration = 0l;
-                                    Long pause = 0l;
-                                    DateTime firstevent = null;
+                                    Map<DateTime, List<Event>> eventsPerDay = splitPerDayNS(applyExcludeLogic(userData.get(entry.getKey()).getEvents()).get(0), iniDate, endDate);
+
+                                    Map<DateTime, List<Event>> wrongPerDay = splitPerDayNS(applyExcludeLogic(userData.get(entry.getKey()).getEvents()).get(1), iniDate, endDate);
+                                    Long tduration = 0l;
+                                    Long tpause = 0l;
                                     Boolean wrongEvent = false;
-                                    if (applyExcludeLogic(entry.getValue().getEvents()).get(1).size() > 0) {
-                                        wrongEvent = true;
-                                    }
-                                    if (!events.isEmpty()) {
-                                        firstevent = events.get(0).getEventDateTime();
-                                        DateTime inevent = null;
+                                    for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+
+                                        List<Event> events = applyExcludeLogic(day.getValue()).get(0);
+                                        if (applyExcludeLogic(userData.get(entry.getKey()).getEvents()).get(1).size() > 0) {
+                                            wrongEvent = true;
+                                        }
+                                        if (wrongPerDay.containsKey(day.getKey())) {
+                                            if (wrongPerDay.get(day.getKey()).size() > 0) {
+                                                wrongEvent = true;
+                                            }
+                                        }
+                                        Long duration = 0l;
+                                        Long pause = 0l;
+                                        DateTime firstevent = null;
                                         DateTime outevent = null;
-                                        for (int i = 0; i < events.size(); i++) {
+                                        Integer jumpIndex = 0;
+                                        if (!events.isEmpty()) {
+                                            firstevent = events.get(0).getEventDateTime();
 
-                                            if (events.get(i).getAddr().contains("In")) {
-                                                if (inevent != null && outevent != null) {
-                                                    if (inevent.getMillis() - firstevent.getMillis() < 8 * 60 * 60 * 1000) {
-                                                        pause += outevent.getMillis() - inevent.getMillis();
+                                            DateTime inevent = null;
 
-                                                    } else {
-                                                        firstevent = inevent;
+                                            for (int i = 0; i < events.size(); i++) {
+
+                                                if (events.get(i).getAddr().contains("In")) {
+
+                                                    if (events.get(i).getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
+                                                        continue;
                                                     }
-                                                }
-                                                inevent = events.get(i).getEventDateTime();
-                                            } else if (events.get(i).getAddr().contains("Exit")) {
-                                                if (inevent != null) {
-                                                    duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
-                                                    outevent = events.get(i).getEventDateTime();
+                                                    inevent = events.get(i).getEventDateTime();
+
+                                                    if (inevent != null) {
+                                                        if (inevent.isAfter(firstevent.plusHours(8)) && jumpIndex == 0) {
+
+                                                            firstevent = inevent;
+
+                                                        }
+                                                    }
+                                                } else if (events.get(i).getAddr().contains("Exit")) {
+
+                                                    if (events.get(i).getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
+                                                        continue;
+                                                    }
+                                                    if (inevent != null) {
+                                                        duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
+                                                        jumpIndex++;
+                                                        outevent = events.get(i).getEventDateTime();
+
+                                                    }
+                                                    if (firstevent != null && outevent != null) {
+                                                        if (outevent.isAfter(firstevent.plusHours(8))) {
+
+                                                            pause = outevent.getMillis() - firstevent.getMillis() - duration;
+                                                            tpause += pause;
+                                                            tduration += duration;
+                                                            duration = 0l;
+                                                            jumpIndex = 0;
+
+                                                        }
+                                                    }
+
                                                 }
                                             }
                                         }
+                                        log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
                                         if (firstevent != null && outevent != null) {
-                                            //    pause = outevent.getMillis() - firstevent.getMillis() - duration;
+                                            pause = outevent.getMillis() - firstevent.getMillis() - duration;
+
+                                        }
+                                        if (jumpIndex > 0) {
+                                            tduration += duration;
                                         }
                                     }
-                                    data.add(new GenericModel(entry.getValue().getName().toUpperCase() + "*", entry.getValue().getDepartment(), formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+
+                                    data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), wrongEvent == true ? formatMillis(tpause + tduration) + " !" : formatMillis(tpause + tduration)));
 
                                 }
                             }
@@ -296,17 +340,16 @@ public enum DataProviderImpl implements DataProvider {
                                 Integer jumpIndex = 0;
                                 if (!events.isEmpty()) {
                                     firstevent = events.get(0).getEventDateTime();
-                                    Boolean shouldJump = false;
-                                    if (events.get(0).getDescription().contains("night shift")) {
-                                        shouldJump = true;
 
-                                    }
                                     DateTime inevent = null;
 
                                     for (int i = 0; i < events.size(); i++) {
 
                                         if (events.get(i).getAddr().contains("In")) {
 
+                                            if (events.get(i).getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
+                                                continue;
+                                            }
                                             inevent = events.get(i).getEventDateTime();
 
                                             if (inevent != null) {
@@ -318,21 +361,25 @@ public enum DataProviderImpl implements DataProvider {
                                             }
                                         } else if (events.get(i).getAddr().contains("Exit")) {
 
+                                            if (events.get(i).getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
+                                                continue;
+                                            }
                                             if (inevent != null) {
                                                 duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
                                                 jumpIndex++;
                                                 outevent = events.get(i).getEventDateTime();
 
                                             }
-                                            if (outevent.isAfter(firstevent.plusHours(8))) {
-                                                if (firstevent != null && outevent != null) {
-                                                    pause = outevent.getMillis() - firstevent.getMillis() - duration;
-                                                }
-                                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
-                                                duration = 0l;
-                                                jumpIndex = 0;
-                                                shouldJump = false;
+                                            if (firstevent != null && outevent != null) {
+                                                if (outevent.isAfter(firstevent.plusHours(8))) {
 
+                                                    pause = outevent.getMillis() - firstevent.getMillis() - duration;
+
+                                                    data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+                                                    duration = 0l;
+                                                    jumpIndex = 0;
+
+                                                }
                                             }
 
                                         }
