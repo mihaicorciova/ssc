@@ -215,6 +215,22 @@ public class OverallReportController implements Initializable {
         totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         departmentTableColumn.setStyle("-fx-alignment:CENTER;");
 
+        
+         Comparator timeComparator=(Comparator<Object>) (Object o1, Object o2) -> {
+            String[] s1= ((String) o1).replace("!", "").split(":");
+             String[] s2= ((String) o2).replace("!", "").split(":");
+            return Long.compare(Long.valueOf(s1[0].trim())*3600+Long.valueOf(s1[1].trim())*60+Long.valueOf(s1[2].trim()), Long.valueOf(s2[0])*3600+Long.valueOf(s2[1].trim())*60+Long.valueOf(s2[2].trim()));
+     
+        };
+        
+       
+        
+        workTimeTableColumn.setComparator(timeComparator);
+        totalTimeTableColumn.setComparator(timeComparator);
+        offTimeTableColumn.setComparator(timeComparator);
+        
+      
+        
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
     }
 

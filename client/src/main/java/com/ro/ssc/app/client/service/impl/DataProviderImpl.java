@@ -19,6 +19,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -46,7 +47,7 @@ public enum DataProviderImpl implements DataProvider {
     INSTANCE {
                 private String MDB_PATH = "mdb";
                 private Map<String, User> userData;
-                private Set<String> nighShiftUsers;
+
                 private Set<String> excludedGates;
                 private Set<String> excludedUsers;
                 private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
@@ -60,11 +61,11 @@ public enum DataProviderImpl implements DataProvider {
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
                         for (Event ev : entry.getValue().getEvents()) {
                             try {
-                                if (nighShiftUsers.contains(entry.getValue().getUserId())) {
-                                    log.debug("night shift" + entry.getValue().getUserId());
-                                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase() + "*", df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
+                                if (entry.getKey().contains("*")) {
+
+                                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
                                 } else {
-                                    log.debug("normal shift" + entry.getValue().getUserId() + "\\n");
+
                                     data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
 
                                 }
@@ -83,7 +84,7 @@ public enum DataProviderImpl implements DataProvider {
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
                         if (!excludedUsers.contains(entry.getKey())) {
                             if (department == null || (department != null && entry.getValue().getDepartment().equals(department))) {
-                                if (!nighShiftUsers.contains(entry.getValue().getUserId())) {
+                                if (!entry.getKey().contains("*")) {
                                     Collections.sort(entry.getValue().getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
                                     Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(entry.getValue().getEvents()).get(0), iniDate, endDate);
                                     Long tduration = 0l;
@@ -119,14 +120,14 @@ public enum DataProviderImpl implements DataProvider {
                                                 pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                             }
                                         }
-                                        // log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
+                                        log.debug("Name: " + entry.getKey() + "Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
                                         tduration += duration;
                                         tpause += pause;
                                     }
 
                                     data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), wrongEvent == true ? formatMillis(tpause + tduration) + " !" : formatMillis(tpause + tduration)));
 
-                                } else if (nighShiftUsers.contains(userData.get(entry.getKey()).getUserId())) {
+                                } else if (entry.getKey().contains("*")) {
                                     Collections.sort(userData.get(entry.getKey()).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
 
                                     Map<DateTime, List<Event>> eventsPerDay = splitPerDayNS(applyExcludeLogic(userData.get(entry.getKey()).getEvents()).get(0), iniDate, endDate);
@@ -138,7 +139,7 @@ public enum DataProviderImpl implements DataProvider {
                                     for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
 
                                         List<Event> events = applyExcludeLogic(day.getValue()).get(0);
-                                        if (applyExcludeLogic(userData.get(entry.getKey()).getEvents()).get(1).size() > 0) {
+                                        if (applyExcludeLogic(day.getValue()).get(1).size() > 0) {
                                             wrongEvent = true;
                                         }
                                         if (wrongPerDay.containsKey(day.getKey())) {
@@ -208,7 +209,7 @@ public enum DataProviderImpl implements DataProvider {
                                         }
                                     }
 
-                                    data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), wrongEvent == true ? formatMillis(tpause + tduration) + " !" : formatMillis(tpause + tduration)));
+                                    data.add(new GenericModel(entry.getValue().getName().toUpperCase(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), wrongEvent == true ? formatMillis(tpause + tduration) + " !" : formatMillis(tpause + tduration)));
 
                                 }
                             }
@@ -266,22 +267,33 @@ public enum DataProviderImpl implements DataProvider {
                     List<GenericModel> data = new ArrayList<>();
 
                     if (user != null && !excludedUsers.contains(user)) {
-                        if (!nighShiftUsers.contains(userData.get(user).getUserId())) {
+                        if (!user.contains("*")) {
                             Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
                             Map<DateTime, List<Event>> eventsPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
-
                             Map<DateTime, List<Event>> wrongPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
-                            for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+
+                            eventsPerDay.entrySet().stream().forEach((day) -> {
                                 Boolean wrongEvent = false;
                                 List<Event> events = applyExcludeLogic(day.getValue()).get(0);
-                                if (applyExcludeLogic(userData.get(user).getEvents()).get(1).size() > 0) {
-                                    wrongEvent = true;
+
+                                if (applyExcludeLogic(day.getValue()).get(1).size() > 0) {
+                                    if (wrongPerDay.containsKey(day.getKey())) {
+                                        wrongPerDay.get(day.getKey()).addAll(applyExcludeLogic(day.getValue()).get(1));
+                                        wrongEvent = true;
+
+                                    } else {
+                                        wrongPerDay.put(day.getKey(), applyExcludeLogic(day.getValue()).get(1));
+                                    }
                                 }
+
                                 if (wrongPerDay.containsKey(day.getKey())) {
                                     if (wrongPerDay.get(day.getKey()).size() > 0) {
                                         wrongEvent = true;
+
                                     }
+
                                 }
+
                                 Long duration = 0l;
                                 Long pause = 0l;
                                 DateTime firstevent = null;
@@ -309,23 +321,31 @@ public enum DataProviderImpl implements DataProvider {
                                         }
                                     }
                                 }
-                                log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
+
                                 if (firstevent != null && outevent != null) {
                                     pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                 }
                                 data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+                            });
 
-                            }
-                        } else if (nighShiftUsers.contains(userData.get(user).getUserId())) {
+                            wrongPerDay.entrySet().stream().forEach((day) -> {
+                                if(!eventsPerDay.containsKey(day.getKey())){
+                                data.add(new GenericModel(day.getKey().toString(dtf2), day.getValue().get(0).getAddr().contains("In") ? day.getValue().get(0).getEventDateTime().toString(dtf) : "",  day.getValue().get(0).getAddr().contains("In") ?  "":day.getValue().get(0).getEventDateTime().toString(dtf) , formatMillis(0l), formatMillis(0l),formatMillis(0l)+ " !" ));
+                                }
+                                });
+                            
+                            
+
+                        } else if (user.contains("*")) {
                             Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
 
                             Map<DateTime, List<Event>> eventsPerDay = splitPerDayNS(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
 
                             Map<DateTime, List<Event>> wrongPerDay = splitPerDayNS(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
-                            for (Map.Entry<DateTime, List<Event>> day : eventsPerDay.entrySet()) {
+                            eventsPerDay.entrySet().stream().forEach((day) -> {
                                 Boolean wrongEvent = false;
                                 List<Event> events = applyExcludeLogic(day.getValue()).get(0);
-                                if (applyExcludeLogic(userData.get(user).getEvents()).get(1).size() > 0) {
+                                if (applyExcludeLogic(day.getValue()).get(1).size() > 0) {
                                     wrongEvent = true;
                                 }
                                 if (wrongPerDay.containsKey(day.getKey())) {
@@ -343,15 +363,12 @@ public enum DataProviderImpl implements DataProvider {
 
                                     DateTime inevent = null;
 
-                                    for (int i = 0; i < events.size(); i++) {
-
-                                        if (events.get(i).getAddr().contains("In")) {
-
-                                            if (events.get(i).getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
+                                    for (Event event : events) {
+                                        if (event.getAddr().contains("In")) {
+                                            if (event.getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
                                                 continue;
                                             }
-                                            inevent = events.get(i).getEventDateTime();
-
+                                            inevent = event.getEventDateTime();
                                             if (inevent != null) {
                                                 if (inevent.isAfter(firstevent.plusHours(8)) && jumpIndex == 0) {
 
@@ -359,16 +376,14 @@ public enum DataProviderImpl implements DataProvider {
 
                                                 }
                                             }
-                                        } else if (events.get(i).getAddr().contains("Exit")) {
-
-                                            if (events.get(i).getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
+                                        } else if (event.getAddr().contains("Exit")) {
+                                            if (event.getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
                                                 continue;
                                             }
                                             if (inevent != null) {
-                                                duration += events.get(i).getEventDateTime().getMillis() - inevent.getMillis();
+                                                duration += event.getEventDateTime().getMillis() - inevent.getMillis();
                                                 jumpIndex++;
-                                                outevent = events.get(i).getEventDateTime();
-
+                                                outevent = event.getEventDateTime();
                                             }
                                             if (firstevent != null && outevent != null) {
                                                 if (outevent.isAfter(firstevent.plusHours(8))) {
@@ -381,20 +396,26 @@ public enum DataProviderImpl implements DataProvider {
 
                                                 }
                                             }
-
                                         }
                                     }
                                 }
-                                log.debug("Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
                                 if (firstevent != null && outevent != null) {
                                     pause = outevent.getMillis() - firstevent.getMillis() - duration;
                                 }
                                 if (jumpIndex > 0) {
                                     data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
                                 }
-                            }
+                            });
                         }
                     }
+
+                     Comparator dateComparator=(Comparator<GenericModel>) (GenericModel o1, GenericModel o2) -> {
+            org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+            DateTime d1 = DateTime.parse((String) o1.getOne(), format);
+            DateTime d2 = DateTime.parse((String) o2.getOne(), format);
+            return Long.compare(d1.getMillis(), d2.getMillis());
+        };
+                      Collections.sort(data, dateComparator);
                     return data;
                 }
 
@@ -416,6 +437,7 @@ public enum DataProviderImpl implements DataProvider {
                 @Override
                 public void importUserData(File file) {
                     userData = readExcel(file);
+
                     enrichUserData();
                 }
 
@@ -424,7 +446,6 @@ public enum DataProviderImpl implements DataProvider {
                     File dir = new File(MDB_PATH);
                     if (dir.exists()) {
                         log.debug("File from " + MDB_PATH + "  " + dir.listFiles()[0].getName());
-                        nighShiftUsers = updateUserMap(dir.listFiles()[0]).get(0);
 
                         excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
                         excludedUsers = updateUserMap(dir.listFiles()[0]).get(2);
@@ -437,7 +458,8 @@ public enum DataProviderImpl implements DataProvider {
                     List<Event> remainingEvents = new ArrayList<>();
                     Boolean shouldAdd = false;
                     for (int i = 0; i < events.size() - 1; i++) {
-                        if (!excludedGates.contains(events.get(i).getAddr())) {
+
+                        if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
                             if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
                                 shouldAdd = true;
                                 trimedEvents.add(events.get(i));
@@ -447,13 +469,14 @@ public enum DataProviderImpl implements DataProvider {
 
                             } else {
                                 shouldAdd = false;
-                                if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i + 1).getEventDateTime().getMillis() > 15 * 1000l) {
+                                if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
+                                    log.debug("Adding " + events.get(i).getAddr() + "to rem events");
                                     remainingEvents.add(events.get(i));
-                                }//  log.debug("Adding " + events.get(i).getAddr() + "to rem events");
+                                }//  
                             }
                         }
                     }
-                    if (!excludedGates.contains(events.get(events.size() - 1).getAddr())) {
+                    if (!excludedGates.contains(events.get(events.size() - 1).getAddr()) && events.get(events.size() - 1).getPassed()) {
                         if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
                             shouldAdd = false;
                             trimedEvents.add(events.get(events.size() - 1));

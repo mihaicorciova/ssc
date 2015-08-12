@@ -154,19 +154,26 @@ public class SingleReportController implements Initializable {
         totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
-        dateTableColumn.setComparator(new Comparator<Object>() {
-
-            @Override
-            public int compare(Object o1, Object o2) {
-
-                org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
-                DateTime d1 = DateTime.parse((String) o1, format);
-                DateTime d2 = DateTime.parse((String) o2, format);
-                return Long.compare(d1.getMillis(), d2.getMillis());
-
-            }
-
-        });
+        Comparator timeComparator=(Comparator<Object>) (Object o1, Object o2) -> {
+            String[] s1= ((String) o1).replace("!", "").split(":");
+             String[] s2= ((String) o2).replace("!", "").split(":");
+            return Long.compare(Long.valueOf(s1[0].trim())*3600+Long.valueOf(s1[1].trim())*60+Long.valueOf(s1[2].trim()), Long.valueOf(s2[0])*3600+Long.valueOf(s2[1].trim())*60+Long.valueOf(s2[2].trim()));
+     
+        };
+        
+        Comparator dateComparator=(Comparator<Object>) (Object o1, Object o2) -> {
+            org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+            DateTime d1 = DateTime.parse((String) o1, format);
+            DateTime d2 = DateTime.parse((String) o2, format);
+            return Long.compare(d1.getMillis(), d2.getMillis());
+        };
+        
+        workTimeTableColumn.setComparator(timeComparator);
+        totalTimeTableColumn.setComparator(timeComparator);
+        offTimeTableColumn.setComparator(timeComparator);
+        
+        dateTableColumn.setComparator(dateComparator);
+        
         singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
     }
 

@@ -54,12 +54,9 @@ public class TrialKeyGenerator {
     }
 
     public static void main(String args[]) {
-        if (args.length > 0) {
+ 
            DateTimeFormatter dtf2 = DateTimeFormat.forPattern("dd-MM-yyyy");
             System.out.println(generateKey(new DateTime().plusDays(7).toString(dtf2)));
-        }
-        else {
-            System.out.println("Usage:\n\tjava TrialKeyGenerator <dateToEncode as dd-MM-yyyy>");
-        }
+           
     }
 }

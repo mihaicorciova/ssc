@@ -43,7 +43,7 @@ public class AccessReader {
 
         Table table;
         try {
-            log.debug("In access reader");
+           
             table = DatabaseBuilder.open(file).getTable("t_b_Reader");
             Cursor cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable().addMatchPattern("f_Attend", 0)) {
@@ -70,7 +70,7 @@ public class AccessReader {
         result.add(nightShifts);
         result.add(excludedGates);
         result.add(excludedUsers);
-log.debug("First id"+nightShifts.iterator().next());
+
         return result;
     }
 
