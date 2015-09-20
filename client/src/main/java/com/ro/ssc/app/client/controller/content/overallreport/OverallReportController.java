@@ -5,70 +5,31 @@
  */
 package com.ro.ssc.app.client.controller.content.overallreport;
 
-import com.ro.ssc.app.client.exporter.Column;
-import com.ro.ssc.app.client.exporter.PDFTableGenerator;
 import com.ro.ssc.app.client.exporter.PptTableExporter;
-import com.ro.ssc.app.client.exporter.Table;
-import com.ro.ssc.app.client.exporter.TableBuilder;
-import com.ro.ssc.app.client.model.commons.Event;
 import com.ro.ssc.app.client.model.commons.GenericModel;
-import com.ro.ssc.app.client.model.commons.User;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
-import com.sun.javafx.scene.control.skin.DatePickerContent;
-import com.sun.javafx.scene.control.skin.DatePickerSkin;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.WritableImage;
-import javafx.scene.text.Text;
-import javafx.util.StringConverter;
-import org.apache.pdfbox.exceptions.COSVisitorException;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -125,23 +86,14 @@ public class OverallReportController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
-            iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(final ActionEvent e) {
-
-                    iniDate = DateTime.parse(iniDatePicker.getValue().format(formatter), dtf);
-                    populateMyTable();
-                }
+            iniDatePicker.setOnAction((final ActionEvent e) -> {
+                iniDate = DateTime.parse(iniDatePicker.getValue().format(formatter), dtf);
+                populateMyTable();
             });
 
-            endDatePicker.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(final ActionEvent e) {
-
-                    endDate = DateTime.parse(endDatePicker.getValue().format(formatter), dtf);
-                    populateMyTable();
-
-                }
+            endDatePicker.setOnAction((final ActionEvent e) -> {
+                endDate = DateTime.parse(endDatePicker.getValue().format(formatter), dtf);
+                populateMyTable();
             });
             departmentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 
@@ -170,7 +122,7 @@ public class OverallReportController implements Initializable {
 
     }
 
-    @FXML
+@FXML
     private void exportTableToPPT() {
         File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt)", ".ppt");
 

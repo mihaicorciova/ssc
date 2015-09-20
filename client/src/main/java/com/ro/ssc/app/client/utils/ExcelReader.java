@@ -75,7 +75,7 @@ public class ExcelReader {
                         String user=WordUtils.capitalizeFully(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim());
                         if (result.containsKey(user)) {
                             events = result.get(user).getEvents();
-                            
+                            events.get(0);
                             events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
                             result.get(user).setEvents(events);
                            

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -277,12 +278,14 @@ public enum DataProviderImpl implements DataProvider {
                                 List<Event> events = applyExcludeLogic(day.getValue()).get(0);
 
                                 if (applyExcludeLogic(day.getValue()).get(1).size() > 0) {
+                                    List<Event> ev = applyExcludeLogic(day.getValue()).get(1).stream().filter(event -> (!event.getDescription().contains("night shift"))).collect(Collectors.toList());
+
                                     if (wrongPerDay.containsKey(day.getKey())) {
-                                        wrongPerDay.get(day.getKey()).addAll(applyExcludeLogic(day.getValue()).get(1));
+                                        wrongPerDay.get(day.getKey()).addAll(ev);
                                         wrongEvent = true;
 
                                     } else {
-                                        wrongPerDay.put(day.getKey(), applyExcludeLogic(day.getValue()).get(1));
+                                        wrongPerDay.put(day.getKey(), ev);
                                     }
                                 }
 
@@ -324,35 +327,55 @@ public enum DataProviderImpl implements DataProvider {
 
                                 if (firstevent != null && outevent != null) {
                                     pause = outevent.getMillis() - firstevent.getMillis() - duration;
+                                    data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+
+                                } else {
+
+                                    data.add(new GenericModel(day.getKey().toString(dtf2), day.getValue().get(0).getAddr().contains("In") ? day.getValue().get(0).getEventDateTime().toString(dtf) : "", day.getValue().get(0).getAddr().contains("In") ? "" : day.getValue().get(0).getEventDateTime().toString(dtf), formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+
                                 }
-                                data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
                             });
 
                             wrongPerDay.entrySet().stream().forEach((day) -> {
-                                if(!eventsPerDay.containsKey(day.getKey())){
-                                data.add(new GenericModel(day.getKey().toString(dtf2), day.getValue().get(0).getAddr().contains("In") ? day.getValue().get(0).getEventDateTime().toString(dtf) : "",  day.getValue().get(0).getAddr().contains("In") ?  "":day.getValue().get(0).getEventDateTime().toString(dtf) , formatMillis(0l), formatMillis(0l),formatMillis(0l)+ " !" ));
+                                if (!eventsPerDay.containsKey(day.getKey())) {
+                                    data.add(new GenericModel(day.getKey().toString(dtf2), day.getValue().get(0).getAddr().contains("In") ? day.getValue().get(0).getEventDateTime().toString(dtf) : "", day.getValue().get(0).getAddr().contains("In") ? "" : day.getValue().get(0).getEventDateTime().toString(dtf), formatMillis(0l), formatMillis(0l), formatMillis(0l) + " !"));
                                 }
-                                });
-                            
-                            
+                            });
 
                         } else if (user.contains("*")) {
                             Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
 
                             Map<DateTime, List<Event>> eventsPerDay = splitPerDayNS(applyExcludeLogic(userData.get(user).getEvents()).get(0), iniDate, endDate);
 
-                            Map<DateTime, List<Event>> wrongPerDay = splitPerDayNS(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
+                            Map<DateTime, List<Event>> wrongPerDay = splitPerDay(applyExcludeLogic(userData.get(user).getEvents()).get(1), iniDate, endDate);
                             eventsPerDay.entrySet().stream().forEach((day) -> {
                                 Boolean wrongEvent = false;
                                 List<Event> events = applyExcludeLogic(day.getValue()).get(0);
-                                if (applyExcludeLogic(day.getValue()).get(1).size() > 0) {
-                                    wrongEvent = true;
+                                List<Event> ev = applyExcludeLogic(day.getValue()).get(1);
+                                if (ev.size() > 0) {
+
+                                    if (wrongPerDay.containsKey(day.getKey())) {
+                                        wrongPerDay.get(day.getKey()).addAll(ev);
+                                        wrongEvent = true;
+
+                                    } else {
+                                        wrongPerDay.put(day.getKey(), ev);
+                                    }
+                                    
+                                      wrongPerDay.get(day.getKey()).stream().forEach(p->log.debug("ccccc "+p.getEventDateTime().toString()));
                                 }
+
                                 if (wrongPerDay.containsKey(day.getKey())) {
                                     if (wrongPerDay.get(day.getKey()).size() > 0) {
                                         wrongEvent = true;
+
                                     }
+                                        
+                                  
+                                    wrongPerDay.get(day.getKey()).stream().forEach(p->log.debug("bbbbbb "+p.getEventDateTime().toString()));
                                 }
+                                
+                                
                                 Long duration = 0l;
                                 Long pause = 0l;
                                 DateTime firstevent = null;
@@ -376,6 +399,7 @@ public enum DataProviderImpl implements DataProvider {
 
                                                 }
                                             }
+
                                         } else if (event.getAddr().contains("Exit")) {
                                             if (event.getDescription().contains("night shift") && !eventsPerDay.containsKey(day.getKey().plusDays(1))) {
                                                 continue;
@@ -401,21 +425,31 @@ public enum DataProviderImpl implements DataProvider {
                                 }
                                 if (firstevent != null && outevent != null) {
                                     pause = outevent.getMillis() - firstevent.getMillis() - duration;
+
                                 }
                                 if (jumpIndex > 0) {
                                     data.add(new GenericModel(day.getKey().toString(dtf2), firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", formatMillis(duration), formatMillis(pause), wrongEvent == true ? formatMillis(pause + duration) + " !" : formatMillis(pause + duration)));
+                                }
+
+                            });
+                            wrongPerDay.entrySet().stream().forEach((day) -> {
+                                
+                                day.getValue().stream().forEach(p->log.debug("aaaaa "+p.getEventDateTime().toString()));
+                                if (!eventsPerDay.containsKey(day.getKey())) {
+                                 
+                                    data.add(new GenericModel(day.getKey().toString(dtf2), day.getValue().get(0).getAddr().contains("In") ? day.getValue().get(0).getEventDateTime().toString(dtf) : "", day.getValue().get(0).getAddr().contains("In") ? "" : day.getValue().get(0).getEventDateTime().toString(dtf), formatMillis(0l), formatMillis(0l), formatMillis(0l) + " !"));
                                 }
                             });
                         }
                     }
 
-                     Comparator dateComparator=(Comparator<GenericModel>) (GenericModel o1, GenericModel o2) -> {
-            org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
-            DateTime d1 = DateTime.parse((String) o1.getOne(), format);
-            DateTime d2 = DateTime.parse((String) o2.getOne(), format);
-            return Long.compare(d1.getMillis(), d2.getMillis());
-        };
-                      Collections.sort(data, dateComparator);
+                    Comparator dateComparator = (Comparator<GenericModel>) (GenericModel o1, GenericModel o2) -> {
+                        org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+                        DateTime d1 = DateTime.parse((String) o1.getOne(), format);
+                        DateTime d2 = DateTime.parse((String) o2.getOne(), format);
+                        return Long.compare(d1.getMillis(), d2.getMillis());
+                    };
+                    Collections.sort(data, dateComparator);
                     return data;
                 }
 
@@ -470,9 +504,10 @@ public enum DataProviderImpl implements DataProvider {
                             } else {
                                 shouldAdd = false;
                                 if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
-                                    log.debug("Adding " + events.get(i).getAddr() + "to rem events");
-                                    remainingEvents.add(events.get(i));
-                                }//  
+                                 
+                                        remainingEvents.add(events.get(i));
+                                    
+                                }
                             }
                         }
                     }
@@ -483,9 +518,11 @@ public enum DataProviderImpl implements DataProvider {
 
                         } else {
                             shouldAdd = false;
+                            if (!events.get(events.size() - 1).getDescription().contains("shift")) {
+                                log.debug("Adding " + events.get(events.size() - 1).getAddr() + " to rem events " + events.get(events.size() - 1).getDescription() + " " + events.get(events.size() - 1).getEventDateTime().toString());
 
-                            remainingEvents.add(events.get(events.size() - 1));
-
+                                remainingEvents.add(events.get(events.size() - 1));
+                            }
                         }
 
                     }

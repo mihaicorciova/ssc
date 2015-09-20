@@ -1,6 +1,5 @@
 package com.ro.ssc.app.client;
 
-import com.ro.ssc.app.client.controller.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

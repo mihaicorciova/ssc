@@ -19,6 +19,15 @@ public class Event {
     String addr;
     Boolean passed;
     Boolean isAccountable;
+int aaa;
+
+    public int getAaa() {
+        return aaa;
+    }
+
+    public void setAaa(int aaa) {
+        this.aaa = aaa;
+    }
 
     public Event(DateTime eventDateTime, String description, String addr, Boolean passed) {
         this.eventDateTime = eventDateTime;
