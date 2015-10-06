@@ -10,11 +10,10 @@ import com.healthmarketscience.jackcess.CursorBuilder;
 import com.healthmarketscience.jackcess.DatabaseBuilder;
 import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
-import com.ro.ssc.app.client.model.commons.User;
-import com.ro.ssc.app.client.service.impl.DataProviderImpl;
+import com.ro.ssc.app.client.model.commons.ShiftData;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +34,6 @@ public class AccessReader {
 
     public static List<Set<String>> updateUserMap(File file) {
 
-     
         Set<String> excludedGates = new LinkedHashSet<>();
         Set<String> excludedUsers = new LinkedHashSet<>();
         Set<String> nightShifts = new LinkedHashSet<>();
@@ -43,7 +41,7 @@ public class AccessReader {
 
         Table table;
         try {
-           
+
             table = DatabaseBuilder.open(file).getTable("t_b_Reader");
             Cursor cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable().addMatchPattern("f_Attend", 0)) {
@@ -70,6 +68,52 @@ public class AccessReader {
         result.add(nightShifts);
         result.add(excludedGates);
         result.add(excludedUsers);
+
+        return result;
+    }
+
+    public static Map<String, Map<String, ShiftData>> getShiftData(File file) {
+       
+        final Map<String, ShiftData> shiftMap = new HashMap<>();
+        
+        final Map<String, Map<String, ShiftData>> result = new HashMap<>();
+        Table table;
+        try {
+
+            table = DatabaseBuilder.open(file).getTable("t_b_ShiftSet");
+            Cursor cursor = CursorBuilder.createCursor(table);
+            for (Row row : cursor.newIterable()) {
+
+                shiftMap.put(String.format("%s", row.get("f_ShiftID")), new ShiftData(String.format("%s", row.get("f_ShiftID")), String.format("%s", row.get("f_ShiftName")).contains("\\:") ? String.format("%s", row.get("f_ShiftName")).split("\\:")[0] : String.format("%s", row.get("f_ShiftName")),
+                        String.format("%s", row.get("f_ShiftName")).contains("\\:") ? String.format("%s", row.get("f_ShiftName")).split("\\:")[1] : "0",
+                        String.format("%s", row.get("f_OnDuty1")), String.format("%s", row.get("f_OffDuty1"))));
+               
+            }
+
+            table = DatabaseBuilder.open(file).getTable("t_d_ShiftData");
+            cursor = CursorBuilder.createCursor(table);
+            for (Row row : cursor.newIterable()) {
+                 Map<String, ShiftData> inter = new HashMap<>();
+                for (int i = 1; i <= 31; i++) {
+                    if (i < 10) {
+                        String key = String.format("%s", row.get("f_ShiftID_0" + i));
+                        if (shiftMap.containsKey(key)) {
+                            inter.put(String.valueOf(i), shiftMap.get(key));
+                        }
+                    } else {
+                        String key = String.format("%s", row.get("f_ShiftID_" + i));
+                        if (shiftMap.containsKey(key)) {
+                            inter.put(String.valueOf(i), shiftMap.get(key));
+                        }
+                    }
+                }
+             
+                result.put(String.format("%s", row.get("f_ConsumerID")), inter);
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(AccessReader.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         return result;
     }

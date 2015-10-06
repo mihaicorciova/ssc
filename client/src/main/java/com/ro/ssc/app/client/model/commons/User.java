@@ -17,8 +17,7 @@ public class User {
     String userId;
     String cardNo;
     String department;
-
-   
+      
     Boolean isNghtShift;
     List<Event> events;
 

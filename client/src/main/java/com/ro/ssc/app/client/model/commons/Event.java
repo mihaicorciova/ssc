@@ -14,12 +14,12 @@ import org.joda.time.DateTime;
  */
 public class Event {
 
-    DateTime eventDateTime;
-    String description;
-    String addr;
-    Boolean passed;
-    Boolean isAccountable;
-int aaa;
+    private DateTime eventDateTime;
+    private String description;
+    private String addr;
+    private Boolean passed;
+    private Boolean isAccountable;
+    private int aaa;
 
     public int getAaa() {
         return aaa;
@@ -34,7 +34,7 @@ int aaa;
         this.description = description;
         this.addr = addr;
         this.passed = passed;
-            }
+    }
 
     public Boolean getIsAccountable() {
         return isAccountable;

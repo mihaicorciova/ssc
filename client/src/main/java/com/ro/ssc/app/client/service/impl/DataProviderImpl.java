@@ -9,10 +9,12 @@ import com.ro.ssc.app.client.controller.content.overallreport.OverallReportContr
 import com.ro.ssc.app.client.controller.content.sumary.SumaryController;
 import com.ro.ssc.app.client.model.commons.Event;
 import com.ro.ssc.app.client.model.commons.GenericModel;
+import com.ro.ssc.app.client.model.commons.ShiftData;
 import com.ro.ssc.app.client.model.commons.User;
 import com.ro.ssc.app.client.service.api.DataProvider;
 import static com.ro.ssc.app.client.utils.ExcelReader.readExcel;
 import static com.ro.ssc.app.client.utils.AccessReader.updateUserMap;
+import static com.ro.ssc.app.client.utils.AccessReader.getShiftData;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -47,8 +49,8 @@ public enum DataProviderImpl implements DataProvider {
 
     INSTANCE {
                 private String MDB_PATH = "mdb";
-                private Map<String, User> userData;
-
+                private Map<String, User> userData=new HashMap();
+                private Map<String,Map<String,ShiftData>> shiftData;
                 private Set<String> excludedGates;
                 private Set<String> excludedUsers;
                 private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
@@ -483,6 +485,7 @@ public enum DataProviderImpl implements DataProvider {
 
                         excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
                         excludedUsers = updateUserMap(dir.listFiles()[0]).get(2);
+                        shiftData= getShiftData(dir.listFiles()[0]);
                     }
                 }
 
