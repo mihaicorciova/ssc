@@ -1,0 +1,72 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ro.ssc.app.client.model.commons;
+
+/**
+ *
+ * @author DauBufu
+ */
+public class ShiftData {
+
+    private String shiftId;
+    private String shiftName;
+    private String shiftBreakTime;
+    private String shiftStartHour;
+    private String shiftEndHour;
+
+    public ShiftData(String shiftId, String shiftName, String shiftBreakTime, String shiftStartHour, String shiftEndHour) {
+        this.shiftId = shiftId;
+        this.shiftName = shiftName;
+        this.shiftBreakTime = shiftBreakTime;
+        this.shiftStartHour = shiftStartHour;
+        this.shiftEndHour = shiftEndHour;
+    }
+
+    public String getShiftId() {
+        return shiftId;
+    }
+
+    public void setShiftId(String shiftId) {
+        this.shiftId = shiftId;
+    }
+
+    public String getShiftName() {
+        return shiftName;
+    }
+
+    public void setShiftName(String shiftName) {
+        this.shiftName = shiftName;
+    }
+
+    public String getShiftBreakTime() {
+        return shiftBreakTime;
+    }
+
+    public void setShiftBreakTime(String shiftBreakTime) {
+        this.shiftBreakTime = shiftBreakTime;
+    }
+
+    public String getShiftStartHour() {
+        return shiftStartHour;
+    }
+
+    public void setShiftStartHour(String shiftStartHour) {
+        this.shiftStartHour = shiftStartHour;
+    }
+
+    public String getShiftEndHour() {
+        return shiftEndHour;
+    }
+
+    public void setShiftEndHour(String shiftEndHour) {
+        this.shiftEndHour = shiftEndHour;
+    }
+
+    @Override
+    public String toString() {
+        return "ShiftData{" + "shiftId=" + shiftId + ", shiftName=" + shiftName + ", shiftBreakTime=" + shiftBreakTime + ", shiftStartHour=" + shiftStartHour + ", shiftEndHour=" + shiftEndHour + '}';
+    }
+}
