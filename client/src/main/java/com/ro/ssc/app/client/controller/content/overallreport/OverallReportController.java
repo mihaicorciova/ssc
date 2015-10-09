@@ -72,6 +72,13 @@ public class OverallReportController implements Initializable {
     private TableColumn<GenericModel, Object> workTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> departmentTableColumn;
+     @FXML
+    private TableColumn<GenericModel, Object> overtimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> absenceTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> lateTableColumn;
+
 
     /**
      * Initializes the controller class.
@@ -159,13 +166,18 @@ public class OverallReportController implements Initializable {
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
-        
+         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
+        lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
+        overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
 
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         nameTableColumn.setStyle("-fx-alignment:CENTER;");
         totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         departmentTableColumn.setStyle("-fx-alignment:CENTER;");
+  absenceTableColumn.setStyle("-fx-alignment:CENTER;");
+        lateTableColumn.setStyle("-fx-alignment:CENTER;");
+        overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
         
          Comparator timeComparator=(Comparator<Object>) (Object o1, Object o2) -> {
@@ -180,7 +192,8 @@ public class OverallReportController implements Initializable {
         workTimeTableColumn.setComparator(timeComparator);
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
-        
+        overtimeTableColumn.setComparator(timeComparator);
+      
       
         
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));

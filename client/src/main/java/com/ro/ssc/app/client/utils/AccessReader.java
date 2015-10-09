@@ -73,9 +73,9 @@ public class AccessReader {
     }
 
     public static Map<String, Map<String, ShiftData>> getShiftData(File file) {
-       
+
         final Map<String, ShiftData> shiftMap = new HashMap<>();
-        
+
         final Map<String, Map<String, ShiftData>> result = new HashMap<>();
         Table table;
         try {
@@ -84,31 +84,43 @@ public class AccessReader {
             Cursor cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable()) {
 
-                shiftMap.put(String.format("%s", row.get("f_ShiftID")), new ShiftData(String.format("%s", row.get("f_ShiftID")), String.format("%s", row.get("f_ShiftName")).contains("\\:") ? String.format("%s", row.get("f_ShiftName")).split("\\:")[0] : String.format("%s", row.get("f_ShiftName")),
-                        String.format("%s", row.get("f_ShiftName")).contains("\\:") ? String.format("%s", row.get("f_ShiftName")).split("\\:")[1] : "0",
-                        String.format("%s", row.get("f_OnDuty1")), String.format("%s", row.get("f_OffDuty1"))));
-               
+                shiftMap.put(String.format("%s", row.get("f_ShiftID")), new ShiftData(String.format("%s", row.get("f_ShiftID")), String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[0] : String.format("%s", row.get("f_ShiftName")),
+                        String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[1] : "0",
+                        String.format("%s", row.get("f_OnDuty1")).replace("CET ",""), String.format("%s", row.get("f_OffDuty1")).replace("CET ","")));
+
             }
 
+            for (String day : shiftMap.keySet()) {
+                log.debug("ziua " + day + " " + shiftMap.get(day).toString());
+            }
             table = DatabaseBuilder.open(file).getTable("t_d_ShiftData");
             cursor = CursorBuilder.createCursor(table);
+            Map<String, ShiftData> inter = new HashMap<>();
+            int cnt = 0;
             for (Row row : cursor.newIterable()) {
-                 Map<String, ShiftData> inter = new HashMap<>();
+                String userId = String.format("%s", row.get("f_ConsumerID"));
+                log.debug(userId);
+                if (!result.containsKey(userId)) {
+
+                    inter = new HashMap<>();
+                    result.put(userId, inter);
+
+                }
+
                 for (int i = 1; i <= 31; i++) {
                     if (i < 10) {
                         String key = String.format("%s", row.get("f_ShiftID_0" + i));
                         if (shiftMap.containsKey(key)) {
-                            inter.put(String.valueOf(i), shiftMap.get(key));
+                            inter.put(String.format("%s", row.get("f_DateYM")) + "-0" + String.valueOf(i), shiftMap.get(key));
                         }
                     } else {
                         String key = String.format("%s", row.get("f_ShiftID_" + i));
                         if (shiftMap.containsKey(key)) {
-                            inter.put(String.valueOf(i), shiftMap.get(key));
+                            inter.put(String.format("%s", row.get("f_DateYM")) + "-" + String.valueOf(i), shiftMap.get(key));
                         }
                     }
                 }
-             
-                result.put(String.format("%s", row.get("f_ConsumerID")), inter);
+
             }
 
         } catch (IOException ex) {
