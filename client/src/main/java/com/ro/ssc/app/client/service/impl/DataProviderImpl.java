@@ -140,24 +140,25 @@ public enum DataProviderImpl implements DataProvider {
                                             if (shiftData.get(userId).keySet().contains(dayKey)) {
                                                 
                                                 Long allowedPause= 60*1000*Long.valueOf(shiftData.get(userId).get(dayKey).getShiftBreakTime());
-                                               DateTime officialStart=new DateTime();
-                                                DateTime officialEnd=new DateTime();
-                                           officialStart=DateTime.parse(shiftData.get(userId).get(dayKey).getShiftStartHour(), dtf4);
-                                              officialEnd=DateTime.parse(shiftData.get(userId).get(dayKey).getShiftEndHour(), dtf4);
+                                               DateTime officialStart=DateTime.parse(shiftData.get(userId).get(dayKey).getShiftStartHour(), dtf4);
+                                                DateTime officialEnd=DateTime.parse(shiftData.get(userId).get(dayKey).getShiftEndHour(), dtf4);
+                                                                                        log.debug("Name: " + entry.getKey() + " Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) +" allowedPause "+ formatMillis(allowedPause)+ "overtime "+tovertime + "  after day" + day.getKey().toString());
+
                                               if (allowedPause<pause)
                                               {
-                                              duration=duration+allowedPause-pause;
+                                              duration+=allowedPause-pause;
                                               }
                                               if(duration>(officialEnd.getMillis()-officialStart.getMillis()))
                                               {
                                               tovertime +=duration-(officialEnd.getMillis()-officialStart.getMillis());
                                               }
                                              
-                                              
+                                             log.debug("Name: " + entry.getKey() + " Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) +" allowedPause "+ formatMillis(allowedPause)+ "overtime "+tovertime + "  after day" + day.getKey().toString());
+                                      
                                              }
+                                              
                                         }
-                                        log.debug("Name: " + entry.getKey() + "Duration " + formatMillis(duration) + "  Pause " + formatMillis(pause) + "  after day" + day.getKey().toString());
-                                        tduration += duration;
+                                         tduration += duration;
                                         tpause += pause;
                                     }
 
