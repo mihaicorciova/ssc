@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ro.ssc.app.client.controller.content.overallreport;
+package com.ro.ssc.app.client.controller.content.singlereport;
 
 import com.ro.ssc.app.client.exporter.PptTableExporter;
 import com.ro.ssc.app.client.model.commons.GenericModel;
@@ -20,6 +20,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -30,7 +31,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +38,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author DauBufu
  */
-public class OverallReportController implements Initializable {
+public class SingleAbsController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
-    private static final Logger log = LoggerFactory.getLogger(OverallReportController.class);
+    private static final Logger log = LoggerFactory.getLogger(SingleAbsController.class);
  private static final String ALL="all";
     private DateTime iniDate;
     private DateTime endDate;
@@ -49,31 +49,25 @@ public class OverallReportController implements Initializable {
     private final org.joda.time.format.DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
 
     @FXML
-    private ChoiceBox departmentChoiceBox;
+    private ChoiceBox userChoiceBox;
     @FXML
     private Button exportButton;
     @FXML
     private DatePicker iniDatePicker;
     @FXML
     private DatePicker endDatePicker;
+
     @FXML
-    private TableView overallReportTableView;
+    private TableView singleReportTableView;
+
     @FXML
-    private TableColumn<GenericModel, Object> offTimeTableColumn;
+    private TableColumn<GenericModel, Object> dateTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object> totalTimeTableColumn;
+    private TableColumn<GenericModel, Object> absTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object> nameTableColumn;
+    private TableColumn<GenericModel, Object> entryTimeTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object> workTimeTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> departmentTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> overtimeTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> absenceTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> lateTableColumn;
+    private TableColumn<GenericModel, Object> delayTableColumn;
 
     /**
      * Initializes the controller class.
@@ -88,16 +82,25 @@ public class OverallReportController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
-            iniDatePicker.setOnAction((final ActionEvent e) -> {
-                iniDate = DateTime.parse(iniDatePicker.getValue().format(formatter), dtf);
-                populateMyTable();
+            iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(final ActionEvent e) {
+
+                    iniDate = DateTime.parse(iniDatePicker.getValue().format(formatter), dtf);
+                    populateMyTable();
+                }
             });
 
-            endDatePicker.setOnAction((final ActionEvent e) -> {
-                endDate = DateTime.parse(endDatePicker.getValue().format(formatter), dtf);
-                populateMyTable();
+            endDatePicker.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(final ActionEvent e) {
+
+                    endDate = DateTime.parse(endDatePicker.getValue().format(formatter), dtf);
+                    populateMyTable();
+
+                }
             });
-            departmentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            userChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 
                 @Override
                 public void changed(ObservableValue observable, String oldValue, String newValue) {
@@ -105,8 +108,8 @@ public class OverallReportController implements Initializable {
                 }
             });
 
-            departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
-
+            userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
+            userChoiceBox.getSelectionModel().selectFirst();
             iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
             endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
 
@@ -118,10 +121,34 @@ public class OverallReportController implements Initializable {
                 endDatePicker.setValue(LocalDate.parse(endDate.toString(dtf), formatter));
             }
 
-            populateMyTable();
-
         }
 
+    }
+
+    public void populateMyTable() {
+
+        dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
+        entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
+        absTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
+        delayTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+       
+        dateTableColumn.setStyle("-fx-alignment:CENTER;");
+        absTableColumn.setStyle("-fx-alignment:CENTER;");
+        delayTableColumn.setStyle("-fx-alignment:CENTER;");
+        entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+       
+       
+        Comparator dateComparator = (Comparator<Object>) (Object o1, Object o2) -> {
+            org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+            DateTime d1 = DateTime.parse((String) o1, format);
+            DateTime d2 = DateTime.parse((String) o2, format);
+            return Long.compare(d1.getMillis(), d2.getMillis());
+        };
+
+       
+        dateTableColumn.setComparator(dateComparator);
+
+        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
     }
 
     @FXML
@@ -145,48 +172,15 @@ public class OverallReportController implements Initializable {
                     content[rowNo][2] = (String) tableData.getThree();
                     content[rowNo][3] = (String) tableData.getFour();
                     content[rowNo][4] = (String) tableData.getFive();
+                    content[rowNo][5] = (String) tableData.getSix();
                     rowNo++;
                 }
                 return content;
             }
         };
 
-        pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
         fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
-    }
-
-    public void populateMyTable() {
-        nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
-        departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
-        workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
-        offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
-        totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
-        absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
-        lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
-        overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
-
-        workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-        offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-        nameTableColumn.setStyle("-fx-alignment:CENTER;");
-        totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-        departmentTableColumn.setStyle("-fx-alignment:CENTER;");
-        absenceTableColumn.setStyle("-fx-alignment:CENTER;");
-        lateTableColumn.setStyle("-fx-alignment:CENTER;");
-        overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
-
-        Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
-            String[] s1 = ((String) o1).replace("!", "").split(":");
-            String[] s2 = ((String) o2).replace("!", "").split(":");
-            return Long.compare(Long.valueOf(s1[0].trim()) * 3600 + Long.valueOf(s1[1].trim()) * 60 + Long.valueOf(s1[2].trim()), Long.valueOf(s2[0]) * 3600 + Long.valueOf(s2[1].trim()) * 60 + Long.valueOf(s2[2].trim()));
-
-        };
-
-        workTimeTableColumn.setComparator(timeComparator);
-        totalTimeTableColumn.setComparator(timeComparator);
-        offTimeTableColumn.setComparator(timeComparator);
-        overtimeTableColumn.setComparator(timeComparator);
-
-        overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
     }
 
 }

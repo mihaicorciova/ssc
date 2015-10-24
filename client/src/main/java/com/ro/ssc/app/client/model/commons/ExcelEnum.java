@@ -5,9 +5,6 @@
  */
 package com.ro.ssc.app.client.model.commons;
 
-import com.ro.ssc.app.client.controller.MainController;
-import java.util.EnumMap;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +23,7 @@ public enum ExcelEnum {
     PASSED("Pass",7),
     DESCRIPTION("Description",8);
     
-    private static final Logger log = LoggerFactory.getLogger(ExcelEnum.class);
+    
     private final String key;
     private final Integer defaultValue;
   

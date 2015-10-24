@@ -9,9 +9,7 @@ import com.ro.ssc.app.client.exporter.PptTableExporter;
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +19,6 @@ import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -29,17 +26,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.WritableImage;
-import org.apache.pdfbox.exceptions.COSVisitorException;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -53,7 +42,7 @@ public class SingleReportController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(SingleReportController.class);
-
+ private static final String ALL="all";
     private DateTime iniDate;
     private DateTime endDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
@@ -82,7 +71,12 @@ public class SingleReportController implements Initializable {
     private TableColumn<GenericModel, Object> entryTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> exitTimeTableColumn;
-
+    @FXML
+    private TableColumn<GenericModel, Object> overtimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> absenceTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> lateTableColumn;
     /**
      * Initializes the controller class.
      *
@@ -124,8 +118,8 @@ public class SingleReportController implements Initializable {
 
             userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
             userChoiceBox.getSelectionModel().selectFirst();
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart();
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd();
+            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
 
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
@@ -147,12 +141,19 @@ public class SingleReportController implements Initializable {
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
+          overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
+        absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
+        lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+
         dateTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+  absenceTableColumn.setStyle("-fx-alignment:CENTER;");
+        lateTableColumn.setStyle("-fx-alignment:CENTER;");
+        overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
         Comparator timeComparator=(Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1= ((String) o1).replace("!", "").split(":");
@@ -174,7 +175,7 @@ public class SingleReportController implements Initializable {
         
         dateTableColumn.setComparator(dateComparator);
         
-        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
+        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
     }
 
     @FXML

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.WordUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -32,8 +31,9 @@ import org.slf4j.LoggerFactory;
  * @author DauBufu
  */
 public class ExcelReader {
-    
-      private static final Logger log = LoggerFactory.getLogger(ExcelReader.class);
+
+    private static final Logger log = LoggerFactory.getLogger(ExcelReader.class);
+
     /**
      *
      * @param file
@@ -72,17 +72,18 @@ public class ExcelReader {
 
                 if (row != null) {
                     try {
-                        String user=WordUtils.capitalizeFully(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim());
+                        String user = WordUtils.capitalizeFully(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim());
                         if (result.containsKey(user)) {
                             events = result.get(user).getEvents();
-                            events.get(0);
+
                             events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
                             result.get(user).setEvents(events);
-                           
+
                         } else {
                             events = new ArrayList();
                             events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
-                            result.put(user, new User(user, row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString().trim(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString().trim()), events));
+                            String id = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
+                            result.put(user, new User(user, id.contains(".") ? id.split("\\.")[0] : id, row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString().trim(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString().trim()), events));
                         }
                     } catch (Exception e) {
                         log.error("Exception" + e.getMessage());
@@ -94,6 +95,5 @@ public class ExcelReader {
         }
         return result;
     }
-    
-   
+
 }

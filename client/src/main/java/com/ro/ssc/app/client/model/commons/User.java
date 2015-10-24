@@ -13,13 +13,13 @@ import java.util.List;
  */
 public class User {
 
-    String name;
-    String userId;
-    String cardNo;
-    String department;
+   private String name;
+   private String userId;
+   private String cardNo;
+   private String department;
       
-    Boolean isNghtShift;
-    List<Event> events;
+   private boolean isNghtShift;
+   private List<Event> events;
 
     public User(String name, String userId, String cardNo, String department, List<Event> events) {
         this.name = name;
@@ -59,7 +59,7 @@ public class User {
 		System.out.println("Failed to make connection!");
 	}
     }
-     public Boolean getIsNghtShift() {
+     public Boolean isNghtShift() {
         return isNghtShift;
     }
 

@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javafx.animation.Animation;
@@ -21,7 +19,6 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 import org.joda.time.DateTime;
@@ -48,7 +45,7 @@ public class SideMenuNoImagesController implements Initializable {
 
     @FXML
     private Label dateSideMenuLabel;
-    
+
     @FXML
     private AnchorPane imageViewAnchorPane;
 
@@ -63,8 +60,8 @@ public class SideMenuNoImagesController implements Initializable {
     public void initialize(final URL url, final ResourceBundle rb) {
         log.debug("Initializing Side Menu Controller");
 
-        if (!Configuration.HAS_LOGO.getAsBoolean()){
-        imageViewAnchorPane.getChildren().clear();
+        if (!Configuration.HAS_LOGO.getAsBoolean()) {
+            imageViewAnchorPane.getChildren().clear();
         }
         // hide root
         navigationTree.setShowRoot(false);
@@ -80,7 +77,7 @@ public class SideMenuNoImagesController implements Initializable {
                                 DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
                                 dateSideMenuLabel.setText(DateTime.now().toLocalDate().toString(dtf2));
                                 timeSideMenuLabel.setText(DateTime.now().toLocalTime().toString(dtf));
-                                
+
                             }
                         }
                 ),
@@ -92,27 +89,44 @@ public class SideMenuNoImagesController implements Initializable {
         // add side menu listener
         navigationTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             log.debug("Clicked on " + newValue.getValue());
-            switch(newValue.getValue()){
-           case "Sumar" : try {
-                mainController.handleSumaryViewLaunch();
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+            switch (newValue.getValue()) {
+                case "Sumar":
+                    try {
+                        mainController.handleSumaryViewLaunch();
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+                case "Raport Cumulativ":
+                    try {
+                        mainController.handleOverallReportViewLaunch();
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+                case "Raport Individual":
+                    try {
+                        mainController.handleSingleReportViewLaunch();
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+                case "Raport Absente Individual":
+                    try {
+                        mainController.handleSingleAbsViewLaunch();
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+                case "Raport Absente Cumulativ":
+                    try {
+                        mainController.handleOverallAbsViewLaunch();
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
             }
-            break;
-           case "Raport Cumulativ" :  try {
-                mainController.handleOverallReportViewLaunch();
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-           break;
-                case "Raport Individual" :  try {
-                mainController.handleSingleReportViewLaunch();
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-           break;
-            }
-           
+
         });
     }
 

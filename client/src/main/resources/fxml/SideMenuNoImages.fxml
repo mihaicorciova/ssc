@@ -62,7 +62,12 @@
                                       
                                         <TreeItem expanded="false" value="Raport Individual">
                                         </TreeItem>
-                                                                            
+                                              
+                                        <TreeItem expanded="false" value="Raport Absente Cumulativ">
+                                        </TreeItem>
+                                      
+                                        <TreeItem expanded="false" value="Raport Absente Individual">
+                                        </TreeItem>                              
                                     </children>
                                 </TreeItem>
                                

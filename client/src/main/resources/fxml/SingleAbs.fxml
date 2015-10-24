@@ -9,7 +9,7 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="singleReportAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.singlereport.SingleReportController">
+<AnchorPane id="AnchorPane" fx:id="singleReportAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.singlereport.SingleAbsController">
     <children>
       <GridPane layoutX="149.0" layoutY="418.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -49,13 +49,8 @@
                   <columns>
                       <TableColumn fx:id="dateTableColumn" prefWidth="118.0" text="Data" />
                   <TableColumn fx:id="entryTimeTableColumn" prefWidth="75.0" text="Intrare" />
-                      <TableColumn fx:id="exitTimeTableColumn" prefWidth="127.0" text="Iesire" />
-                      <TableColumn fx:id="workTimeTableColumn" prefWidth="92.0" text="Timp Lucru" />
-                      <TableColumn fx:id="offTimeTableColumn" prefWidth="87.0" text="Timp Pauza" />
-                  <TableColumn fx:id="totalTimeTableColumn" prefWidth="75.0" text="Timp Total" />
-                   <TableColumn fx:id="overtimeTableColumn" prefWidth="137.0" text="Ore suplimentare" />
-                  <TableColumn fx:id="absenceTableColumn" prefWidth="75.0" text="Absente" />
-                  <TableColumn fx:id="lateTableColumn" prefWidth="75.0" text="Intarzieri" />
+                      <TableColumn fx:id="absTableColumn" prefWidth="127.0" text="Absenta" />
+                      <TableColumn fx:id="delayTableColumn" prefWidth="92.0" text="Intarziere" />
                   </columns>
                   <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

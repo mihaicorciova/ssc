@@ -84,22 +84,19 @@ public class AccessReader {
             Cursor cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable()) {
 
-                shiftMap.put(String.format("%s", row.get("f_ShiftID")), new ShiftData(String.format("%s", row.get("f_ShiftID")), String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[0] : String.format("%s", row.get("f_ShiftName")),
+                shiftMap.put(String.format("%s", row.get("f_ShiftID")).trim(), new ShiftData(String.format("%s", row.get("f_ShiftID")), String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[0] : String.format("%s", row.get("f_ShiftName")),
                         String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[1] : "0",
-                        String.format("%s", row.get("f_OnDuty1")).replace("CET ",""), String.format("%s", row.get("f_OffDuty1")).replace("CET ","")));
+                        String.format("%s", row.get("f_OnDuty1")), String.format("%s", row.get("f_OffDuty1"))));
 
             }
 
-            for (String day : shiftMap.keySet()) {
-                log.debug("ziua " + day + " " + shiftMap.get(day).toString());
-            }
             table = DatabaseBuilder.open(file).getTable("t_d_ShiftData");
             cursor = CursorBuilder.createCursor(table);
             Map<String, ShiftData> inter = new HashMap<>();
             int cnt = 0;
             for (Row row : cursor.newIterable()) {
                 String userId = String.format("%s", row.get("f_ConsumerID"));
-                log.debug(userId);
+
                 if (!result.containsKey(userId)) {
 
                     inter = new HashMap<>();

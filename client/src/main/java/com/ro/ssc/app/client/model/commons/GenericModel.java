@@ -35,6 +35,7 @@ public class GenericModel {
     private Object six;
 private Object seven;
 private Object eight;
+private Object nine;
 
  private static final Logger log = LoggerFactory.getLogger(ExcelEnum.class);
     public GenericModel(Object... args) {
@@ -97,4 +98,10 @@ private Object eight;
     public Object getEight() {
         return eight;
     }
+
+    public Object getNine() {
+        return nine;
+    }
+    
+    
 }

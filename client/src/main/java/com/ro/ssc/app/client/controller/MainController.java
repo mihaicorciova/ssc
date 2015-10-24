@@ -36,6 +36,8 @@ public class MainController implements Initializable {
     private static final String STATUS_BAR_LAYOUT_FILE = "/fxml/StatusBar.fxml";
     private static final String SUMARY_FILE = "/fxml/Sumary.fxml";
     private static final String SINGLEREPORT_LAYOUT_FILE = "/fxml/SingleReport.fxml";
+     private static final String SINGLEABS_LAYOUT_FILE = "/fxml/SingleAbs.fxml";
+      private static final String OVERALLABS_LAYOUT_FILE = "/fxml/OverallAbs.fxml";
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
@@ -54,6 +56,8 @@ public class MainController implements Initializable {
     private AnchorPane sumaryPane;
     private AnchorPane overallReportPane;
     private AnchorPane singleReportPane;
+    private AnchorPane overallAbsPane;
+    private AnchorPane singleAbsPane;
     private String MDB_PATH = "opt";
     // controllers
 
@@ -101,7 +105,7 @@ public class MainController implements Initializable {
         
             Configuration.IS_EXPIRED.setValue("true");
             UiCommonTools.getInstance().showInfoDialogStatus("Licenta Expirata", "Data expirarii " + licenseStatus.getExpireDate(), "Va rugam contactati vanzatorul softului.");
-         //   return;
+          //  return;
       }
         // load components
         try {
@@ -178,4 +182,26 @@ public class MainController implements Initializable {
         contentContainer.getChildren().setAll(singleReportPane);
     }
 
+      public void handleOverallAbsViewLaunch() throws IOException {
+
+        final FXMLLoader singleReportPaneLoader = new FXMLLoader();
+        overallAbsPane = singleReportPaneLoader.load(getClass().getResourceAsStream(OVERALLABS_LAYOUT_FILE));
+        AnchorPane.setLeftAnchor(overallAbsPane, 0.0);
+        AnchorPane.setTopAnchor(overallAbsPane, 0.0);
+        AnchorPane.setRightAnchor(overallAbsPane, 0.0);
+        AnchorPane.setBottomAnchor(overallAbsPane, 0.0);
+
+        contentContainer.getChildren().setAll(overallAbsPane);
+    }
+        public void handleSingleAbsViewLaunch() throws IOException {
+
+        final FXMLLoader singleReportPaneLoader = new FXMLLoader();
+        singleAbsPane = singleReportPaneLoader.load(getClass().getResourceAsStream(SINGLEABS_LAYOUT_FILE));
+        AnchorPane.setLeftAnchor(singleAbsPane, 0.0);
+        AnchorPane.setTopAnchor(singleAbsPane, 0.0);
+        AnchorPane.setRightAnchor(singleAbsPane, 0.0);
+        AnchorPane.setBottomAnchor(singleAbsPane, 0.0);
+
+        contentContainer.getChildren().setAll(singleAbsPane);
+    }
 }

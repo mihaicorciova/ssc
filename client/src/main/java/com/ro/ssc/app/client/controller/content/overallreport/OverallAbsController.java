@@ -13,7 +13,6 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
@@ -38,11 +37,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author DauBufu
  */
-public class OverallReportController implements Initializable {
+public class OverallAbsController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
-    private static final Logger log = LoggerFactory.getLogger(OverallReportController.class);
- private static final String ALL="all";
+    private static final Logger log = LoggerFactory.getLogger(OverallAbsController.class);
+    private static final String ALL="all";
     private DateTime iniDate;
     private DateTime endDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
@@ -56,20 +55,12 @@ public class OverallReportController implements Initializable {
     private DatePicker iniDatePicker;
     @FXML
     private DatePicker endDatePicker;
-    @FXML
+      @FXML
     private TableView overallReportTableView;
-    @FXML
-    private TableColumn<GenericModel, Object> offTimeTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> totalTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> nameTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object> workTimeTableColumn;
-    @FXML
     private TableColumn<GenericModel, Object> departmentTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> overtimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> absenceTableColumn;
     @FXML
@@ -158,34 +149,15 @@ public class OverallReportController implements Initializable {
     public void populateMyTable() {
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
-        workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
-        offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
-        totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
-        absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
+         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
-        overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
-
-        workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-        offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-        nameTableColumn.setStyle("-fx-alignment:CENTER;");
-        totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+       nameTableColumn.setStyle("-fx-alignment:CENTER;");
         departmentTableColumn.setStyle("-fx-alignment:CENTER;");
         absenceTableColumn.setStyle("-fx-alignment:CENTER;");
         lateTableColumn.setStyle("-fx-alignment:CENTER;");
-        overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
-
-        Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
-            String[] s1 = ((String) o1).replace("!", "").split(":");
-            String[] s2 = ((String) o2).replace("!", "").split(":");
-            return Long.compare(Long.valueOf(s1[0].trim()) * 3600 + Long.valueOf(s1[1].trim()) * 60 + Long.valueOf(s1[2].trim()), Long.valueOf(s2[0]) * 3600 + Long.valueOf(s2[1].trim()) * 60 + Long.valueOf(s2[2].trim()));
-
-        };
-
-        workTimeTableColumn.setComparator(timeComparator);
-        totalTimeTableColumn.setComparator(timeComparator);
-        offTimeTableColumn.setComparator(timeComparator);
-        overtimeTableColumn.setComparator(timeComparator);
-
+    
+    
+      
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
     }
 
