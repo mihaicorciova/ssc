@@ -74,6 +74,8 @@ public class OverallReportController implements Initializable {
     private TableColumn<GenericModel, Object> absenceTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> lateTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object>  earlyTableColumn;
 
     /**
      * Initializes the controller class.
@@ -145,6 +147,10 @@ public class OverallReportController implements Initializable {
                     content[rowNo][2] = (String) tableData.getThree();
                     content[rowNo][3] = (String) tableData.getFour();
                     content[rowNo][4] = (String) tableData.getFive();
+                     content[rowNo][5] = (String) tableData.getSix();
+                      content[rowNo][6] = (String) tableData.getSeven();
+                    content[rowNo][7] = (String) tableData.getEight();
+                    content[rowNo][8] = (String) tableData.getNine();
                     rowNo++;
                 }
                 return content;
@@ -164,7 +170,9 @@ public class OverallReportController implements Initializable {
         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
         overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
-
+ earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+            
+    earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         nameTableColumn.setStyle("-fx-alignment:CENTER;");

@@ -65,6 +65,8 @@ public class OverallAbsController implements Initializable {
     private TableColumn<GenericModel, Object> absenceTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> lateTableColumn;
+ @FXML
+    private TableColumn<GenericModel, Object> earlyTableColumn;
 
     /**
      * Initializes the controller class.
@@ -133,16 +135,16 @@ public class OverallAbsController implements Initializable {
                 for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
                     content[rowNo][0] = (String) tableData.getOne();
                     content[rowNo][1] = (String) tableData.getTwo();
-                    content[rowNo][2] = (String) tableData.getThree();
-                    content[rowNo][3] = (String) tableData.getFour();
-                    content[rowNo][4] = (String) tableData.getFive();
+                    content[rowNo][2] = (String) tableData.getSeven();
+                    content[rowNo][3] = (String) tableData.getEight();
+                    content[rowNo][4] = (String) tableData.getNine();
                     rowNo++;
                 }
                 return content;
             }
         };
 
-        pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+        pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ absente de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
         fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
     }
 
@@ -151,12 +153,14 @@ public class OverallAbsController implements Initializable {
         departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
          absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
+        earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+            
+    earlyTableColumn.setStyle("-fx-alignment:CENTER;");
        nameTableColumn.setStyle("-fx-alignment:CENTER;");
         departmentTableColumn.setStyle("-fx-alignment:CENTER;");
         absenceTableColumn.setStyle("-fx-alignment:CENTER;");
         lateTableColumn.setStyle("-fx-alignment:CENTER;");
-    
-    
+
       
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
     }

@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +58,7 @@ public enum DataProviderImpl implements DataProvider {
                 private DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
                 private DateTimeFormatter dtf3 = DateTimeFormat.forPattern("yyyy-MM-dd");
                 private java.time.format.DateTimeFormatter dtf4 = java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z YYYY");
- private java.time.format.DateTimeFormatter dtf5 = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
+                private java.time.format.DateTimeFormatter dtf5 = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
 
                 private DecimalFormat df = new DecimalFormat();
                 private final Logger log = LoggerFactory.getLogger(DataProviderImpl.class);
@@ -98,29 +97,36 @@ public enum DataProviderImpl implements DataProvider {
                                 Long tpause = 0l;
                                 Long tovertime = 0l;
                                 int tabsent = 0;
-                                int tlate = 0;
+                                int tlaters = 0;
+                                long tlate = 0;
+                                int tearlys = 0;
+                                long tearly = 0;
+                                boolean withWrongEv = false;
                                 List<DailyData> dailyList = getListPerDay(entry.getKey(), iniDate, endDate);
                                 for (DailyData day : dailyList) {
-                                    long workTime = day.getWorkTime() - (day.getPauseTime() > day.getDailyPause() ? day.getPauseTime() - day.getDailyPause() : 0);
-                                    long overTime = day.getWorkTime() > day.getShiftHours() * 3600 * 1000 ? (day.getWorkTime() - day.getShiftHours() * 3660 * 1000) : 0l;
 
-                                    if (!day.getFirstInEvent().equals("") && !day.getStartDayTime().equals("")) {
-                                        if (DateTime.parse(day.getStartDayTime().trim(), dtf).hourOfDay().get() > (DateTime.parse(day.getFirstInEvent().trim(), dtf).hourOfDay().get())) {
-                                            tlate++;
-                                        }
+                                    if (day.getLateTime() > 0) {
+                                        tlaters++;
                                     }
-
+                                    tlate += day.getLateTime();
+                                    if (day.getEarlyTime() > 0) {
+                                        tearlys++;
+                                    }
+                                    tearly += day.getEarlyTime();
                                     if (day.getFirstInEvent().equals("") && day.getLastOutEvent().equals("")) {
+                                        if (day.getWrongEvents().size() > 0) {
+                                            withWrongEv = true;
+                                        }
 
                                         tabsent++;
 
                                     }
-                                    tduration += workTime;
+                                    tduration += day.getWorkTime();
                                     tpause += day.getPauseTime();
-                                    tovertime += overTime;
+                                    tovertime += day.getOverTime();
                                 }
 
-                                data.add(new GenericModel(entry.getValue().getName().toUpperCase(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration),formatMillis(tovertime),tabsent,tlate));
+                                data.add(new GenericModel(entry.getValue().getName().toUpperCase(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration), formatMillis(tovertime), withWrongEv == true ? tabsent + "***" : tabsent + "", formatMillis(tlate) + "(" + tlaters + ")", formatMillis(tearly) + "(" + tearlys + ")"));
                             }
                         }
 
@@ -138,16 +144,8 @@ public enum DataProviderImpl implements DataProvider {
 
                         List<DailyData> dailyList = getListPerDay(user, iniDate, endDate);
                         for (DailyData day : dailyList) {
-                            log.debug("Ziua " + day.getDate().toString(dtf2) + " timp lucru " + formatMillis(day.getWorkTime()) + " timp pauza " + formatMillis(day.getPauseTime()) + " pauza zilnica " + formatMillis(day.getDailyPause())+ "norma de lucru"+formatMillis(day.getShiftHours() * 3600 * 1000l));
-                            long workTime = day.getWorkTime() - (day.getPauseTime() > day.getDailyPause() ? day.getPauseTime() - day.getDailyPause() : 0);
-                            long overTime = day.getWorkTime() > day.getShiftHours() * 3600 * 1000 ? (day.getWorkTime() - day.getShiftHours() * 3600 * 1000) : 0l;
-                            boolean late = false;
+
                             int absent = 0;
-                            if (!day.getFirstInEvent().equals("") && !day.getStartDayTime().equals("")) {
-                                if (DateTime.parse(day.getStartDayTime().trim(), dtf).hourOfDay().get() > (DateTime.parse(day.getFirstInEvent().trim(), dtf).hourOfDay().get())) {
-                                    late = true;
-                                }
-                            }
 
                             if (day.getFirstInEvent().equals("") && day.getLastOutEvent().equals("")) {
                                 if (day.getWrongEvents().size() > 0) {
@@ -157,7 +155,7 @@ public enum DataProviderImpl implements DataProvider {
                                 }
                             }
 
-                            data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(workTime), formatMillis(day.getPauseTime()), formatMillis(day.getWorkTime()  + day.getPauseTime()), formatMillis(overTime), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", late == true ? "Da" : ""));
+                            data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()), formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime())));
                         }
                     }
 
@@ -168,7 +166,6 @@ public enum DataProviderImpl implements DataProvider {
                 public DateTime getPossibleDateEnd(String user) {
                     DateTime result = new DateTime().withYear(1970);
 
-                   
                     if (user.equals("all")) {
                         for (Map.Entry<String, User> entry : userData.entrySet()) {
                             for (Event ev : entry.getValue().getEvents()) {
@@ -192,7 +189,6 @@ public enum DataProviderImpl implements DataProvider {
                 public DateTime getPossibleDateStart(String user) {
                     DateTime result = DateTime.now();
 
-                   
                     if (user.equals("all")) {
                         for (Map.Entry<String, User> entry : userData.entrySet()) {
                             for (Event ev : entry.getValue().getEvents()) {
@@ -250,21 +246,24 @@ public enum DataProviderImpl implements DataProvider {
                 private Set<String> getNeededPresence(String user) {
                     Set<String> result = new HashSet<>();
                     String userId = userData.get(user).getUserId().trim();
-                 
+
                     if (shiftData.containsKey(userId)) {
+                     
                         for (String day : shiftData.get(userId).keySet()) {
+                               log.debug("day "+day.trim()+" user id "+userId);
                             if (DateTime.parse(day, dtf3).plusDays(1).isAfter(getPossibleDateStart(user)) && DateTime.parse(day, dtf3).isBefore(getPossibleDateEnd(user))) {
                                 result.add(day);
                             }
                         }
                     }
-                   
+log.debug(result.toString());
                     return result;
 
                 }
 
                 private List<DailyData> getListPerDay(String user, DateTime iniDate, DateTime endDate) {
                     List result = new ArrayList();
+                   
                     Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
                     Map<DateTime, List<Event>> eventsPerDay;
                     Map<DateTime, List<Event>> wrongPerDay;
@@ -276,13 +275,13 @@ public enum DataProviderImpl implements DataProvider {
                         wrongPerDay = splitPerDay(applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(1), iniDate, endDate);
                     }
                     String userId = userData.get(user).getUserId().trim();
-
+ log.debug("User "+user.trim()+" user id "+userId);
                     getNeededPresence(user).stream().forEach((String dd) -> {
-                      
+
                         DateTime day = DateTime.parse(dd, dtf3);
-     log.debug("incepe"+dd);
+                        log.debug("incepe" + dd);
                         if (eventsPerDay.containsKey(day)) {
-                       
+
                             List<Event> events = applyExcludeLogic(excludedGates, eventsPerDay.get(day)).get(0);
                             List<Event> exEvents = applyExcludeLogic(excludedGates, eventsPerDay.get(day)).get(1).stream().filter(event -> (!event.getDescription().contains("night shift"))).collect(Collectors.toList());;
 
@@ -295,72 +294,72 @@ public enum DataProviderImpl implements DataProvider {
                             }
 
                             Integer jumpIndex = 0;
-  Long allowedPause = 60 * 1000 * Long.valueOf(shiftData.get(userId).get(dd).getShiftBreakTime());
+                            Long allowedPause = 60 * 1000 * Long.valueOf(shiftData.get(userId).get(dd).getShiftBreakTime());
                             LocalTime officialStart = LocalTime.from(dtf4.parse(shiftData.get(userId).get(dd).getShiftStartHour()));
                             LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftData.get(userId).get(dd).getShiftEndHour()));
-                       String     startOfDay = officialStart.format(dtf5);
-                       int     dailyHours = officialEnd.getHour() > officialStart.getHour()? officialEnd.getHour() - officialStart.getHour():officialStart.getHour() - officialEnd.getHour() ;
 
-                         
+                            int dailyHours = officialEnd.isAfter(officialStart) ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay()) : 1000 * (officialStart.toSecondOfDay() - officialEnd.toSecondOfDay());
+
                             Long duration = 0l;
                             Long pause = 0l;
-                           
-                          
+
                             DateTime firstevent = null;
                             DateTime outevent = null;
                             if (!events.isEmpty()) {
                                 firstevent = events.get(0).getEventDateTime();
                                 DateTime inevent = null;
                                 for (Event event : events) {
-                                   if (event.getAddr().contains("In")) {
-                                            if (event.getDescription().contains("night shift") && !eventsPerDay.containsKey(day.plusDays(1))) {
-                                                continue;
-                                            }
-                                            inevent = event.getEventDateTime();
-                                            if (inevent != null) {
-                                                if (inevent.isAfter(firstevent.plusHours(dailyHours)) && jumpIndex == 0) {
-                                                    firstevent = inevent;
-                                                }
-                                            }
-                                        } else if (event.getAddr().contains("Exit")) {
-                                            if (event.getDescription().contains("night shift") && !eventsPerDay.containsKey(day.plusDays(1))) {
-                                                continue;
-                                            }
-                                            if (inevent != null) {
-                                                duration += event.getEventDateTime().getMillis() - inevent.getMillis();
-                                                jumpIndex++;
-                                                outevent = event.getEventDateTime();
-                                            }
-                                            if (firstevent != null && outevent != null) {
-                                                if (outevent.isAfter(firstevent.plusHours(dailyHours))) {
-                                                  pause = outevent.getMillis() - firstevent.getMillis() - duration;
-                                                    log.debug("user"+userId+" zi "+day+"DAILY HOURS"+dailyHours);
-                                                  result.add(new DailyData(userId,day, firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", startOfDay, duration, pause, allowedPause, dailyHours, wrongPerDay.get(day)));
-                                                    duration = 0l;
-                                                    jumpIndex = 0;
-                                                }
+                                    if (event.getAddr().contains("In")) {
+                                        if (event.getDescription().contains("night shift") && !eventsPerDay.containsKey(day.plusDays(1))) {
+                                            continue;
+                                        }
+                                        inevent = event.getEventDateTime();
+                                        if (inevent != null) {
+                                            if (inevent.isAfter(firstevent.plusMillis(dailyHours)) && jumpIndex == 0) {
+                                                firstevent = inevent;
                                             }
                                         }
+                                    } else if (event.getAddr().contains("Exit")) {
+                                        if (event.getDescription().contains("night shift") && !eventsPerDay.containsKey(day.plusDays(1))) {
+                                            continue;
+                                        }
+                                        if (inevent != null) {
+                                            duration += event.getEventDateTime().getMillis() - inevent.getMillis();
+                                            jumpIndex++;
+                                            outevent = event.getEventDateTime();
+                                        }
+                                        if (firstevent != null && outevent != null) {
+                                            if (outevent.isAfter(firstevent.plusMillis(dailyHours))) {
+                                                pause = outevent.getMillis() - firstevent.getMillis() - duration;
+                                                log.debug("user" + userId + " zi " + day + "DAILY HOURS" + dailyHours / 3600000);
+                                                result.add(new DailyData(userId, day, firstevent.toString(dtf), outevent.toString(dtf), outevent.getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - outevent.getSecondOfDay()) : 0,
+                                                                duration - (pause > allowedPause ? pause - allowedPause : 0), pause, duration > dailyHours && shiftData.get(userId).get(dd).isHasOvertime()? duration - dailyHours : 0, firstevent.getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (firstevent.getSecondOfDay() - officialStart.toSecondOfDay()) : 0, wrongPerDay.get(day)));
+                                                duration = 0l;
+                                                jumpIndex = 0;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             if (firstevent != null && outevent != null) {
                                 pause = outevent.getMillis() - firstevent.getMillis() - duration;
-                            }
 
-                           if(jumpIndex>0){
-                               
-                                log.debug("user"+userId+" zi "+day+"DAILY HOURS"+dailyHours);
-                            result.add(new DailyData(userId, day, firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", startOfDay, duration, pause, allowedPause, dailyHours, wrongPerDay.get(day)));
-                           }
-                           } else if (wrongPerDay.containsKey(day)) {
-                                log.debug("user with wrong"+userId+" zi "+day);
-                            result.add(new DailyData(userId, day, "", "", "", 0, 0, 0, 0, wrongPerDay.get(day)));
+                                if (jumpIndex > 0) {
+
+                                    log.debug("user" + userId + " zi " + day + "DAILY HOURS" + dailyHours / 3600000);
+                                    result.add(new DailyData(userId, day, firstevent != null ? firstevent.toString(dtf) : "", outevent != null ? outevent.toString(dtf) : "", outevent.getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - outevent.getSecondOfDay()) : 0,
+                                                    duration - (pause > allowedPause ? pause - allowedPause : 0), pause, duration > dailyHours && shiftData.get(userId).get(dd).isHasOvertime()? duration - dailyHours : 0, firstevent.getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (firstevent.getSecondOfDay() - officialStart.toSecondOfDay()) : 0, wrongPerDay.get(day)));
+                                }
+                            }
+                        } else if (wrongPerDay.containsKey(day)) {
+                            log.debug("user with wrong" + userId + " zi " + day);
+                            result.add(new DailyData(userId, day, "", "", 0, 0, 0, 0, 0, wrongPerDay.get(day)));
 
                         } else {
-                               log.debug("user"+userId+" zi "+day);
-                            result.add(new DailyData(userId, day, "", "", "", 0, 0, 0, 0, new ArrayList<>()));
+                            log.debug("user" + userId + " zi " + day);
+                            result.add(new DailyData(userId, day, "", "", 0, 0, 0, 0, 0, new ArrayList<>()));
                         }
- log.debug("sfarseste"+dd);
+                        log.debug("sfarseste" + dd);
                     });
 
                     Comparator dateComparator = (Comparator<DailyData>) (DailyData o1, DailyData o2) -> {

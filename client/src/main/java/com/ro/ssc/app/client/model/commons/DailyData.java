@@ -19,27 +19,49 @@ public class DailyData {
     DateTime date;
     String firstInEvent;
     String lastOutEvent;
-    String startDayTime;
+    long earlyTime;
     long workTime;
     long pauseTime;
-    long dailyPause;
-    int dailyHours;
+    long overTime;
+    long lateTime;
     List<Event> wrongEvents;
 
-    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, String startDayTime, long workTime, long pauseTime, long dailyPause, int dailyHours, List<Event> wrongEvents) {
+    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, long earlyTime, long workTime, long pauseTime, long overTime, long lateTime, List<Event> wrongEvents) {
         this.userId = userId;
         this.date = date;
         this.firstInEvent = firstInEvent;
         this.lastOutEvent = lastOutEvent;
-        this.startDayTime = startDayTime;
+        this.earlyTime = earlyTime;
         this.workTime = workTime;
         this.pauseTime = pauseTime;
-        this.dailyPause = dailyPause;
-        this.dailyHours = dailyHours;
+        this.overTime = overTime;
+        this.lateTime = lateTime;
         this.wrongEvents = wrongEvents;
     }
 
- 
+    public long getEarlyTime() {
+        return earlyTime;
+    }
+
+    public void setEarlyTime(long earlyTime) {
+        this.earlyTime = earlyTime;
+    }
+
+    public long getOverTime() {
+        return overTime;
+    }
+
+    public void setOverTime(long overTime) {
+        this.overTime = overTime;
+    }
+
+    public long getLateTime() {
+        return lateTime;
+    }
+
+    public void setLateTime(long lateTime) {
+        this.lateTime = lateTime;
+    }
 
     public String getUserId() {
         return userId;
@@ -65,22 +87,6 @@ public class DailyData {
         this.pauseTime = pauseTime;
     }
 
-    public long getDailyPause() {
-        return dailyPause;
-    }
-
-    public void setDailyPause(long dailyPause) {
-        this.dailyPause = dailyPause;
-    }
-
-    public int getShiftHours() {
-        return dailyHours;
-    }
-
-    public void setShiftHours(int dailyHours) {
-        this.dailyHours = dailyHours;
-    }
-
     public DateTime getDate() {
         return date;
     }
@@ -89,7 +95,6 @@ public class DailyData {
         this.date = date;
     }
 
-    
     public String getFirstInEvent() {
         return firstInEvent;
     }
@@ -104,22 +109,6 @@ public class DailyData {
 
     public void setLastOutEvent(String lastOutEvent) {
         this.lastOutEvent = lastOutEvent;
-    }
-
-    public String getStartDayTime() {
-        return startDayTime;
-    }
-
-    public void setStartDayTime(String startDayTime) {
-        this.startDayTime = startDayTime;
-    }
-
-    public int getDailyHours() {
-        return dailyHours;
-    }
-
-    public void setDailyHours(int dailyHours) {
-        this.dailyHours = dailyHours;
     }
 
     public List<Event> getWrongEvents() {

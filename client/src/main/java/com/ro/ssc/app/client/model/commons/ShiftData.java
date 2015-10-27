@@ -16,13 +16,15 @@ public class ShiftData {
     private String shiftBreakTime;
     private String shiftStartHour;
     private String shiftEndHour;
+    private boolean hasOvertime;
 
-    public ShiftData(String shiftId, String shiftName, String shiftBreakTime, String shiftStartHour, String shiftEndHour) {
+    public ShiftData(String shiftId, String shiftName, String shiftBreakTime, String shiftStartHour, String shiftEndHour, boolean hasOvertime) {
         this.shiftId = shiftId;
         this.shiftName = shiftName;
         this.shiftBreakTime = shiftBreakTime;
         this.shiftStartHour = shiftStartHour;
         this.shiftEndHour = shiftEndHour;
+        this.hasOvertime=hasOvertime;
     }
 
     public String getShiftId() {
@@ -63,6 +65,14 @@ public class ShiftData {
 
     public void setShiftEndHour(String shiftEndHour) {
         this.shiftEndHour = shiftEndHour;
+    }
+
+    public boolean isHasOvertime() {
+        return hasOvertime;
+    }
+
+    public void setHasOvertime(boolean hasOvertime) {
+        this.hasOvertime = hasOvertime;
     }
 
     @Override

@@ -51,6 +51,7 @@
                       <TableColumn fx:id="departmentTableColumn" prefWidth="127.0" text="Departament" />
                   <TableColumn fx:id="absenceTableColumn" prefWidth="75.0" text="Absente" />
                   <TableColumn fx:id="lateTableColumn" prefWidth="75.0" text="Intarzieri" />
+                  <TableColumn fx:id="earlyTableColumn" prefWidth="75.0" text="Plecari timpurii" />
                   </columns>
                   <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

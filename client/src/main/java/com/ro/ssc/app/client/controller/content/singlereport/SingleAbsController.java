@@ -68,6 +68,8 @@ public class SingleAbsController implements Initializable {
     private TableColumn<GenericModel, Object> entryTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> delayTableColumn;
+@FXML
+    private TableColumn<GenericModel, Object> earlyTableColumn;
 
     /**
      * Initializes the controller class.
@@ -131,7 +133,9 @@ public class SingleAbsController implements Initializable {
         entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
         absTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
         delayTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
-       
+       earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
+            
+    earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         dateTableColumn.setStyle("-fx-alignment:CENTER;");
         absTableColumn.setStyle("-fx-alignment:CENTER;");
         delayTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -169,17 +173,17 @@ public class SingleAbsController implements Initializable {
                 for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
                     content[rowNo][0] = (String) tableData.getOne();
                     content[rowNo][1] = (String) tableData.getTwo();
-                    content[rowNo][2] = (String) tableData.getThree();
-                    content[rowNo][3] = (String) tableData.getFour();
-                    content[rowNo][4] = (String) tableData.getFive();
-                    content[rowNo][5] = (String) tableData.getSix();
+                    content[rowNo][2] = (String) tableData.getEight();
+                    content[rowNo][3] = (String) tableData.getNine();
+                    content[rowNo][4] = (String) tableData.getTen();
+                   
                     rowNo++;
                 }
                 return content;
             }
         };
 
-        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual absente pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
         fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
     }
 

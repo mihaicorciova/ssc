@@ -10,8 +10,6 @@ package com.ro.ssc.app.client.model.commons;
  * @author DauBufu
  */
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +34,7 @@ public class GenericModel {
 private Object seven;
 private Object eight;
 private Object nine;
+private Object ten;
 
  private static final Logger log = LoggerFactory.getLogger(ExcelEnum.class);
     public GenericModel(Object... args) {
@@ -101,6 +100,10 @@ private Object nine;
 
     public Object getNine() {
         return nine;
+    }
+
+    public Object getTen() {
+        return ten;
     }
     
     

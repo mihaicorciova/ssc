@@ -83,10 +83,10 @@ public class AccessReader {
             table = DatabaseBuilder.open(file).getTable("t_b_ShiftSet");
             Cursor cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable()) {
-
+log.debug("Overtime"+row.get("f_bOvertimeShift"));
                 shiftMap.put(String.format("%s", row.get("f_ShiftID")).trim(), new ShiftData(String.format("%s", row.get("f_ShiftID")), String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[0] : String.format("%s", row.get("f_ShiftName")),
                         String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[1] : "0",
-                        String.format("%s", row.get("f_OnDuty1")), String.format("%s", row.get("f_OffDuty1"))));
+                        String.format("%s", row.get("f_OnDuty1")), String.format("%s", row.get("f_OffDuty1")), String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
 
             }
 

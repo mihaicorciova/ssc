@@ -49,8 +49,9 @@
                   <columns>
                       <TableColumn fx:id="dateTableColumn" prefWidth="118.0" text="Data" />
                   <TableColumn fx:id="entryTimeTableColumn" prefWidth="75.0" text="Intrare" />
-                      <TableColumn fx:id="absTableColumn" prefWidth="127.0" text="Absenta" />
-                      <TableColumn fx:id="delayTableColumn" prefWidth="92.0" text="Intarziere" />
+                      <TableColumn fx:id="absTableColumn" prefWidth="127.0" text="Absente" />
+                      <TableColumn fx:id="delayTableColumn" prefWidth="92.0" text="Intarzieri" />
+                        <TableColumn fx:id="earlyTableColumn" prefWidth="75.0" text="Plecari timpurii" />
                   </columns>
                   <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
