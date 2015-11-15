@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -67,6 +68,7 @@ public class SingleReportController implements Initializable {
     private TableColumn<GenericModel, Object> dateTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> workTimeTableColumn;
+
     @FXML
     private TableColumn<GenericModel, Object> entryTimeTableColumn;
     @FXML
@@ -142,13 +144,15 @@ public class SingleReportController implements Initializable {
         entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
         exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
+        
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
           overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
  earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
-            
+        
+ 
     earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         dateTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -185,7 +189,9 @@ public class SingleReportController implements Initializable {
 
     @FXML
     private void exportTableToPPT() {
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt)", ".ppt");
+           String[] ext = { ".xls" ,".ppt"};
+
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
 
         if (file == null) {
             return;
@@ -209,15 +215,21 @@ public class SingleReportController implements Initializable {
                     content[rowNo][7] = (String) tableData.getEight();
                     content[rowNo][8] = (String) tableData.getNine();
                     content[rowNo][9] = (String) tableData.getTen();
-                   
+                  
                     rowNo++;
                 }
                 return content;
             }
         };
-
-        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
-        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+  if (!file.getPath().endsWith(ext[0])) {
+            pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual absente pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + iniDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+ fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+        } else {
+           
+            pptExporter.exportTableToXls(singleReportTableView, file, "Raport individual absente pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
+        }
+       
     }
 
 }

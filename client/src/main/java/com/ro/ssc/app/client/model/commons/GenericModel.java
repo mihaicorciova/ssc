@@ -35,6 +35,7 @@ private Object seven;
 private Object eight;
 private Object nine;
 private Object ten;
+private Object eleven;
 
  private static final Logger log = LoggerFactory.getLogger(ExcelEnum.class);
     public GenericModel(Object... args) {
@@ -104,6 +105,10 @@ private Object ten;
 
     public Object getTen() {
         return ten;
+    }
+
+    public Object getEleven() {
+        return eleven;
     }
     
     

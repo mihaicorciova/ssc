@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -42,7 +43,7 @@ public class OverallReportController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(OverallReportController.class);
- private static final String ALL="all";
+    private static final String ALL = "all";
     private DateTime iniDate;
     private DateTime endDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
@@ -66,6 +67,7 @@ public class OverallReportController implements Initializable {
     private TableColumn<GenericModel, Object> nameTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> workTimeTableColumn;
+
     @FXML
     private TableColumn<GenericModel, Object> departmentTableColumn;
     @FXML
@@ -75,7 +77,7 @@ public class OverallReportController implements Initializable {
     @FXML
     private TableColumn<GenericModel, Object> lateTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object>  earlyTableColumn;
+    private TableColumn<GenericModel, Object> earlyTableColumn;
 
     /**
      * Initializes the controller class.
@@ -128,7 +130,9 @@ public class OverallReportController implements Initializable {
 
     @FXML
     private void exportTableToPPT() {
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt)", ".ppt");
+        String[] ext = {".xls", ".ppt"};
+
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
 
         if (file == null) {
             return;
@@ -147,32 +151,40 @@ public class OverallReportController implements Initializable {
                     content[rowNo][2] = (String) tableData.getThree();
                     content[rowNo][3] = (String) tableData.getFour();
                     content[rowNo][4] = (String) tableData.getFive();
-                     content[rowNo][5] = (String) tableData.getSix();
-                      content[rowNo][6] = (String) tableData.getSeven();
+                    content[rowNo][5] = (String) tableData.getSix();
+                    content[rowNo][6] = (String) tableData.getSeven();
                     content[rowNo][7] = (String) tableData.getEight();
                     content[rowNo][8] = (String) tableData.getNine();
+
                     rowNo++;
                 }
                 return content;
             }
         };
+        if (!file.getPath().endsWith(ext[0])) {
+            pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ de la " + iniDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+        } else {
 
-        pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
-        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+            pptExporter.exportTableToXls(overallReportTableView, file, "Raport individual absente pentru ");
+            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
+        }
+
     }
 
     public void populateMyTable() {
+        
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
+        overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
-        overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
- earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
-            
-    earlyTableColumn.setStyle("-fx-alignment:CENTER;");
+        earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+
+        earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         nameTableColumn.setStyle("-fx-alignment:CENTER;");

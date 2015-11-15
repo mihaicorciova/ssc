@@ -50,6 +50,7 @@
                       <TableColumn fx:id="nameTableColumn" prefWidth="118.0" text="Nume" />
                       <TableColumn fx:id="departmentTableColumn" prefWidth="127.0" text="Departament" />
                       <TableColumn fx:id="workTimeTableColumn" prefWidth="92.0" text="Timp Lucru" />
+                    
                       <TableColumn fx:id="offTimeTableColumn" prefWidth="90.0" text="Timp Pauza" />
                   <TableColumn fx:id="totalTimeTableColumn" prefWidth="132.0" text="Timp Total" />
                   <TableColumn fx:id="overtimeTableColumn" prefWidth="137.0" text="Ore suplimentare" />

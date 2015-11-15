@@ -6,6 +6,8 @@
 package com.ro.ssc.app.client.utils;
 
 import com.ro.ssc.app.client.model.commons.Event;
+import com.ro.ssc.app.client.model.commons.ShiftData;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -22,6 +26,9 @@ import org.slf4j.LoggerFactory;
 public class Utils {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(Utils.class);
+
+    private static final DateTimeFormatter dtf3 = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final java.time.format.DateTimeFormatter dtf4 = java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z YYYY");
 
     public static List<List<Event>> applyExcludeLogic(Set<String> excludedGates, List<Event> events) {
         List<List<Event>> result = new ArrayList<>();
@@ -56,7 +63,7 @@ public class Utils {
             } else {
                 shouldAdd = false;
                 if (!events.get(events.size() - 1).getDescription().contains("shift")) {
-                  
+
                     remainingEvents.add(events.get(events.size() - 1));
                 }
             }
@@ -68,57 +75,49 @@ public class Utils {
 
     }
 
-    public static Map<DateTime, List<Event>> splitPerDay(List<Event> events, DateTime iniDate, DateTime endDate) {
+    public static Map<DateTime, List<Event>> splitPerDay(Map<String, ShiftData> shiftData, List<Event> events, DateTime iniDate, DateTime endDate, boolean notWrong) {
         Map<DateTime, List<Event>> result = new LinkedHashMap<>();
         List<Event> perDayList = new ArrayList<>();
-        if (!events.isEmpty()) {
+
+        if (!events.isEmpty() && shiftData != null) {
             DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-
-            for (Event ev : events) {
-                if (ev.getEventDateTime().isAfter(dt)) {
-                    if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-
-                        result.put(dt.minusDays(1), perDayList);
-                    }
-                    dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-                    perDayList = null;
-                    perDayList = new ArrayList<>();
-                    perDayList.add(ev);
-
-                } else {
-                    perDayList.add(ev);
+            String dd = dt.minusDays(1).toString(dtf3);
+            LocalTime officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
+            LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
+            if (notWrong) {
+                if (officialEnd.isBefore(officialStart)) {
+                    perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
 
                 }
             }
-
-            if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-
-                result.put(dt.minusDays(1), perDayList);
-            }
-        }
-        return result;
-    }
-
-    public static Map<DateTime, List<Event>> splitPerDayNS(List<Event> events, DateTime iniDate, DateTime endDate) {
-        Map<DateTime, List<Event>> result = new LinkedHashMap<>();
-        List<Event> perDayList = new ArrayList<>();
-
-        if (!events.isEmpty()) {
-            DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-            perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
             for (Event ev : events) {
                 if (ev.getEventDateTime().isAfter(dt)) {
                     if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-                        perDayList.add(new Event(dt.minusMillis(1), "Intermediate exit event for night shift", "Exit", Boolean.TRUE));
+                        if (notWrong) {
+                            if (officialEnd.isBefore(officialStart)) {
+                                perDayList.add(new Event(dt.minusMillis(1), "Intermediate exit event for night shift", "Exit", Boolean.TRUE));
+
+                            }
+                        }
                         result.put(dt.minusDays(1), perDayList);
                     }
                     dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+                    dd = dt.minusDays(1).toString(dtf3);
+                    officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
+                    officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
                     perDayList = null;
                     perDayList = new ArrayList<>();
-                    perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
+                    if (notWrong) {
+                        if (officialEnd.isBefore(officialStart)) {
+                            perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
+
+                        }
+                    }
                     perDayList.add(ev);
+
                 } else {
                     perDayList.add(ev);
+
                 }
             }
 

@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
@@ -41,7 +42,7 @@ public class OverallAbsController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(OverallAbsController.class);
-    private static final String ALL="all";
+    private static final String ALL = "all";
     private DateTime iniDate;
     private DateTime endDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
@@ -55,7 +56,7 @@ public class OverallAbsController implements Initializable {
     private DatePicker iniDatePicker;
     @FXML
     private DatePicker endDatePicker;
-      @FXML
+    @FXML
     private TableView overallReportTableView;
     @FXML
     private TableColumn<GenericModel, Object> nameTableColumn;
@@ -65,7 +66,7 @@ public class OverallAbsController implements Initializable {
     private TableColumn<GenericModel, Object> absenceTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> lateTableColumn;
- @FXML
+    @FXML
     private TableColumn<GenericModel, Object> earlyTableColumn;
 
     /**
@@ -119,7 +120,9 @@ public class OverallAbsController implements Initializable {
 
     @FXML
     private void exportTableToPPT() {
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt)", ".ppt");
+        String[] ext = {".xls", ".ppt"};
+
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
 
         if (file == null) {
             return;
@@ -144,24 +147,30 @@ public class OverallAbsController implements Initializable {
             }
         };
 
-        pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ absente de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
-        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+        if (!file.getPath().endsWith(ext[0])) {
+            pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+        } else {
+
+            pptExporter.exportTableToXls(overallReportTableView, file, "Raport individual absente pentru ");
+            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
+        }
+
     }
 
     public void populateMyTable() {
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
-         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
+        absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
         earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
-            
-    earlyTableColumn.setStyle("-fx-alignment:CENTER;");
-       nameTableColumn.setStyle("-fx-alignment:CENTER;");
+
+        earlyTableColumn.setStyle("-fx-alignment:CENTER;");
+        nameTableColumn.setStyle("-fx-alignment:CENTER;");
         departmentTableColumn.setStyle("-fx-alignment:CENTER;");
         absenceTableColumn.setStyle("-fx-alignment:CENTER;");
         lateTableColumn.setStyle("-fx-alignment:CENTER;");
 
-      
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
     }
 

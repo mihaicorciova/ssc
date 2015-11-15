@@ -51,6 +51,7 @@
                   <TableColumn fx:id="entryTimeTableColumn" prefWidth="75.0" text="Intrare" />
                       <TableColumn fx:id="exitTimeTableColumn" prefWidth="127.0" text="Iesire" />
                       <TableColumn fx:id="workTimeTableColumn" prefWidth="92.0" text="Timp Lucru" />
+                       
                       <TableColumn fx:id="offTimeTableColumn" prefWidth="87.0" text="Timp Pauza" />
                   <TableColumn fx:id="totalTimeTableColumn" prefWidth="75.0" text="Timp Total" />
                    <TableColumn fx:id="overtimeTableColumn" prefWidth="137.0" text="Ore suplimentare" />

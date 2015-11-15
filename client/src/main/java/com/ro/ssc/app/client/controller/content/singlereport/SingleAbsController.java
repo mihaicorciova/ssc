@@ -13,7 +13,10 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
@@ -42,7 +45,7 @@ public class SingleAbsController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(SingleAbsController.class);
- private static final String ALL="all";
+    private static final String ALL = "all";
     private DateTime iniDate;
     private DateTime endDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
@@ -67,8 +70,10 @@ public class SingleAbsController implements Initializable {
     @FXML
     private TableColumn<GenericModel, Object> entryTimeTableColumn;
     @FXML
+    private TableColumn<GenericModel, Object> exitTimeTableColumn;
+    @FXML
     private TableColumn<GenericModel, Object> delayTableColumn;
-@FXML
+    @FXML
     private TableColumn<GenericModel, Object> earlyTableColumn;
 
     /**
@@ -131,17 +136,18 @@ public class SingleAbsController implements Initializable {
 
         dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
+        exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         absTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
         delayTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
-       earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
-            
-    earlyTableColumn.setStyle("-fx-alignment:CENTER;");
+        earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
+
+        exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+        earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         dateTableColumn.setStyle("-fx-alignment:CENTER;");
         absTableColumn.setStyle("-fx-alignment:CENTER;");
         delayTableColumn.setStyle("-fx-alignment:CENTER;");
         entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-       
-       
+
         Comparator dateComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
             DateTime d1 = DateTime.parse((String) o1, format);
@@ -149,7 +155,6 @@ public class SingleAbsController implements Initializable {
             return Long.compare(d1.getMillis(), d2.getMillis());
         };
 
-       
         dateTableColumn.setComparator(dateComparator);
 
         singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
@@ -157,11 +162,9 @@ public class SingleAbsController implements Initializable {
 
     @FXML
     private void exportTableToPPT() {
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt)", ".ppt");
+         String[] ext = { ".xls" ,".ppt"};
 
-        if (file == null) {
-            return;
-        }
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
 
         PptTableExporter pptExporter = new PptTableExporter() {
 
@@ -173,18 +176,29 @@ public class SingleAbsController implements Initializable {
                 for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
                     content[rowNo][0] = (String) tableData.getOne();
                     content[rowNo][1] = (String) tableData.getTwo();
-                    content[rowNo][2] = (String) tableData.getEight();
-                    content[rowNo][3] = (String) tableData.getNine();
-                    content[rowNo][4] = (String) tableData.getTen();
-                   
+                    content[rowNo][2] = (String) tableData.getThree();
+                    content[rowNo][3] = (String) tableData.getEight();
+                    content[rowNo][4] = (String) tableData.getNine();
+                    content[rowNo][5] = (String) tableData.getTen();
+
                     rowNo++;
                 }
                 return content;
             }
         };
 
-        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual absente pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
-        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+        if (file == null) {
+            return;
+        }
+        if (!file.getPath().endsWith(ext[0])) {
+            pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual absente pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+  fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+        } else {
+            
+            pptExporter.exportTableToXls(singleReportTableView, file, "Raport individual absente pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+  fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
+        }
+      
     }
 
 }

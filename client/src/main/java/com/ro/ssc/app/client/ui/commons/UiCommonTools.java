@@ -4,6 +4,7 @@
 package com.ro.ssc.app.client.ui.commons;
 
 import java.io.File;
+import java.util.List;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -33,21 +34,17 @@ public class UiCommonTools {
     /**
      * Opens a FileChooser to let the user select a file to save to.
      */
-    public File getFileByChooser(ContextMenu context, String description, String fileExtension) {
+    public File getFileByChooser(ContextMenu context, String description, List<String> fileExtension) {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                description, "*" + fileExtension);
+                description, fileExtension);
         fileChooser.getExtensionFilters().add(extFilter);
 
         // Show save file dialog
         File file = fileChooser.showSaveDialog(context);
 
-        if (file != null) {
-            // The file must be a *.pdf file
-            if (!file.getPath().endsWith(fileExtension)) {
-                file = new File(file.getPath() + fileExtension);
-            }
-        }
+        
+        
         return file;
     }
     
