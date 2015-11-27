@@ -11,6 +11,13 @@ package com.ro.ssc.app.client.licensing;
  */
 
 
+import javafx.application.Application;
+import static javafx.application.Application.launch;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -19,13 +26,13 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-public class TrialKeyGenerator {
+public class TrialKeyGenerator extends Application {
 
+    
     private static final int ITERATIONS_ENCRYPT = 10000;
     private static final String SECRET_KEY_FACTORY = "PBKDF2WithHmacSHA1";
     private static final String CIPHER = "AES/ECB/PKCS5Padding";
@@ -33,6 +40,47 @@ public class TrialKeyGenerator {
     private static final int KEY_LENGTH = 128;
     private static final String PASS_ENCRYPT = "777DAUBUFU$$$";
     private static final String SALT_ENCRYPT = "RO.SSC.SPT";
+
+    private static final Logger log = LoggerFactory.getLogger(TrialKeyGenerator.class);
+    private static final String ROOT_LAYOUT_FILE = "/fxml/RootLayout_1.fxml";
+    private static final String MAIN_CSS_FILE = "/styles/Main.css";
+    private static final double SCENE_MIN_WIDTH = 600;
+    private static final double SCENE_MIN_HEIGHT = 400;
+    private Stage stage;
+
+    public static void main(String[] args) throws Exception {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+
+        log.info("Starting Litho InSight");
+        this.stage = stage;
+
+        log.debug("Loading FXML for main view from: {}", ROOT_LAYOUT_FILE);
+        FXMLLoader loader = new FXMLLoader();
+
+        Parent rootNode = (Parent) loader.load(getClass().getResourceAsStream(ROOT_LAYOUT_FILE));
+
+        log.debug("Showing JFX scene");
+        Scene scene = new Scene(rootNode, SCENE_MIN_WIDTH, SCENE_MIN_HEIGHT);
+        // scene.getStylesheets().add(MAIN_CSS_FILE);
+       
+        stage.setTitle("Soft Pontaj v2.0");
+        stage.setMinWidth(SCENE_MIN_WIDTH);
+        stage.setMinHeight(SCENE_MIN_HEIGHT);
+        stage.setScene(scene);
+
+        stage.show();
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+
+
 
     public static String generateKey(String toEncode) {
 
@@ -53,10 +101,5 @@ public class TrialKeyGenerator {
         return encoded;
     }
 
-    public static void main(String args[]) {
- 
-           DateTimeFormatter dtf2 = DateTimeFormat.forPattern("dd-MM-yyyy");
-            System.out.println(generateKey(new DateTime().plusDays(7).toString(dtf2)));
-           
-    }
+   
 }
