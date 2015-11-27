@@ -1,16 +1,16 @@
 package com.ro.ssc.app.client.controller;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import com.ro.ssc.app.client.controller.sidemenu.SideMenuNoImagesController;
 import com.ro.ssc.app.client.licensing.LicenseStatus;
-import com.ro.ssc.app.client.licensing.TrialKeyGenerator;
 import com.ro.ssc.app.client.licensing.TrialKeyValidator;
 import com.ro.ssc.app.client.model.commons.Configuration;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,11 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.Optional;
+import java.util.Properties;
 import java.util.ResourceBundle;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
 
 public class MainController implements Initializable {
 
@@ -36,8 +36,8 @@ public class MainController implements Initializable {
     private static final String STATUS_BAR_LAYOUT_FILE = "/fxml/StatusBar.fxml";
     private static final String SUMARY_FILE = "/fxml/Sumary.fxml";
     private static final String SINGLEREPORT_LAYOUT_FILE = "/fxml/SingleReport.fxml";
-    private static final String SINGLEABS_LAYOUT_FILE = "/fxml/SingleAbs.fxml";
-    private static final String OVERALLABS_LAYOUT_FILE = "/fxml/OverallAbs.fxml";
+     private static final String SINGLEABS_LAYOUT_FILE = "/fxml/SingleAbs.fxml";
+      private static final String OVERALLABS_LAYOUT_FILE = "/fxml/OverallAbs.fxml";
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
@@ -59,47 +59,57 @@ public class MainController implements Initializable {
     private AnchorPane overallAbsPane;
     private AnchorPane singleAbsPane;
     private String MDB_PATH = "opt";
-
-    private DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
     // controllers
+
+    private Timer licenseTimer;
+    private TimerTask licenseRefreshTask = new TimerTask() {
+        @Override
+        public void run() {
+            licenseStatus = licenseService.getLicenseStatus();
+        }
+    };
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info("Initializing main controller");
-        File destDir = new File(MDB_PATH);
-        if (!destDir.exists()) {
-            destDir.mkdirs();
-        } else {
-            File file = new File(MDB_PATH + "/status.txt");
-            try {
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                String content = Files.toString(file, Charsets.UTF_8);
-                log.debug("cont" + content + " file" + file);
-                if (content.contains("111111111111111")) {
-                    Files.write(DateTime.now().toString(dtf), file, Charsets.UTF_8);
-                    Configuration.IS_EXPIRED.setValue("true");
-                    Optional<String> result = UiCommonTools.getInstance().showExpDialogStatus("Licenta Expirata", "Va rugam contactati vanzatorul softului pentru codul de deblocare ", TrialKeyGenerator.generateKey(DateTime.now().toString(dtf)));
-                    if (result.isPresent()) {
-                        if (TrialKeyValidator.decodeKey(result.get()).equals(Files.toString(file, Charsets.UTF_8).concat("0"))) {
-                            Files.write("NO_EXP", file, Charsets.UTF_8);
-                        } else {
-                            return;
-                        }
-                    } else {
-                        return;
+
+        licenseStatus = licenseService.getLicenseStatus();
+        licenseTimer = new Timer("LicenseCheckThread", true);
+        long interval = Configuration.LICENSE_CHECK_INTERVAL.getAsInteger() * MILLIS_PER_MINUTE;
+        licenseTimer.schedule(licenseRefreshTask, interval, interval);
+       
+        
+           File destDir = new File(MDB_PATH);
+            if (!destDir.exists()) {
+                        destDir.mkdirs();
                     }
-                } else if (!content.contains("NO_EXP")) {
-                    Files.append("1", file, Charsets.UTF_8);
+        if (licenseStatus.isExpired()&& destDir.exists() || destDir.listFiles().length>0) {
+            // don't initialize importing if the license is expired
+           
+ 
+                File file = new File(MDB_PATH+"/status.txt");
+               
+                OutputStream out = null;
+                try {
+
+                    out = new FileOutputStream(file);
+                   out.write(1);
+                   out.flush();
+                } catch (FileNotFoundException ex) {
+                    log.error("Exception in finding file" + ex.getMessage());
+                } catch (IOException ex) {
+                    log.error("Exception in writing file" + ex.getMessage());
                 }
-            } catch (FileNotFoundException ex) {
-                log.error("Exception in finding file " + ex.getMessage());
-            } catch (IOException ex) {
-                log.error("Exception in writing file " + ex.getMessage());
-            }
-        }
+
+            
+        
+            Configuration.IS_EXPIRED.setValue("true");
+            UiCommonTools.getInstance().showInfoDialogStatus("Licenta Expirata", "Data expirarii " + licenseStatus.getExpireDate(), "Va rugam contactati vanzatorul softului.");
+           // return;
+      }
+        // load components
         try {
+
             // load side menu
             final FXMLLoader sideMenuLoader = new FXMLLoader();
             final AnchorPane sideMenu = sideMenuLoader.load(getClass().getResourceAsStream(SIDE_MENU_LAYOUT_FILE));
@@ -172,7 +182,7 @@ public class MainController implements Initializable {
         contentContainer.getChildren().setAll(singleReportPane);
     }
 
-    public void handleOverallAbsViewLaunch() throws IOException {
+      public void handleOverallAbsViewLaunch() throws IOException {
 
         final FXMLLoader singleReportPaneLoader = new FXMLLoader();
         overallAbsPane = singleReportPaneLoader.load(getClass().getResourceAsStream(OVERALLABS_LAYOUT_FILE));
@@ -183,8 +193,7 @@ public class MainController implements Initializable {
 
         contentContainer.getChildren().setAll(overallAbsPane);
     }
-
-    public void handleSingleAbsViewLaunch() throws IOException {
+        public void handleSingleAbsViewLaunch() throws IOException {
 
         final FXMLLoader singleReportPaneLoader = new FXMLLoader();
         singleAbsPane = singleReportPaneLoader.load(getClass().getResourceAsStream(SINGLEABS_LAYOUT_FILE));

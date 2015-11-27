@@ -145,12 +145,6 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-examples</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>13.0.1</version>
-            <type>jar</type>
-        </dependency>
     </dependencies>
 
 </project>

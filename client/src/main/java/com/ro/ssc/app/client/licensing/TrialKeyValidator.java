@@ -30,7 +30,7 @@ public class TrialKeyValidator {
     private static final String SALT_DECRYPT = "RO.SSC.SPT";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("dd-MM-yyyy");
 
-    public static String decodeKey(String encodedEncrypted) {
+    public String decodeKey(String encodedEncrypted) {
         String decoded = "";
         try {
             byte[] saltDecrypt = SALT_DECRYPT.getBytes(StandardCharsets.UTF_8);
