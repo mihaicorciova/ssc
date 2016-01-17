@@ -35,39 +35,47 @@ public class Utils {
         List<Event> trimedEvents = new ArrayList<>();
         List<Event> remainingEvents = new ArrayList<>();
         Boolean shouldAdd = false;
-        for (int i = 0; i < events.size() - 1; i++) {
+        for (Event event : events) {
+            if (!event.getPassed()) {
+                remainingEvents.add(event);
+            }
+        }
+        events.removeAll(remainingEvents);
+        if (events.size() > 0) {
+            for (int i = 0; i < events.size() - 1; i++) {
 
-            if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
-                if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
-                    shouldAdd = true;
-                    trimedEvents.add(events.get(i));
-                } else if (events.get(i).getAddr().contains("Exit") && shouldAdd) {
-                    shouldAdd = false;
-                    trimedEvents.add(events.get(i));
+                if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
+                    if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
+                        shouldAdd = true;
+                        trimedEvents.add(events.get(i));
+                    } else if (events.get(i).getAddr().contains("Exit") && shouldAdd) {
+                        shouldAdd = false;
+                        trimedEvents.add(events.get(i));
 
-                } else {
-                    shouldAdd = false;
-                    if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
+                    } else {
+                        shouldAdd = false;
+                        if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
 
-                        remainingEvents.add(events.get(i));
+                            remainingEvents.add(events.get(i));
 
+                        }
                     }
                 }
             }
-        }
-        if (!excludedGates.contains(events.get(events.size() - 1).getAddr()) && events.get(events.size() - 1).getPassed()) {
-            if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
-                shouldAdd = false;
-                trimedEvents.add(events.get(events.size() - 1));
+            if (!excludedGates.contains(events.get(events.size() - 1).getAddr()) && events.get(events.size() - 1).getPassed()) {
+                if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
+                    shouldAdd = false;
+                    trimedEvents.add(events.get(events.size() - 1));
 
-            } else {
-                shouldAdd = false;
-                if (!events.get(events.size() - 1).getDescription().contains("shift")) {
+                } else {
+                    shouldAdd = false;
+                    if (!events.get(events.size() - 1).getDescription().contains("shift")) {
 
-                    remainingEvents.add(events.get(events.size() - 1));
+                        remainingEvents.add(events.get(events.size() - 1));
+                    }
                 }
-            }
 
+            }
         }
         result.add(trimedEvents);
         result.add(remainingEvents);
