@@ -125,6 +125,13 @@ public class SideMenuNoImagesController implements Initializable {
                         java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     break;
+                    case "Raport Lunar":
+                    try {
+                        mainController.handleMonthlyViewLaunch();
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
             }
 
         });

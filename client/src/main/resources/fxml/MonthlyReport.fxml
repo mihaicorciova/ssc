@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.spreadsheet.*?>
 
-<AnchorPane id="AnchorPane" fx:id="overalReportAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.overallreport.OverallReportController">
+<AnchorPane id="AnchorPane" fx:id="overalReportAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.overallreport.MonthlyReportController">
     <children>
       <GridPane layoutX="149.0" layoutY="418.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -24,16 +24,16 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
                <children>
-                  <DatePicker fx:id="iniDatePicker">
+                  <ChoiceBox fx:id="monthChoiceBox" prefWidth="75.0">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
-                  </DatePicker>
-                  <DatePicker fx:id="endDatePicker">
+                  </ChoiceBox>
+                  <ChoiceBox fx:id="yearChoiceBox" prefWidth="75.0">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
-                  </DatePicker>
+                  </ChoiceBox>
                   <ChoiceBox fx:id="departmentChoiceBox" prefWidth="150.0">
                      <HBox.margin>
                         <Insets left="10.0" />
@@ -46,28 +46,29 @@
                   </Button>
                </children>
             </HBox>
-             <SpreadsheetView editable="true" 
-                         showRowHeader="true"
+            
+             <SpreadsheetView fx:id="monthlySpreadsheetView" editable="false" 
+                         showRowHeader="false"
                          showColumnHeader="true"
-                         layoutX="57.0" layoutY="-2.0" prefHeight="200.0" prefWidth="320.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <columns>
-                <TableColumn prefWidth="75.0" text="C1" />
-                <TableColumn prefWidth="75.0" text="C2" />
-            </columns>
+                         prefHeight="392.0" prefWidth="679.0" GridPane.rowIndex="2" >
+            <GridPane.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </GridPane.margin>
+               
         </SpreadsheetView>
-            <Label text="Data Inceput">
+            <Label text="Luna">
                <GridPane.margin>
                   <Insets left="10.0" />
                </GridPane.margin>
             </Label>
-            <Label text="Data Sfarsit">
+            <Label text="Anul">
                <GridPane.margin>
-                  <Insets left="240.0" />
+                  <Insets left="95.0" />
                </GridPane.margin>
             </Label>
             <Label text="Departament">
                <GridPane.margin>
-                  <Insets left="470.0" />
+                  <Insets left="180.0" />
                </GridPane.margin>
             </Label>
          </children>
