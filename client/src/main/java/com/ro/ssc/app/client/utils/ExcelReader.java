@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.WordUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -41,7 +40,7 @@ public class ExcelReader {
      */
     public static Map<String, User> readExcel(File file) {
         Map<String, User> result = new HashMap<>();
-        List<Event> events = new ArrayList();
+        List<Event> events;
         try {
             POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
             HSSFWorkbook wb = new HSSFWorkbook(fs);
@@ -53,7 +52,7 @@ public class ExcelReader {
             rows = sheet.getPhysicalNumberOfRows();
 
             int cols = 0; // No of columns
-            int tmp = 0;
+            int tmp;
 
             // This trick ensures that we get the data properly even if it doesn't start from first few rows
             for (int i = 0; i < 10 || i < rows; i++) {
