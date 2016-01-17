@@ -101,7 +101,7 @@ public class MainController implements Initializable {
         
             Configuration.IS_EXPIRED.setValue("true");
             UiCommonTools.getInstance().showInfoDialogStatus("Licenta Expirata", "Data expirarii " + licenseStatus.getExpireDate(), "Va rugam contactati vanzatorul softului.");
-            return;
+           // return;
         }
         // load components
         try {

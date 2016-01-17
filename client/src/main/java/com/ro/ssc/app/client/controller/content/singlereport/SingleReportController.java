@@ -124,8 +124,8 @@ public class SingleReportController implements Initializable {
 
             userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
             userChoiceBox.getSelectionModel().selectFirst();
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart();
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd();
+            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(userChoiceBox.getSelectionModel().getSelectedItem().toString());
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(userChoiceBox.getSelectionModel().getSelectedItem().toString());
 
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
@@ -174,7 +174,7 @@ public class SingleReportController implements Initializable {
         
         dateTableColumn.setComparator(dateComparator);
         
-        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
+        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
     }
 
     @FXML

@@ -24,13 +24,13 @@ public interface DataProvider {
 
     public void importUserData(File file);
        
-    public List<GenericModel> getTableData (DateTime iniDate,DateTime endDate,String department);
+    public List<GenericModel> getOverallTableData (DateTime iniDate,DateTime endDate,String department);
       
-    public List<GenericModel> getUTableData (String user,DateTime iniDate,DateTime endDate);
+    public List<GenericModel> getUserSpecificTableData (String user,DateTime iniDate,DateTime endDate);
     
-    public DateTime getPossibleDateStart();
+    public DateTime getPossibleDateStart(String user);
     
-     public DateTime getPossibleDateEnd(); 
+     public DateTime getPossibleDateEnd(String user); 
      
      public List<String> getUsers();
      

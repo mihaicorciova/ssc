@@ -105,8 +105,8 @@ public class OverallReportController implements Initializable {
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
 
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart();
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd();
+            iniDate = DataProviderImpl.getInstance().getPossibleDateStart("all");
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd("all");
 
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
@@ -183,7 +183,7 @@ public class OverallReportController implements Initializable {
         
       
         
-        overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
+        overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
     }
 
 }
