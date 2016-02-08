@@ -82,6 +82,7 @@ public class Utils {
         if (!events.isEmpty() && shiftData != null) {
             DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
             String dd = dt.minusDays(1).toString(dtf3);
+            if(shiftData.containsKey(dd)){
             LocalTime officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
             LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
             if (notWrong) {
@@ -92,7 +93,7 @@ public class Utils {
             }
             for (Event ev : events) {
                 if (ev.getEventDateTime().isAfter(dt)) {
-                    if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
+                    if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate.plusDays(1)) && dt.isAfter(iniDate))) {
                         if (notWrong) {
                             if (officialEnd.isBefore(officialStart)) {
                                 perDayList.add(new Event(dt.minusMillis(1), "Intermediate exit event for night shift", "Exit", Boolean.TRUE));
@@ -103,9 +104,11 @@ public class Utils {
                     }
                     dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
                     dd = dt.minusDays(1).toString(dtf3);
+                   if(shiftData.containsKey(dd)){
                     officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
                     officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
-                    perDayList = null;
+                   }
+                    
                     perDayList = new ArrayList<>();
                     if (notWrong) {
                         if (officialEnd.isBefore(officialStart)) {
@@ -125,7 +128,7 @@ public class Utils {
 
                 result.put(dt.minusDays(1), perDayList);
             }
-        }
+        }}
         return result;
     }
 
