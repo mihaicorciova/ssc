@@ -82,53 +82,54 @@ public class Utils {
         if (!events.isEmpty() && shiftData != null) {
             DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
             String dd = dt.minusDays(1).toString(dtf3);
-            if(shiftData.containsKey(dd)){
-            LocalTime officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
-            LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
-            if (notWrong) {
-                if (officialEnd.isBefore(officialStart)) {
-                    perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
+            if (shiftData.containsKey(dd)) {
+                LocalTime officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
+                LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
+                if (notWrong) {
+                    if (officialEnd.isBefore(officialStart)) {
+                        perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
 
+                    }
                 }
-            }
-            for (Event ev : events) {
-                if (ev.getEventDateTime().isAfter(dt)) {
-                    if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate.plusDays(1)) && dt.isAfter(iniDate))) {
+                for (Event ev : events) {
+                    if (ev.getEventDateTime().isAfter(dt)) {
+                        if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate.plusDays(1)) && dt.isAfter(iniDate))) {
+                            if (notWrong) {
+                                if (officialEnd.isBefore(officialStart)) {
+                                    perDayList.add(new Event(dt.minusMillis(1), "Intermediate exit event for night shift", "Exit", Boolean.TRUE));
+
+                                }
+                            }
+                            result.put(dt.minusDays(1), perDayList);
+                        }
+                        dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+                        dd = dt.minusDays(1).toString(dtf3);
+                        if (shiftData.containsKey(dd)) {
+                            officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
+                            officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
+                        }
+
+                        perDayList = new ArrayList<>();
                         if (notWrong) {
                             if (officialEnd.isBefore(officialStart)) {
-                                perDayList.add(new Event(dt.minusMillis(1), "Intermediate exit event for night shift", "Exit", Boolean.TRUE));
+                                perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
 
                             }
                         }
-                        result.put(dt.minusDays(1), perDayList);
+                        perDayList.add(ev);
+
+                    } else {
+                        perDayList.add(ev);
+
                     }
-                    dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-                    dd = dt.minusDays(1).toString(dtf3);
-                   if(shiftData.containsKey(dd)){
-                    officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
-                    officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
-                   }
-                    
-                    perDayList = new ArrayList<>();
-                    if (notWrong) {
-                        if (officialEnd.isBefore(officialStart)) {
-                            perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
+                }
 
-                        }
-                    }
-                    perDayList.add(ev);
+                if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
 
-                } else {
-                    perDayList.add(ev);
-
+                    result.put(dt.minusDays(1), perDayList);
                 }
             }
-
-            if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-
-                result.put(dt.minusDays(1), perDayList);
-            }
-        }}
+        }
         return result;
     }
 
