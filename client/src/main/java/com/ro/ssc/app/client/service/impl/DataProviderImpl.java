@@ -299,7 +299,7 @@ public enum DataProviderImpl implements DataProvider {
                                             outevent = event.getEventDateTime();
                                         }
                                         if (firstevent != null && outevent != null) {
-                                            if (outevent.isAfter(firstevent.plusHours(8))) {
+                                            if (outevent.isAfter(firstevent.plusHours(1))) {
                                                 pause = outevent.getMillis() - firstevent.getMillis() - duration;
 
                                                 result.add(new DailyData(user, day, firstevent.toString(dtf), outevent.toString(dtf), duration, pause, wrongPerDay.get(day)));
