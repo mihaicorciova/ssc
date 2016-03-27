@@ -9,16 +9,21 @@ import com.ro.ssc.app.client.model.commons.Event;
 import com.ro.ssc.app.client.model.commons.ShiftData;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.LoggerFactory;
-
+import org.jooq.lambda.Seq;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 /**
  *
  * @author DauBufu
@@ -38,7 +43,7 @@ public class Utils {
         for (int i = 0; i < events.size() - 1; i++) {
 
             if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
-                if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit")) {
+                if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit") && events.get(i + 1).getEventDateTime().minus(events.get(i).getEventDateTime().getMillis()).getMillis() < 24 * 3600 * 1000) {
                     shouldAdd = true;
                     trimedEvents.add(events.get(i));
                 } else if (events.get(i).getAddr().contains("Exit") && shouldAdd) {
@@ -75,61 +80,57 @@ public class Utils {
 
     }
 
-    public static Map<DateTime, List<Event>> splitPerDay(Map<String, ShiftData> shiftData, List<Event> events, DateTime iniDate, DateTime endDate, boolean notWrong) {
-        Map<DateTime, List<Event>> result = new LinkedHashMap<>();
-        List<Event> perDayList = new ArrayList<>();
-
-        if (!events.isEmpty() && shiftData != null) {
-            DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-            String dd = dt.minusDays(1).toString(dtf3);
-            if (shiftData.containsKey(dd)) {
-                LocalTime officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
-                LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
-                if (notWrong) {
-                    if (officialEnd.isBefore(officialStart)) {
-                        perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
-
-                    }
-                }
-                for (Event ev : events) {
-                    if (ev.getEventDateTime().isAfter(dt)) {
-                        if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate.plusDays(1)) && dt.isAfter(iniDate))) {
-                            if (notWrong) {
-                                if (officialEnd.isBefore(officialStart)) {
-                                    perDayList.add(new Event(dt.minusMillis(1), "Intermediate exit event for night shift", "Exit", Boolean.TRUE));
-
-                                }
-                            }
-                            result.put(dt.minusDays(1), perDayList);
-                        }
-                        dt = ev.getEventDateTime().plusDays(1).withTimeAtStartOfDay();
-                        dd = dt.minusDays(1).toString(dtf3);
-                        if (shiftData.containsKey(dd)) {
-                            officialStart = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftStartHour()));
-                            officialEnd = LocalTime.from(dtf4.parse(shiftData.get(dd).getShiftEndHour()));
-                        }
-
-                        perDayList = new ArrayList<>();
-                        if (notWrong) {
-                            if (officialEnd.isBefore(officialStart)) {
-                                perDayList.add(new Event(dt.minusDays(1), "Intermediate in event for night shift", "In", Boolean.TRUE));
-
-                            }
-                        }
-                        perDayList.add(ev);
-
-                    } else {
-                        perDayList.add(ev);
-
-                    }
-                }
-
-                if (iniDate == null || endDate == null || (dt.minusDays(1).isBefore(endDate) && iniDate != null && endDate != null && dt.isAfter(iniDate))) {
-
-                    result.put(dt.minusDays(1), perDayList);
-                }
-            }
+    public static Map<Pair<DateTime, DateTime>, List<Pair<Event,Event>>> splitPerDay(LocalTime time, List<Event> events, DateTime iniDate, DateTime endDate, boolean notWrong) {
+        Map<Pair<DateTime, DateTime>, List<Pair<Event,Event>>> result = new LinkedHashMap<>();
+          List<Pair<Event,Event>> pairedEvents = new LinkedList<>();
+            List<Pair<Event,Event>> perDayList= new LinkedList<>();
+              List<Pair<Event,Event>> additionalList= new LinkedList<>();
+       if (!events.isEmpty()) {
+       pairedEvents= Seq.seq(events.iterator())
+   .window()
+   .filter(w -> w.lead().isPresent() && w.value().getAddr().contains("In"))
+   .map(w -> new Pair<Event,Event>(w.value(), w.lead().get())) // alternatively, use your new Pair() class
+   .toList();
+      
         }
+       
+       
+           for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date.plusDays(1)) {
+
+       perDayList= pairedEvents.stream()
+               .filter(o->o.getKey().getEventDateTime().withTimeAtStartOfDay().isEqual(date))
+               .collect(Collectors.toList());
+       perDayList.removeAll(additionalList);
+       additionalList.clear();;
+
+if(perDayList.get(perDayList.size()-1).getValue().getEventDateTime().isBefore(date.plusDays(1)))
+{
+    additionalList=pairedEvents.stream()
+            .filter(o->o.getValue().getEventDateTime().withTimeAtStartOfDay().isAfter(date.plusDays(1)) && o.getValue().getEventDateTime().withTimeAtStartOfDay().isBefore(date.plusDays(1).plusHours(time.getHour())))
+    .collect(Collectors.toList());
+ perDayList.addAll(additionalList);
+
+}
+    result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(),perDayList.get(perDayList.size()-1).getValue().getEventDateTime()), perDayList);
+           }
+
+       result.entrySet().forEach(o->log.debug("intrarea "+o.getKey().getKey().toString() + " si iesirea "+ o.getKey().getValue().toString() +" cu nr de perechi" + o.getValue().size()));
+//    pairedEvents=  Seq.of(events).window().map(o-> new Pair(o,o)).;
+//      
+//            DateTime dt = events.get(0).getEventDateTime().plusDays(1).withTimeAtStartOfDay();
+//            for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date.plusDays(1)) {
+//                perDayList = events.stream().filter(o -> o.getEventDateTime().isAfter(date) && o.getEventDateTime().isBefore(date.plusDays(1))).collect(Collectors.toList());
+//                if (perDayList.get(0).getAddr().contains("In") && perDayList.get(perDayList.size() - 1).getAddr().contains("Exit")) {
+//                    pair = new Pair(perDayList.get(0).getEventDateTime(), perDayList.get(perDayList.size() - 1).getEventDateTime());
+//                
+//                }
+//                else
+//                {
+//               additional= events.stream().filter(o -> o.getEventDateTime().isAfter(date.plusDays(1)) && o.getEventDateTime().isBefore(date.plusDays(1))).collect(Collectors.toList());
+//                }
+//                result.put(pair,perDayList);
+//            }
+//        }
         return result;
     }
 

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -48,12 +49,14 @@ public enum DataProviderImpl implements DataProvider {
                 private Set<String> excludedUsers;
                 private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
                 private DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
-              
+                private LocalTime time;
                 private DecimalFormat df = new DecimalFormat();
                 private final Logger log = LoggerFactory.getLogger(DataProviderImpl.class);
 
                 @Override
                 public List<GenericModel> getUserData() {
+                    log.debug("Timp setat de user"+time.toString());
+   
                     List<GenericModel> data = new ArrayList<>();
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
                         for (Event ev : entry.getValue().getEvents()) {
@@ -92,7 +95,7 @@ public enum DataProviderImpl implements DataProvider {
                                 int tearlys = 0;
                                 long tearly = 0;
                                 boolean withWrongEv = false;
-                                List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData,shiftData,excludedGates,entry.getKey(), iniDate, endDate);
+                                List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData,time,shiftData,excludedGates,entry.getKey(), iniDate, endDate);
                                 for (DailyData day : dailyList) {
 
                                     if (day.getLateTime() > 0) {
@@ -133,7 +136,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     if (user != null && !excludedUsers.contains(user)) {
 
-                        List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData,shiftData,excludedGates,user, iniDate, endDate);
+                        List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData,time,shiftData,excludedGates,user, iniDate, endDate);
                         for (DailyData day : dailyList) {
 
                             int absent = 0;
@@ -268,6 +271,14 @@ public enum DataProviderImpl implements DataProvider {
                     enrichUserData();
                 }
 
+        public LocalTime getTime() {
+            return time;
+        }
+
+        public void setTime(LocalTime time) {
+            this.time = time;
+        }
+
           
 
                 private void enrichUserData() {
@@ -291,8 +302,12 @@ public enum DataProviderImpl implements DataProvider {
 
             };
 
-    public static DataProvider getInstance() {
+    public static DataProviderImpl getInstance() {
         return DataProviderImpl.INSTANCE;
+    }
+
+    public void setTime(LocalTime lt) {
+      getInstance().setTime(lt);
     }
 
 }

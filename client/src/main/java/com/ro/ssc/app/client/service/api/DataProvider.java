@@ -7,6 +7,7 @@ package com.ro.ssc.app.client.service.api;
 
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import java.io.File;
+import java.time.LocalTime;
 import java.util.List;
 import org.joda.time.DateTime;
 
