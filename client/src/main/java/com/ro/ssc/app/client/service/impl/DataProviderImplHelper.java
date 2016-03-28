@@ -11,6 +11,7 @@ import com.ro.ssc.app.client.model.commons.ShiftData;
 import com.ro.ssc.app.client.model.commons.User;
 import static com.ro.ssc.app.client.utils.Utils.applyExcludeLogic;
 import static com.ro.ssc.app.client.utils.Utils.splitPerDay;
+import static com.ro.ssc.app.client.utils.Utils.splitPerDayWrong;
 import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.jooq.lambda.Seq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,15 +84,33 @@ public class DataProviderImplHelper {
         List result = new ArrayList();
       Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
         Map<Pair<DateTime,DateTime>, List<Pair<Event,Event>>> eventsPerDay;
-        Map<Pair<DateTime,DateTime>, List<Pair<Event,Event>>> wrongPerDay;
+        Map<DateTime, List<Event>> wrongPerDay;
         String userId = userData.get(user).getUserId().trim();
-        eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(0), iniDate, endDate, true);
-        wrongPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(1), iniDate, endDate, false);
-//        Set<String> neededPresence = getNeededPresence(userData, shiftData, user, iniDate, endDate);
+        eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(0), iniDate, endDate);
+        wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(1), iniDate, endDate);
+        Set<String> neededPresence = getNeededPresence(userData, shiftData, user, iniDate, endDate);
+       
+        for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
+       final DateTime dd=date;
+      
+       for(Map.Entry<Pair<DateTime,DateTime>, List<Pair<Event,Event>>> entry : eventsPerDay.entrySet()) {
+            if(entry.getKey().getKey().withTimeAtStartOfDay().isEqual(dd)) {
+             
+                Long duration= 0l;
+                for(Pair<Event,Event> pair:entry.getValue())
+                {
+                duration=duration+pair.getValue().getEventDateTime().getMillis() - pair.getKey().getEventDateTime().getMillis();
+                }
+                Long pause= entry.getKey().getValue().getMillis()-entry.getKey().getKey().getMillis()-duration;
+                result.add(new DailyData(userId, date, user, user, 0, duration, duration, pause, 0, 0, wrongPerDay.get(dd)));
+            }
+        }
+        }
+        
 //        Set<String> eventDays = eventsPerDay.keySet().stream().map(e -> e.toString(dtf3)).collect(Collectors.toSet());
 //        eventDays.removeAll(neededPresence);
 //
-//        long tovertime = 0L;
+//        long tovertime = 0L;s
 //        Long allowedPause = 60 * 1000 * 30l;
 //        int dailyHours = 8;
 //        LocalTime officialStart = null;
@@ -101,9 +121,9 @@ public class DataProviderImplHelper {
 //            DateTime day = DateTime.parse(dd, dtf3);
 //
 //            if (eventsPerDay.containsKey(day)) {
-//
-//                List<Event> events = applyExcludeLogic(excludedGates, eventsPerDay.get(day)).get(0);
+//);
 //                List<Event> exEvents = applyExcludeLogic(excludedGates, eventsPerDay.get(day)).get(1);
+//                List<Event> events = applyExcludeLogic(excludedGates, eventsPerDay.get(day)).get(0
 //
 //                if (exEvents.size() > 0) {
 //                    if (wrongPerDay.containsKey(day)) {

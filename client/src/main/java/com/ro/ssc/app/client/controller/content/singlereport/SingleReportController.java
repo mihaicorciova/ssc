@@ -90,10 +90,14 @@ public class SingleReportController implements Initializable {
      */
     @Override
     public void initialize(final URL url, final ResourceBundle rb) {
-        log.info("Initializing Sumary controller");
+        log.info("Initializing Sg rep controller");
 
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
+
+          
+            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
 
             iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -121,11 +125,10 @@ public class SingleReportController implements Initializable {
                 }
             });
 
-            userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
+              userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
             userChoiceBox.getSelectionModel().selectFirst();
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
-
+            
+                log.debug("DAte "+iniDate.toString());
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
             }
@@ -183,8 +186,8 @@ public class SingleReportController implements Initializable {
         offTimeTableColumn.setComparator(timeComparator);
         
         dateTableColumn.setComparator(dateComparator);
-        
-        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
+        log.debug("DAte "+iniDate.toString());
+       singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
     }
 
     @FXML
