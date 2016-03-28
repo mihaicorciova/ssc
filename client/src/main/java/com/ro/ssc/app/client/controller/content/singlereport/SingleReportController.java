@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
@@ -187,7 +188,27 @@ public class SingleReportController implements Initializable {
         
         dateTableColumn.setComparator(dateComparator);
         log.debug("DAte "+iniDate.toString());
-       singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
+        List<GenericModel> ll=DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate);
+       singleReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
+    
+    if(ll.stream().allMatch(o->o.getEight().equals("")))
+    {
+    absenceTableColumn.setVisible(false);
+    }
+    
+     if(ll.stream().allMatch(o->o.getSeven().equals("00:00:00")))
+    {
+    overtimeTableColumn.setVisible(false);
+    }
+      if(ll.stream().allMatch(o->o.getNine().equals("00:00:00")))
+    {
+    lateTableColumn.setVisible(false);
+    }
+       if(ll.stream().allMatch(o->o.getTen().equals("00:00:00")))
+    {
+    earlyTableColumn.setVisible(false);
+    }
+       
     }
 
     @FXML

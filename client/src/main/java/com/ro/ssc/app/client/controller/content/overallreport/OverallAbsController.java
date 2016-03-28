@@ -82,6 +82,9 @@ public class OverallAbsController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
+                iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
+            
             iniDatePicker.setOnAction((final ActionEvent e) -> {
                 iniDate = DateTime.parse(iniDatePicker.getValue().format(formatter), dtf);
                 populateMyTable();
@@ -101,8 +104,7 @@ public class OverallAbsController implements Initializable {
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
 
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
+        
 
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));

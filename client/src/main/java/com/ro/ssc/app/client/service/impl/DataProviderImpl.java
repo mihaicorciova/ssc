@@ -83,10 +83,9 @@ public enum DataProviderImpl implements DataProvider {
                     List<GenericModel> data = new ArrayList<>();
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
                         if (!excludedUsers.contains(entry.getKey())) {
-                            if (department == null || (department != null && entry.getValue().getDepartment().equals(department))) {
+                            if (department == null || ( entry.getValue().getDepartment().equals(department))) {
 
                                 Long tduration = 0L;
-                                Long tcduration = 0L;
                                 Long tpause = 0L;
                                 Long tovertime = 0L;
                                 int tabsent = 0;
@@ -115,7 +114,6 @@ public enum DataProviderImpl implements DataProvider {
 
                                     }
                                     tduration += day.getWorkTime();
-                                    tcduration += day.getCworkTime();
                                     tpause += day.getPauseTime();
                                     tovertime += day.getOverTime();
                                 }
@@ -148,42 +146,7 @@ public enum DataProviderImpl implements DataProvider {
                                     absent = 1;
                                 }
                             }
-
-                            /*
-                             for (int i = 0; i < dailyList.size(); i++) {
-
-                             int absent = 0;
-
-                             if (dailyList.get(i).getFirstInEvent().equals("") || dailyList.get(i).getLastOutEvent().equals("")) {
-                             if (dailyList.get(i).getWrongEvents().size() > 0) {
-                             absent = 2;
-                             } else {
-                             absent = 1;
-                             }
-                             }
-                            
-                             if (!user.contains("*")) {
-                             data.add(new GenericModel(dailyList.get(i).getDate().toString(dtf2), dailyList.get(i).getFirstInEvent(), dailyList.get(i).getLastOutEvent(), formatMillis(dailyList.get(i).getWorkTime()), formatMillis(dailyList.get(i).getPauseTime()), absent == 0 ? formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i).getPauseTime()) : formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i).getPauseTime()) + "!"));
-                             } else if (i + 1 != dailyList.size()) {
-                             if (dailyList.get(i).getDate().plusDays(1).equals(dailyList.get(i + 1).getDate())) {
-                             log.debug(user + " " + dailyList.get(i).getDate().toString(dtf) + "");
-                             if (dailyList.get(i + 1).getFirstInEvent().equals("00:00:00") && dailyList.get(i).getLastOutEvent().equals("23:59:59")) {
-                             log.debug(user + " " + dailyList.get(i) + "in if");
-                             data.add(new GenericModel(dailyList.get(i).getDate().toString(dtf2), dailyList.get(i).getFirstInEvent(), dailyList.get(i + 1).getLastOutEvent(), formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i + 1).getWorkTime()), formatMillis(dailyList.get(i).getPauseTime() + dailyList.get(i + 1).getPauseTime()), absent == 0 ? formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i).getPauseTime() + dailyList.get(i + 1).getWorkTime() + dailyList.get(i + 1).getPauseTime()) : formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i).getPauseTime() + dailyList.get(i + 1).getWorkTime() + dailyList.get(i + 1).getPauseTime()) + "!"));
-                             i++;
-                             } else {
-                             log.debug(user + " " + dailyList.get(i) + "in else");
-                             data.add(new GenericModel(dailyList.get(i).getDate().toString(dtf2), dailyList.get(i).getFirstInEvent(), dailyList.get(i).getLastOutEvent(), formatMillis(dailyList.get(i).getWorkTime()), formatMillis(dailyList.get(i).getPauseTime()), absent == 0 ? formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i).getPauseTime()) : formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i).getPauseTime()) + "!"));
-
-                             }
-                             } else {
-                             data.add(new GenericModel(dailyList.get(i).getDate().toString(dtf2), dailyList.get(i).getFirstInEvent(), dailyList.get(i).getLastOutEvent(), formatMillis(dailyList.get(i).getWorkTime()), formatMillis(dailyList.get(i).getPauseTime()), absent == 0 ? formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i).getPauseTime()) : formatMillis(dailyList.get(i).getWorkTime() + dailyList.get(i).getPauseTime()) + "!"));
-
-                             }
-                             }
-                             }
-                             */
-                            data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()), formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime())));
+                         data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()), formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime())));
                         }
                     }
 

@@ -76,14 +76,21 @@ public class MainController implements Initializable {
                     file.createNewFile();
                 }
                 String content = Files.toString(file, Charsets.UTF_8);
+                try {
+                    if (DateTime.parse(content, dtf).isBeforeNow()) {
+                        return;
+                    }
+                } catch (Exception e) {
+                }
                 log.debug("cont" + content + " file" + file);
                 if (content.contains("111111111111111")) {
                     Files.write(DateTime.now().toString(dtf), file, Charsets.UTF_8);
-                    Configuration.IS_EXPIRED.setValue("true");
+
                     Optional<String> result = UiCommonTools.getInstance().showExpDialogStatus("Licenta Expirata", "Va rugam contactati vanzatorul softului pentru codul de deblocare ", TrialKeyGenerator.generateKey(DateTime.now().toString(dtf)));
                     if (result.isPresent()) {
                         if (TrialKeyValidator.decodeKey(result.get()).equals(Files.toString(file, Charsets.UTF_8).concat("0"))) {
                             Files.write("NO_EXP", file, Charsets.UTF_8);
+
                         } else {
                             return;
                         }
@@ -99,7 +106,9 @@ public class MainController implements Initializable {
                 log.error("Exception in writing file " + ex.getMessage());
             }
         }
+
         try {
+
             // load side menu
             final FXMLLoader sideMenuLoader = new FXMLLoader();
             final AnchorPane sideMenu = sideMenuLoader.load(getClass().getResourceAsStream(SIDE_MENU_LAYOUT_FILE));

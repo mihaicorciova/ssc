@@ -79,6 +79,7 @@ public class AccessReader {
 
             table = DatabaseBuilder.open(file).getTable("t_b_ShiftSet");
             Cursor cursor = CursorBuilder.createCursor(table);
+            shiftMap.put("0",new ShiftData("0", "weekend", "", "", "", true));
             for (Row row : cursor.newIterable()) {
 
                 shiftMap.put(String.format("%s", row.get("f_ShiftID")).trim(), new ShiftData(String.format("%s", row.get("f_ShiftID")), String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[0] : String.format("%s", row.get("f_ShiftName")),

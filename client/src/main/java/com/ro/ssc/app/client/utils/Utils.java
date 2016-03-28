@@ -6,10 +6,8 @@
 package com.ro.ssc.app.client.utils;
 
 import com.ro.ssc.app.client.model.commons.Event;
-import com.ro.ssc.app.client.model.commons.ShiftData;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +21,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.LoggerFactory;
 import org.jooq.lambda.Seq;
-import static org.jooq.lambda.tuple.Tuple.tuple;
 
 /**
  *
@@ -82,7 +79,6 @@ public class Utils {
     }
 
     public static Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> splitPerDay(LocalTime time, List<Event> events, DateTime iniDate, DateTime endDate) {
-        log.debug("aicii");
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> result = new LinkedHashMap<>();
         List<Pair<Event, Event>> pairedEvents = new LinkedList<>();
         List<Pair<Event, Event>> perDayList = new LinkedList<>();
@@ -92,9 +88,11 @@ public class Utils {
             pairedEvents = Seq.seq(events.iterator())
                     .window()
                     .filter(w -> w.lead().isPresent() && w.value().getAddr().contains("In"))
-                    .map(w -> new Pair<Event, Event>(w.value(), w.lead().get())) // alternatively, use your new Pair() class
+                    .map(w -> new Pair<>(w.value(), w.lead().get())) // alternatively, use your new Pair() class
                     .toList();
 
+            pairedEvents.stream().forEach(o->log.debug(o.getKey().getAddr() + " "+o.getValue().getAddr()));
+            
             for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
                 final DateTime dd = date;
                 perDayList = pairedEvents.stream()
@@ -103,24 +101,32 @@ public class Utils {
                 perDayList.removeAll(additionalList);
                 additionalList.clear();
                 if (!perDayList.isEmpty()) {
-                    if (perDayList.get(perDayList.size() - 1).getValue().getEventDateTime().isBefore(date.plusDays(1))) {
+                    final DateTime evt =perDayList.get(perDayList.size() - 1).getValue().getEventDateTime();
+                    if (evt.isAfter(date.plusDays(1))) {
                         additionalList = pairedEvents.stream()
-                                .filter(o -> o.getValue().getEventDateTime().withTimeAtStartOfDay().isAfter(dd.plusDays(1)) && o.getValue().getEventDateTime().withTimeAtStartOfDay().isBefore(dd.plusDays(1).plusHours(time.getHour()).plusMinutes(time.getMinute())))
+                                .filter(o -> o.getValue().getEventDateTime().isAfter(evt) && o.getValue().getEventDateTime().isBefore(dd.plusDays(1).plusHours(time.getHour()).plusMinutes(time.getMinute())))
                                 .collect(Collectors.toList());
+                                            
                         perDayList.addAll(additionalList);
-
-                    }
+                        if(!additionalList.isEmpty()){
+                    result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), additionalList.get(additionalList.size() - 1).getValue().getEventDateTime()), perDayList);
+                        }
+                        else
+                        {
+                         result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), perDayList.get(perDayList.size() - 1).getValue().getEventDateTime()), perDayList);
+                  
+                        }
+                    }else{
                     result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), perDayList.get(perDayList.size() - 1).getValue().getEventDateTime()), perDayList);
-                }
+                    }
+                    }
             }
-            result.entrySet().forEach(o -> log.debug("intrarea " + o.getKey().getKey().toString() + " si iesirea " + o.getKey().getValue().toString() + " cu nr de perechi" + o.getValue().size()));
         }
 
         return result;
     }
 
     public static Map<DateTime, List<Event>> splitPerDayWrong(LocalTime time, List<Event> events, DateTime iniDate, DateTime endDate) {
-        log.debug("aicii");
         Map<DateTime, List<Event>> result = new LinkedHashMap<>();
 
         List<Event> perDayList = new LinkedList<>();

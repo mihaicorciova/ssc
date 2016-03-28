@@ -89,6 +89,9 @@ public class SingleAbsController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
+              iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
+
             iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(final ActionEvent e) {
@@ -117,9 +120,7 @@ public class SingleAbsController implements Initializable {
 
             userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
             userChoiceBox.getSelectionModel().selectFirst();
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
-
+          
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
             }
