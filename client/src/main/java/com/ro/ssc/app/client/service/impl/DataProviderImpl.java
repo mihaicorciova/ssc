@@ -22,6 +22,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,8 +56,8 @@ public enum DataProviderImpl implements DataProvider {
 
                 @Override
                 public List<GenericModel> getUserData() {
-                    log.debug("Timp setat de user"+time.toString());
-   
+                    log.debug("Timp setat de user" + time.toString());
+
                     List<GenericModel> data = new ArrayList<>();
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
                         for (Event ev : entry.getValue().getEvents()) {
@@ -74,6 +75,16 @@ public enum DataProviderImpl implements DataProvider {
                             }
                         }
                     }
+                    
+                    data.sort(new Comparator<GenericModel>() {
+
+                        @Override
+                        public int compare(GenericModel o1, GenericModel o2) {
+                            return o1.getOne().toString().compareTo(o2.getOne().toString());
+                        }
+
+                    }
+                    );
                     return data;
                 }
 
@@ -83,7 +94,7 @@ public enum DataProviderImpl implements DataProvider {
                     List<GenericModel> data = new ArrayList<>();
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
                         if (!excludedUsers.contains(entry.getKey())) {
-                            if (department == null || ( entry.getValue().getDepartment().equals(department))) {
+                            if (department == null || (entry.getValue().getDepartment().equals(department))) {
 
                                 Long tduration = 0L;
                                 Long tpause = 0L;
@@ -94,7 +105,7 @@ public enum DataProviderImpl implements DataProvider {
                                 int tearlys = 0;
                                 long tearly = 0;
                                 boolean withWrongEv = false;
-                                List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData,time,shiftData,excludedGates,entry.getKey(), iniDate, endDate);
+                                List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, entry.getKey(), iniDate, endDate);
                                 for (DailyData day : dailyList) {
 
                                     if (day.getLateTime() > 0) {
@@ -124,6 +135,15 @@ public enum DataProviderImpl implements DataProvider {
 
                     }
 
+                    data.sort(new Comparator<GenericModel>() {
+
+                        @Override
+                        public int compare(GenericModel o1, GenericModel o2) {
+                            return o1.getOne().toString().compareTo(o2.getOne().toString());
+                        }
+
+                    }
+                    );
                     return data;
                 }
 
@@ -134,7 +154,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     if (user != null && !excludedUsers.contains(user)) {
 
-                        List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData,time,shiftData,excludedGates,user, iniDate, endDate);
+                        List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, user, iniDate, endDate);
                         for (DailyData day : dailyList) {
 
                             int absent = 0;
@@ -146,10 +166,11 @@ public enum DataProviderImpl implements DataProvider {
                                     absent = 1;
                                 }
                             }
-                         data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()), formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime())));
+                            data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()), formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime())));
                         }
                     }
 
+                  
                     return data;
                 }
 
@@ -200,16 +221,21 @@ public enum DataProviderImpl implements DataProvider {
 
                 @Override
                 public List<String> getUsers() {
-                    return new ArrayList<>(userData.keySet());
+                    List<String> result=new ArrayList<>(userData.keySet());
+                    result.sort((String o1, String o2) -> o1.compareTo(o2));
+                    return result;
                 }
 
                 @Override
                 public List<String> getDepartments() {
                     Set<String> result = new LinkedHashSet<>();
+                      
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
                         result.add(entry.getValue().getDepartment());
                     }
-                    return new ArrayList<>(result);
+                     List<String> res = new ArrayList<>(result);
+                     res.sort((String o1, String o2)->o1.compareTo(o2));
+                    return res;
                 }
 
                 @Override
@@ -234,15 +260,13 @@ public enum DataProviderImpl implements DataProvider {
                     enrichUserData();
                 }
 
-        public LocalTime getTime() {
-            return time;
-        }
+                public LocalTime getTime() {
+                    return time;
+                }
 
-        public void setTime(LocalTime time) {
-            this.time = time;
-        }
-
-          
+                public void setTime(LocalTime time) {
+                    this.time = time;
+                }
 
                 private void enrichUserData() {
 
@@ -270,7 +294,7 @@ public enum DataProviderImpl implements DataProvider {
     }
 
     public void setTime(LocalTime lt) {
-      getInstance().setTime(lt);
+        getInstance().setTime(lt);
     }
 
 }

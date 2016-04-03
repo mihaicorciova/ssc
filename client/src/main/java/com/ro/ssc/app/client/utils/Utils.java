@@ -78,6 +78,63 @@ public class Utils {
 
     }
 
+    public static List<List<Event>> applyExcludeLogic2(Set<String> excludedGates, List<Event> events) {
+        List<List<Event>> result = new ArrayList<>();
+        List<Event> trimedEvents = new ArrayList<>();
+        List<Event> remainingEvents = new ArrayList<>();
+        Boolean shouldAddExit = false;
+        Boolean shouldAddIn = true;
+        for (int i = 0; i < events.size() - 1; i++) {
+
+            if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
+                if (shouldAddExit && events.get(i).getAddr().contains("Exit") && events.get(i + 1).getAddr().contains("In")) {
+if(trimedEvents.size()>0){
+                    if (events.get(i).getEventDateTime().minus(trimedEvents.get(trimedEvents.size()-1).getEventDateTime().getMillis()).getMillis() < 24 * 3600 * 1000) {
+                        shouldAddIn = true;
+                        shouldAddExit = false;
+                        trimedEvents.add(events.get(i));
+                    }}
+                } else {
+                    if (events.get(i).getAddr().contains("In") && shouldAddIn) {
+                        shouldAddIn = false;
+                        shouldAddExit = true;
+                        trimedEvents.add(events.get(i));
+
+                    } else {
+                        shouldAddIn = false;
+                        shouldAddExit = true;
+                        if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
+
+                            remainingEvents.add(events.get(i));
+
+                        }
+                    }
+                }
+            }
+        }
+        if (!excludedGates.contains(events.get(events.size() - 1).getAddr()) && events.get(events.size() - 1).getPassed()) {
+            if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAddExit) {
+                shouldAddIn = false;
+                shouldAddExit = false;
+                trimedEvents.add(events.get(events.size() - 1));
+
+            } else {
+                shouldAddIn = false;
+                shouldAddExit = false;
+                if (!events.get(events.size() - 1).getDescription().contains("shift")) {
+
+                    remainingEvents.add(events.get(events.size() - 1));
+                }
+            }
+
+        }
+        result.add(trimedEvents);
+        result.add(remainingEvents);
+        trimedEvents.forEach(o -> log.debug("Ev " + o.getEventDateTime().toString() + " " + o.getAddr()));
+        return result;
+
+    }
+
     public static Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> splitPerDay(LocalTime time, List<Event> events, DateTime iniDate, DateTime endDate) {
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> result = new LinkedHashMap<>();
         List<Pair<Event, Event>> pairedEvents = new LinkedList<>();
@@ -91,8 +148,8 @@ public class Utils {
                     .map(w -> new Pair<>(w.value(), w.lead().get())) // alternatively, use your new Pair() class
                     .toList();
 
-            pairedEvents.stream().forEach(o->log.debug(o.getKey().getAddr() + " "+o.getValue().getAddr()));
-            
+            pairedEvents.stream().forEach(o -> log.debug(o.getKey().getAddr() + " " + o.getValue().getAddr()));
+
             for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
                 final DateTime dd = date;
                 perDayList = pairedEvents.stream()
@@ -101,25 +158,23 @@ public class Utils {
                 perDayList.removeAll(additionalList);
                 additionalList.clear();
                 if (!perDayList.isEmpty()) {
-                    final DateTime evt =perDayList.get(perDayList.size() - 1).getValue().getEventDateTime();
+                    final DateTime evt = perDayList.get(perDayList.size() - 1).getValue().getEventDateTime();
                     if (evt.isAfter(date.plusDays(1))) {
                         additionalList = pairedEvents.stream()
                                 .filter(o -> o.getValue().getEventDateTime().isAfter(evt) && o.getValue().getEventDateTime().isBefore(dd.plusDays(1).plusHours(time.getHour()).plusMinutes(time.getMinute())))
                                 .collect(Collectors.toList());
-                                            
+
                         perDayList.addAll(additionalList);
-                        if(!additionalList.isEmpty()){
-                    result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), additionalList.get(additionalList.size() - 1).getValue().getEventDateTime()), perDayList);
+                        if (!additionalList.isEmpty()) {
+                            result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), additionalList.get(additionalList.size() - 1).getValue().getEventDateTime()), perDayList);
+                        } else {
+                            result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), perDayList.get(perDayList.size() - 1).getValue().getEventDateTime()), perDayList);
+
                         }
-                        else
-                        {
-                         result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), perDayList.get(perDayList.size() - 1).getValue().getEventDateTime()), perDayList);
-                  
-                        }
-                    }else{
-                    result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), perDayList.get(perDayList.size() - 1).getValue().getEventDateTime()), perDayList);
+                    } else {
+                        result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), perDayList.get(perDayList.size() - 1).getValue().getEventDateTime()), perDayList);
                     }
-                    }
+                }
             }
         }
 
@@ -135,7 +190,7 @@ public class Utils {
             for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
                 final DateTime dd = date;
                 perDayList = events.stream().filter(o -> o.getEventDateTime().withTimeAtStartOfDay().isEqual(dd)).collect(Collectors.toList());
-                result.put(dd, events);
+                result.put(dd, perDayList);
             }
         }
 

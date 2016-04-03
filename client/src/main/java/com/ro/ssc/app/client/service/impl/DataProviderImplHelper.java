@@ -5,11 +5,13 @@
  */
 package com.ro.ssc.app.client.service.impl;
 
+import com.ro.ssc.app.client.model.commons.Configuration;
 import com.ro.ssc.app.client.model.commons.DailyData;
 import com.ro.ssc.app.client.model.commons.Event;
 import com.ro.ssc.app.client.model.commons.ShiftData;
 import com.ro.ssc.app.client.model.commons.User;
 import static com.ro.ssc.app.client.utils.Utils.applyExcludeLogic;
+import static com.ro.ssc.app.client.utils.Utils.applyExcludeLogic2;
 import static com.ro.ssc.app.client.utils.Utils.splitPerDay;
 import static com.ro.ssc.app.client.utils.Utils.splitPerDayWrong;
 import java.text.DecimalFormat;
@@ -50,7 +52,7 @@ public class DataProviderImplHelper {
 
             for (String day : shiftData.get(userId).keySet()) {
 
-                if (DateTime.parse(day, dtf3).plusDays(1).isAfter(DataProviderImpl.getInstance().getPossibleDateStart(user)) && DateTime.parse(day, dtf3).isBefore(DataProviderImpl.getInstance().getPossibleDateEnd(user))) {
+                if (!shiftData.get(userId).get(day).getShiftId().equals("0") && DateTime.parse(day, dtf3).plusDays(1).isAfter(DataProviderImpl.getInstance().getPossibleDateStart(user)) && DateTime.parse(day, dtf3).isBefore(DataProviderImpl.getInstance().getPossibleDateEnd(user))) {
                     result.add(day);
                 }
             }
@@ -60,14 +62,20 @@ public class DataProviderImplHelper {
     }
 
     public static List<DailyData> getListPerDay(Map<String, User> userData, LocalTime time, Map<String, Map<String, ShiftData>> shiftData, Set<String> excludedGates, String user, DateTime iniDate, DateTime endDate) {
-        List result = new ArrayList();
+        List<DailyData> result = new ArrayList();
         Collections.sort(userData.get(user).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
         Map<DateTime, List<Event>> wrongPerDay;
+        Set<String> usedDates = new HashSet<>();
         String userId = userData.get(user).getUserId().trim();
-        eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(0), iniDate, endDate);
-        wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(1), iniDate, endDate);
-        Set<String> neededPresence = getNeededPresence(userData, shiftData, user, iniDate, endDate);
+        if (Configuration.IS_EXPIRED.getAsBoolean()) {
+            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(0), iniDate, endDate);
+            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, userData.get(user).getEvents()).get(1), iniDate, endDate);
+        } else {
+            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, userData.get(user).getEvents()).get(0), iniDate, endDate);
+            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, userData.get(user).getEvents()).get(1), iniDate, endDate);
+
+        }
 
         for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
             final DateTime dd = date;
@@ -92,11 +100,20 @@ public class DataProviderImplHelper {
                             } else {
                                 LocalTime officialStart = LocalTime.from(dtf4.parse(sh.getShiftStartHour()));
                                 LocalTime officialEnd = LocalTime.from(dtf4.parse(sh.getShiftEndHour()));
+                                long dailyPause = Long.valueOf(sh.getShiftBreakTime()) * 1000 * 60l;
                                 long dailyHours = officialEnd.isAfter(officialStart)
                                         ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
                                         : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
                                 if (sh.isHasOvertime()) {
-                                    overtime = duration > dailyHours ? duration - dailyHours : 0l;
+                                    if (pause > dailyPause) {
+                                        overtime = duration - dailyHours + dailyPause;
+                                    } else {
+                                        overtime = duration - dailyHours;
+                                        if (duration > dailyHours) {
+                                            duration = dailyHours;
+                                        }
+                                        pause = dailyPause;
+                                    }
                                 }
                                 earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
                                 latetime = entry.getKey().getKey().getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (entry.getKey().getKey().getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
@@ -104,9 +121,32 @@ public class DataProviderImplHelper {
                         }
                     }
                     result.add(new DailyData(userId, date, entry.getKey().getKey().toString(dtf), entry.getKey().getValue().toString(dtf), earlytime, duration, duration, pause, overtime, latetime, wrongPerDay.get(dd)));
+                    usedDates.add(dd.toString(dtf3));
+                }
+            }
+
+        }
+
+        for (String day : getNeededPresence(userData, shiftData, user, iniDate, endDate)) {
+            if (!usedDates.contains(day)) {
+                if (wrongPerDay.containsKey(DateTime.parse(day, dtf3)) ) {
+                    if (wrongPerDay.get(DateTime.parse(day, dtf3)).size()>0 ) {
+                    String ev = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getEventDateTime().toString(dtf);
+                    Boolean isIn = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getAddr().contains("In");
+          
+                    result.add(new DailyData(userId, DateTime.parse(day, dtf3), isIn == true ? ev : "", isIn == false ? ev : "", 0, 0, 0, 0, 0, 0, wrongPerDay.get(DateTime.parse(day, dtf3))));
+                    }
+                    else {
+                    result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, 0, 0, 0, new ArrayList<>()));
+
+                }
+                    } else {
+                    result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, 0, 0, 0, new ArrayList<>()));
+
                 }
             }
         }
+
         return result;
     }
 
