@@ -108,10 +108,8 @@ public class DataProviderImplHelper {
                                     if (pause > dailyPause) {
                                         overtime = duration - dailyHours + dailyPause;
                                     } else {
-                                        overtime = duration - dailyHours;
-                                        if (duration > dailyHours) {
-                                            duration = dailyHours;
-                                        }
+                                        overtime = duration +pause - dailyHours;
+                                        duration = duration  -(dailyPause-pause);
                                         pause = dailyPause;
                                     }
                                 }

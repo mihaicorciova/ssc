@@ -8,9 +8,11 @@ package com.ro.ssc.app.client.utils;
 import com.ro.ssc.app.client.model.commons.Event;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -84,31 +86,25 @@ public class Utils {
         List<Event> remainingEvents = new ArrayList<>();
         Boolean shouldAddExit = false;
         Boolean shouldAddIn = true;
+        Event in = null;
         for (int i = 0; i < events.size() - 1; i++) {
 
             if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
                 if (shouldAddExit && events.get(i).getAddr().contains("Exit") && events.get(i + 1).getAddr().contains("In")) {
-if(trimedEvents.size()>0){
-                    if (events.get(i).getEventDateTime().minus(trimedEvents.get(trimedEvents.size()-1).getEventDateTime().getMillis()).getMillis() < 24 * 3600 * 1000) {
-                        shouldAddIn = true;
-                        shouldAddExit = false;
-                        trimedEvents.add(events.get(i));
-                    }}
-                } else {
-                    if (events.get(i).getAddr().contains("In") && shouldAddIn) {
-                        shouldAddIn = false;
-                        shouldAddExit = true;
-                        trimedEvents.add(events.get(i));
+                    shouldAddIn = true;
+                    shouldAddExit = false;
+                    trimedEvents.add(events.get(i));
 
-                    } else {
-                        shouldAddIn = false;
-                        shouldAddExit = true;
-                        if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
+                } else if (events.get(i).getAddr().contains("In") && shouldAddIn) {
+                    shouldAddIn = false;
+                    shouldAddExit = true;
+                    in = events.get(i);
+                    trimedEvents.add(events.get(i));
 
-                            remainingEvents.add(events.get(i));
+                } else if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
 
-                        }
-                    }
+                    remainingEvents.add(events.get(i));
+
                 }
             }
         }
@@ -128,9 +124,26 @@ if(trimedEvents.size()>0){
             }
 
         }
+
         result.add(trimedEvents);
         result.add(remainingEvents);
-        trimedEvents.forEach(o -> log.debug("Ev " + o.getEventDateTime().toString() + " " + o.getAddr()));
+        List<Pair<Event, Event>> pairedEvents = Seq.seq(trimedEvents.iterator())
+                .window()
+                .filter(w -> w.lead().isPresent() && w.value().getAddr().contains("In"))
+                .map(w -> new Pair<>(w.value(), w.lead().get())) // alternatively, use your new Pair() class
+                .toList();
+        List<Pair<Event, Event>> ll = pairedEvents.stream().filter(o -> (o.getValue().getEventDateTime().getMillis() - o.getKey().getEventDateTime().getMillis() > 24 * 3600 * 1000)).collect(Collectors.toList());
+
+        if(ll.size()>0){
+        for (ListIterator<Event> it =trimedEvents.listIterator();it.hasNext();) {
+            for (Pair<Event, Event> pair : ll) {
+                if (it.next().equals(pair.getKey())) {
+                    Event newEv=remainingEvents.stream().filter(o->o.getEventDateTime().withTimeAtStartOfDay().isEqual(pair.getValue().getEventDateTime().withTimeAtStartOfDay())).collect(Collectors.toList()).get(0);
+                    it.set(newEv);
+                }
+            }
+        }
+        }
         return result;
 
     }
@@ -148,7 +161,7 @@ if(trimedEvents.size()>0){
                     .map(w -> new Pair<>(w.value(), w.lead().get())) // alternatively, use your new Pair() class
                     .toList();
 
-            pairedEvents.stream().forEach(o -> log.debug(o.getKey().getAddr() + " " + o.getValue().getAddr()));
+            pairedEvents.stream().forEach(o -> log.debug("aici" + o.getKey().getEventDateTime().toString() + o.getKey().getAddr() + " " + o.getValue().getEventDateTime().toString() + o.getValue().getAddr()));
 
             for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
                 final DateTime dd = date;
@@ -163,7 +176,7 @@ if(trimedEvents.size()>0){
                         additionalList = pairedEvents.stream()
                                 .filter(o -> o.getValue().getEventDateTime().isAfter(evt) && o.getValue().getEventDateTime().isBefore(dd.plusDays(1).plusHours(time.getHour()).plusMinutes(time.getMinute())))
                                 .collect(Collectors.toList());
-
+                        additionalList.forEach(o -> log.debug("asda" + o.getValue().getEventDateTime()));
                         perDayList.addAll(additionalList);
                         if (!additionalList.isEmpty()) {
                             result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), additionalList.get(additionalList.size() - 1).getValue().getEventDateTime()), perDayList);
