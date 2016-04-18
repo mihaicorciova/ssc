@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
@@ -92,6 +93,10 @@ public class OverallReportController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
+            
+            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
+            
             iniDatePicker.setOnAction((final ActionEvent e) -> {
                 iniDate = DateTime.parse(iniDatePicker.getValue().format(formatter), dtf);
                 populateMyTable();
@@ -111,8 +116,6 @@ public class OverallReportController implements Initializable {
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
 
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
 
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
@@ -205,8 +208,27 @@ public class OverallReportController implements Initializable {
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
         overtimeTableColumn.setComparator(timeComparator);
-
-        overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
+ List<GenericModel> ll= DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString());
+     
+        overallReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
+     if(ll.stream().allMatch(o->o.getSeven().equals("0")))
+    {
+    absenceTableColumn.setVisible(false);
+    }
+    
+     if(ll.stream().allMatch(o->o.getSix().equals("00:00:00")))
+    {
+    overtimeTableColumn.setVisible(false);
+    }
+      if(ll.stream().allMatch(o->o.getEight().equals("00:00:00")))
+    {
+    lateTableColumn.setVisible(false);
+    }
+       if(ll.stream().allMatch(o->o.getNine().equals("00:00:00")))
+    {
+    earlyTableColumn.setVisible(false);
+    }
+     
     }
 
 }

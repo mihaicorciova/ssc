@@ -82,6 +82,9 @@ public class OverallAbsController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
+                iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
+            
             iniDatePicker.setOnAction((final ActionEvent e) -> {
                 iniDate = DateTime.parse(iniDatePicker.getValue().format(formatter), dtf);
                 populateMyTable();
@@ -101,8 +104,7 @@ public class OverallAbsController implements Initializable {
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
 
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
+        
 
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
@@ -171,6 +173,8 @@ public class OverallAbsController implements Initializable {
         absenceTableColumn.setStyle("-fx-alignment:CENTER;");
         lateTableColumn.setStyle("-fx-alignment:CENTER;");
 
+        log.debug("DAte " + iniDate.toString());
+                
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString())));
     }
 

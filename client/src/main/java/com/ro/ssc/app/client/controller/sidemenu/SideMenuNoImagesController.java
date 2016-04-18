@@ -2,6 +2,7 @@ package com.ro.ssc.app.client.controller.sidemenu;
 
 import com.ro.ssc.app.client.controller.MainController;
 import com.ro.ssc.app.client.model.commons.Configuration;
+import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import java.io.IOException;
 
 import javafx.fxml.FXML;
@@ -11,14 +12,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.time.LocalTime;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 import org.joda.time.DateTime;
@@ -33,7 +38,8 @@ import org.joda.time.format.DateTimeFormatter;
 public class SideMenuNoImagesController implements Initializable {
 
     private static final Logger log = LoggerFactory.getLogger(SideMenuNoImagesController.class);
-
+ private static final java.time.format.DateTimeFormatter dtf4 = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+    
     // content controllers
     private MainController mainController;
 
@@ -48,6 +54,9 @@ public class SideMenuNoImagesController implements Initializable {
 
     @FXML
     private AnchorPane imageViewAnchorPane;
+    
+    @FXML
+    private TextField timeTextField;
 
     /**
      * Initializes the controller class.
@@ -68,6 +77,27 @@ public class SideMenuNoImagesController implements Initializable {
         navigationTree.getRoot().getChildren().stream().forEach((item) -> {
             item.setExpanded(true);
         });
+        
+         try {
+                 LocalTime lt= LocalTime.from(dtf4.parse(timeTextField.getText()));
+                  DataProviderImpl.getInstance().setTime(lt);
+                } catch (Exception e) {
+                    log.debug("Exception",e);
+                }
+         
+        timeTextField.textProperty().addListener(new ChangeListener<String>() {
+
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                try {
+                 LocalTime lt= LocalTime.from(dtf4.parse(newValue));
+                  DataProviderImpl.getInstance().setTime(lt);
+                } catch (Exception e) {
+                    log.debug("Exception",e);
+                }
+ }
+        });
+        
         final Timeline digitalTime = new Timeline(
                 new KeyFrame(Duration.seconds(0),
                         new EventHandler<ActionEvent>() {

@@ -7,7 +7,9 @@ package com.ro.ssc.app.client.service.api;
 
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import java.io.File;
+import java.time.LocalTime;
 import java.util.List;
+import org.controlsfx.control.spreadsheet.GridBase;
 import org.joda.time.DateTime;
 
 /**
@@ -18,6 +20,8 @@ public interface DataProvider {
 
     public  List<GenericModel>  getUserData();
 
+     public GridBase  getMonthlyData();
+     
     public void importUserData(File file);
        
     public List<GenericModel> getOverallTableData (DateTime iniDate,DateTime endDate,String department);
