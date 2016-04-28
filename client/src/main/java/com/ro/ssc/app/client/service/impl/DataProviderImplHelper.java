@@ -109,7 +109,7 @@ public class DataProviderImplHelper {
                                         overtime = duration - dailyHours + dailyPause;
                                     } else {
                                         overtime = duration +pause - dailyHours;
-                                        duration = duration  -(dailyPause-pause);
+                                        duration = duration  -(dailyPause-pause) >0?duration  -(dailyPause-pause):0;
                                         pause = dailyPause;
                                     }
                                 }

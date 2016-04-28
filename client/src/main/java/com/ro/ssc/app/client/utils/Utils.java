@@ -134,15 +134,27 @@ public class Utils {
                 .toList();
         List<Pair<Event, Event>> ll = pairedEvents.stream().filter(o -> (o.getValue().getEventDateTime().getMillis() - o.getKey().getEventDateTime().getMillis() > 24 * 3600 * 1000)).collect(Collectors.toList());
 
-        if(ll.size()>0){
-        for (ListIterator<Event> it =trimedEvents.listIterator();it.hasNext();) {
-            for (Pair<Event, Event> pair : ll) {
-                if (it.next().equals(pair.getKey())) {
-                    Event newEv=remainingEvents.stream().filter(o->o.getEventDateTime().withTimeAtStartOfDay().isEqual(pair.getValue().getEventDateTime().withTimeAtStartOfDay())).collect(Collectors.toList()).get(0);
-                    it.set(newEv);
+        if (ll.size() > 0) {
+            boolean toRemoveNext = false;
+            for (ListIterator<Event> it = trimedEvents.listIterator(); it.hasNext();) {
+                Event e = it.next();
+                if (toRemoveNext) {
+                    it.remove();
+                    toRemoveNext=false;
+                }
+                for (Pair<Event, Event> pair : ll) {
+                    if (e.equals(pair.getKey())) {
+                        List<Event> ls = remainingEvents.stream().filter(o -> o.getAddr().contains("In") && o.getEventDateTime().withTimeAtStartOfDay().isEqual(pair.getValue().getEventDateTime().withTimeAtStartOfDay())).collect(Collectors.toList());
+                        if (!ls.isEmpty()) {
+                            Event newEv = ls.get(0);
+                            it.set(newEv);
+                        } else {
+                            it.remove();
+                            toRemoveNext = true;
+                        }
+                    }
                 }
             }
-        }
         }
         return result;
 

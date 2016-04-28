@@ -54,6 +54,8 @@
                       <TableColumn fx:id="offTimeTableColumn" prefWidth="90.0" text="Timp Pauza" />
                   <TableColumn fx:id="totalTimeTableColumn" prefWidth="132.0" text="Timp Total" />
                   <TableColumn fx:id="overtimeTableColumn" prefWidth="137.0" text="Ore suplimentare" />
+                   <TableColumn fx:id="undertimeTableColumn" prefWidth="100.0" text="Ore lipsa" />
+                    <TableColumn fx:id="allovertimeTableColumn" prefWidth="160.0" text="Total ore suplimentare/lipsa" />
                   <TableColumn fx:id="absenceTableColumn" prefWidth="75.0" text="Absente" />
                   <TableColumn fx:id="lateTableColumn" prefWidth="75.0" text="Intarzieri" />
                     <TableColumn fx:id="earlyTableColumn" prefWidth="75.0" text="Plecari timpurii" />
