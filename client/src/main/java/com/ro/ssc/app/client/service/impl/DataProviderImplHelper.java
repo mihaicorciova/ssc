@@ -52,7 +52,7 @@ public class DataProviderImplHelper {
 
             for (String day : shiftData.get(userId).keySet()) {
 
-                if (!shiftData.get(userId).get(day).getShiftId().equals("0") && DateTime.parse(day, dtf3).plusDays(1).isAfter(DataProviderImpl.getInstance().getPossibleDateStart(user)) && DateTime.parse(day, dtf3).isBefore(DataProviderImpl.getInstance().getPossibleDateEnd(user))) {
+                if (!shiftData.get(userId).get(day).getShiftId().equals("0") && DateTime.parse(day, dtf3).plusDays(1).isAfter(inidate) && DateTime.parse(day, dtf3).isBefore(endate.plusDays(1))) {
                     result.add(day);
                 }
             }
@@ -118,8 +118,8 @@ public class DataProviderImplHelper {
                                     }
                                     log.debug(userName+" data "+ currentDateAsDateTime.toString(dtf3) +" overtime "+overtime);
                                 } else {
-                                    if (duration < dailyHours) {
-                                        overtime = duration - dailyHours;
+                                    if (duration < dailyHours-dailyPause) {
+                                        overtime = duration - dailyHours+dailyPause;
                                     }
                                 }
                                 earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
