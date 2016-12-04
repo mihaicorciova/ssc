@@ -56,8 +56,6 @@ public enum DataProviderImpl implements DataProvider {
 
         @Override
         public List<GenericModel> getUserData() {
-            log.debug("Timp setat de user" + time.toString());
-
             List<GenericModel> data = new ArrayList<>();
             for (Map.Entry<String, User> entry : userData.entrySet()) {
                 for (Event ev : entry.getValue().getEvents()) {
@@ -260,8 +258,6 @@ public enum DataProviderImpl implements DataProvider {
 
             File dir = new File(MDB_PATH);
             if (dir.exists()) {
-                log.debug("File from " + MDB_PATH + "  " + dir.listFiles()[0].getName());
-
                 updateUserMap(dir.listFiles()[0]).get(0).stream().forEach(p -> {
                     String userId = p.split("-")[0];
                     String userName = p.split("-")[1];

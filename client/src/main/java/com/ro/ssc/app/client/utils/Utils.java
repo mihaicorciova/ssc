@@ -173,7 +173,6 @@ public class Utils {
                     .map(w -> new Pair<>(w.value(), w.lead().get())) // alternatively, use your new Pair() class
                     .toList();
 
-            pairedEvents.stream().forEach(o -> log.debug("aici" + o.getKey().getEventDateTime().toString() + o.getKey().getAddr() + " " + o.getValue().getEventDateTime().toString() + o.getValue().getAddr()));
 
             for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
                 final DateTime dd = date;
@@ -188,7 +187,7 @@ public class Utils {
                         additionalList = pairedEvents.stream()
                                 .filter(o -> o.getValue().getEventDateTime().isAfter(evt) && o.getValue().getEventDateTime().isBefore(dd.plusDays(1).plusHours(time.getHour()).plusMinutes(time.getMinute())))
                                 .collect(Collectors.toList());
-                        additionalList.forEach(o -> log.debug("asda" + o.getValue().getEventDateTime()));
+                      
                         perDayList.addAll(additionalList);
                         if (!additionalList.isEmpty()) {
                             result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), additionalList.get(additionalList.size() - 1).getValue().getEventDateTime()), perDayList);

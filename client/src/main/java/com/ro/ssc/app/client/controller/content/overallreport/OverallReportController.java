@@ -215,12 +215,11 @@ public class OverallReportController implements Initializable {
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
         overtimeTableColumn.setComparator(timeComparator);
-        allovertimeTableColumn.setComparator(timeComparator);
+   allovertimeTableColumn.setComparator(timeComparator);
         undertimeTableColumn.setComparator(timeComparator);
         List<GenericModel> ll = DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString());
 
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
-        
 
     }
 
