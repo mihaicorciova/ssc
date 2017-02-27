@@ -39,6 +39,5 @@ public interface DataProvider {
 
     public String getDepartmentFromUser(String entry);
     
-    public List<String> getDatesForMonth(String date);
-
+    
 }
