@@ -30,6 +30,8 @@ public interface DataProvider {
     public DateTime getPossibleDateEnd(String userId);
 
     public List<String> getUsers();
+    
+    public List<String> getUsersDep();
 
     public List<String> getDepartments();
 

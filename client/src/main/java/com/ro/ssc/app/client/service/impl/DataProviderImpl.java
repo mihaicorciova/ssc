@@ -22,6 +22,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -283,6 +284,17 @@ public enum DataProviderImpl implements DataProvider {
                         return userData.get(entry).getDepartment();
                     }
                     return "";
+                }
+
+                @Override
+                public List<String> getUsersDep() {
+                    List<User> users = new ArrayList(userData.values());
+                    users.sort((User u1, User u2) -> u1.getDepartment().compareTo(u2.getDepartment()));
+                    List<String> result = new ArrayList<>();
+                    for (User user : users) {
+                        result.add(user.getName());
+                    }
+                    return result;
                 }
 
             };
