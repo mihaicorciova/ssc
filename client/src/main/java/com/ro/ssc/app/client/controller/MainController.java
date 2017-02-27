@@ -38,6 +38,7 @@ public class MainController implements Initializable {
     private static final String SINGLEREPORT_LAYOUT_FILE = "/fxml/SingleReport.fxml";
     private static final String SINGLEABS_LAYOUT_FILE = "/fxml/SingleAbs.fxml";
     private static final String OVERALLABS_LAYOUT_FILE = "/fxml/OverallAbs.fxml";
+     private static final String MONTHLY_LAYOUT_FILE = "/fxml/MonthlyReport.fxml";
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
@@ -58,6 +59,8 @@ public class MainController implements Initializable {
     private AnchorPane singleReportPane;
     private AnchorPane overallAbsPane;
     private AnchorPane singleAbsPane;
+       private AnchorPane monthlyReportPane;
+
     private String MDB_PATH = "opt";
 
     private DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -193,6 +196,19 @@ public class MainController implements Initializable {
         contentContainer.getChildren().setAll(overallAbsPane);
     }
 
+      public void handleMonthlyViewLaunch() throws IOException {
+        // load side menu
+
+        final FXMLLoader overallReportPaneLoader = new FXMLLoader();
+        monthlyReportPane = overallReportPaneLoader.load(getClass().getResourceAsStream(MONTHLY_LAYOUT_FILE));
+        AnchorPane.setLeftAnchor(monthlyReportPane, 0.0);
+        AnchorPane.setTopAnchor(monthlyReportPane, 0.0);
+        AnchorPane.setRightAnchor(monthlyReportPane, 0.0);
+        AnchorPane.setBottomAnchor(monthlyReportPane, 0.0);
+
+        contentContainer.getChildren().setAll(monthlyReportPane);
+    }
+      
     public void handleSingleAbsViewLaunch() throws IOException {
 
         final FXMLLoader singleReportPaneLoader = new FXMLLoader();
@@ -204,4 +220,6 @@ public class MainController implements Initializable {
 
         contentContainer.getChildren().setAll(singleAbsPane);
     }
+
+   
 }

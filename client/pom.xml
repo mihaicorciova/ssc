@@ -156,6 +156,12 @@
             <version>13.0.1</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>8.40.9</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
 </project>
