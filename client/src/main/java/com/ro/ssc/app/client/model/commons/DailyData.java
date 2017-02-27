@@ -14,31 +14,72 @@ import org.joda.time.DateTime;
  */
 public class DailyData {
 
-    String userName;
+    String userId;
     DateTime date;
     String firstInEvent;
     String lastOutEvent;
+    long earlyTime;
     long workTime;
+    long cworkTime;
     long pauseTime;
+    long overTime;
+    long lateTime;
     List<Event> wrongEvents;
 
-    public DailyData(String userName, DateTime date, String firstInEvent, String lastOutEvent, long workTime, long pauseTime, List<Event> wrongEvents) {
-        this.userName = userName;
+    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, long earlyTime, long workTime, long cworkTime, long pauseTime, long overTime, long lateTime, List<Event> wrongEvents) {
+        this.userId = userId;
         this.date = date;
         this.firstInEvent = firstInEvent;
         this.lastOutEvent = lastOutEvent;
+        this.earlyTime = earlyTime;
         this.workTime = workTime;
+        this.cworkTime = cworkTime;
         this.pauseTime = pauseTime;
+        this.overTime = overTime;
+        this.lateTime = lateTime;
         this.wrongEvents = wrongEvents;
     }
 
-  
+    
+    public long getCworkTime() {
+        return cworkTime;
+    }
+
+    public void setCworkTime(long cworkTime) {
+        this.cworkTime = cworkTime;
+    }
+
+   
+    public long getEarlyTime() {
+        return earlyTime;
+    }
+
+    public void setEarlyTime(long earlyTime) {
+        this.earlyTime = earlyTime;
+    }
+
+    public long getOverTime() {
+        return overTime;
+    }
+
+    public void setOverTime(long overTime) {
+        this.overTime = overTime;
+    }
+
+    public long getLateTime() {
+        return lateTime;
+    }
+
+    public void setLateTime(long lateTime) {
+        this.lateTime = lateTime;
+    }
+
     public String getUserId() {
-        return userName;
+        return userId;
     }
 
     public void setUserId(String userId) {
-        this.userName = userId;
+        this.userId = userId;
     }
 
     public long getWorkTime() {

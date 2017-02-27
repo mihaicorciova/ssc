@@ -83,7 +83,7 @@ public class SumaryController implements Initializable {
                                 if (file.getName().contains("mdb")) {
 
                                     DataProviderImpl.getInstance().saveMdbFile(file);
-
+DataProviderImpl.getInstance().getUserData().clear();
                                 } else {
                                     DataProviderImpl.getInstance().importUserData(file);
                                 }

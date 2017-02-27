@@ -9,19 +9,18 @@ import com.ro.ssc.app.client.exporter.PptTableExporter;
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -29,17 +28,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.WritableImage;
-import org.apache.pdfbox.exceptions.COSVisitorException;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -53,7 +44,7 @@ public class SingleReportController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(SingleReportController.class);
-
+ private static final String ALL="all";
     private DateTime iniDate;
     private DateTime endDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
@@ -78,10 +69,19 @@ public class SingleReportController implements Initializable {
     private TableColumn<GenericModel, Object> dateTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> workTimeTableColumn;
+
     @FXML
     private TableColumn<GenericModel, Object> entryTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> exitTimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> overtimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> absenceTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> lateTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> earlyTableColumn;
 
     /**
      * Initializes the controller class.
@@ -91,10 +91,14 @@ public class SingleReportController implements Initializable {
      */
     @Override
     public void initialize(final URL url, final ResourceBundle rb) {
-        log.info("Initializing Sumary controller");
+        log.info("Initializing Sg rep controller");
 
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
+
+          
+            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
+            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
 
             iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -122,11 +126,10 @@ public class SingleReportController implements Initializable {
                 }
             });
 
-            userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
+              userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
             userChoiceBox.getSelectionModel().selectFirst();
-            iniDate = DataProviderImpl.getInstance().getPossibleDateStart(userChoiceBox.getSelectionModel().getSelectedItem().toString());
-            endDate = DataProviderImpl.getInstance().getPossibleDateEnd(userChoiceBox.getSelectionModel().getSelectedItem().toString());
-
+            
+                log.debug("DAte "+iniDate.toString());
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
             }
@@ -145,14 +148,25 @@ public class SingleReportController implements Initializable {
         entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
         exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
+        
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
+          overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
+        absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
+        lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+ earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
+        
+ 
+    earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         dateTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+  absenceTableColumn.setStyle("-fx-alignment:CENTER;");
+        lateTableColumn.setStyle("-fx-alignment:CENTER;");
+        overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
         Comparator timeComparator=(Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1= ((String) o1).replace("!", "").split(":");
@@ -173,13 +187,19 @@ public class SingleReportController implements Initializable {
         offTimeTableColumn.setComparator(timeComparator);
         
         dateTableColumn.setComparator(dateComparator);
-        
-        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate)));
+        log.debug("DAte "+iniDate.toString());
+        List<GenericModel> ll=DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate);
+       singleReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
+    
+  
+       
     }
 
     @FXML
     private void exportTableToPPT() {
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt)", ".ppt");
+           String[] ext = { ".xls" ,".ppt"};
+
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
 
         if (file == null) {
             return;
@@ -199,14 +219,25 @@ public class SingleReportController implements Initializable {
                     content[rowNo][3] = (String) tableData.getFour();
                     content[rowNo][4] = (String) tableData.getFive();
                     content[rowNo][5] = (String) tableData.getSix();
+                      content[rowNo][6] = (String) tableData.getSeven();
+                    content[rowNo][7] = (String) tableData.getEight();
+                    content[rowNo][8] = (String) tableData.getNine();
+                    content[rowNo][9] = (String) tableData.getTen();
+                  
                     rowNo++;
                 }
                 return content;
             }
         };
-
-        pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
-        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+  if (!file.getPath().endsWith(ext[0])) {
+            pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual absente pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + iniDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+ fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
+        } else {
+           
+            pptExporter.exportTableToXls(singleReportTableView, file, "Raport individual absente pentru " + userChoiceBox.getSelectionModel().getSelectedItem().toString() + " de la " + endDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
+fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
+        }
+       
     }
 
 }
