@@ -40,14 +40,7 @@ public class Utils {
         List<Event> trimedEvents = new ArrayList<>();
         List<Event> remainingEvents = new ArrayList<>();
         Boolean shouldAdd = false;
-        for (Event event : events) {
-            if (!event.getPassed()) {
-                remainingEvents.add(event);
-            }
-        }
-        events.removeAll(remainingEvents);
-        if (events.size() > 0) {
-            for (int i = 0; i < events.size() - 1; i++) {
+        for (int i = 0; i < events.size() - 1; i++) {
 
             if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
                 if (events.get(i).getAddr().contains("In") && events.get(i + 1).getAddr().contains("Exit") && events.get(i + 1).getEventDateTime().minus(events.get(i).getEventDateTime().getMillis()).getMillis() < 24 * 3600 * 1000) {
@@ -57,30 +50,29 @@ public class Utils {
                     shouldAdd = false;
                     trimedEvents.add(events.get(i));
 
-                    } else {
-                        shouldAdd = false;
-                        if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
-
-                            remainingEvents.add(events.get(i));
-
-                        }
-                    }
-                }
-            }
-            if (!excludedGates.contains(events.get(events.size() - 1).getAddr()) && events.get(events.size() - 1).getPassed()) {
-                if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
-                    shouldAdd = false;
-                    trimedEvents.add(events.get(events.size() - 1));
-
                 } else {
                     shouldAdd = false;
-                    if (!events.get(events.size() - 1).getDescription().contains("shift")) {
+                    if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
 
-                        remainingEvents.add(events.get(events.size() - 1));
+                        remainingEvents.add(events.get(i));
+
                     }
                 }
-
             }
+        }
+        if (!excludedGates.contains(events.get(events.size() - 1).getAddr()) && events.get(events.size() - 1).getPassed()) {
+            if (events.get(events.size() - 1).getAddr().contains("Exit") && shouldAdd) {
+                shouldAdd = false;
+                trimedEvents.add(events.get(events.size() - 1));
+
+            } else {
+                shouldAdd = false;
+                if (!events.get(events.size() - 1).getDescription().contains("shift")) {
+
+                    remainingEvents.add(events.get(events.size() - 1));
+                }
+            }
+
         }
         result.add(trimedEvents);
         result.add(remainingEvents);
@@ -142,15 +134,27 @@ public class Utils {
                 .toList();
         List<Pair<Event, Event>> ll = pairedEvents.stream().filter(o -> (o.getValue().getEventDateTime().getMillis() - o.getKey().getEventDateTime().getMillis() > 24 * 3600 * 1000)).collect(Collectors.toList());
 
-        if(ll.size()>0){
-        for (ListIterator<Event> it =trimedEvents.listIterator();it.hasNext();) {
-            for (Pair<Event, Event> pair : ll) {
-                if (it.next().equals(pair.getKey())) {
-                    Event newEv=remainingEvents.stream().filter(o->o.getEventDateTime().withTimeAtStartOfDay().isEqual(pair.getValue().getEventDateTime().withTimeAtStartOfDay())).collect(Collectors.toList()).get(0);
-                    it.set(newEv);
+        if (ll.size() > 0) {
+            boolean toRemoveNext = false;
+            for (ListIterator<Event> it = trimedEvents.listIterator(); it.hasNext();) {
+                Event e = it.next();
+                if (toRemoveNext) {
+                    it.remove();
+                    toRemoveNext=false;
+                }
+                for (Pair<Event, Event> pair : ll) {
+                    if (e.equals(pair.getKey())) {
+                        List<Event> ls = remainingEvents.stream().filter(o -> o.getAddr().contains("In") && o.getEventDateTime().withTimeAtStartOfDay().isEqual(pair.getValue().getEventDateTime().withTimeAtStartOfDay())).collect(Collectors.toList());
+                        if (!ls.isEmpty()) {
+                            Event newEv = ls.get(0);
+                            it.set(newEv);
+                        } else {
+                            it.remove();
+                            toRemoveNext = true;
+                        }
+                    }
                 }
             }
-        }
         }
         return result;
 
@@ -169,7 +173,6 @@ public class Utils {
                     .map(w -> new Pair<>(w.value(), w.lead().get())) // alternatively, use your new Pair() class
                     .toList();
 
-            pairedEvents.stream().forEach(o -> log.debug("aici" + o.getKey().getEventDateTime().toString() + o.getKey().getAddr() + " " + o.getValue().getEventDateTime().toString() + o.getValue().getAddr()));
 
             for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
                 final DateTime dd = date;
@@ -184,7 +187,7 @@ public class Utils {
                         additionalList = pairedEvents.stream()
                                 .filter(o -> o.getValue().getEventDateTime().isAfter(evt) && o.getValue().getEventDateTime().isBefore(dd.plusDays(1).plusHours(time.getHour()).plusMinutes(time.getMinute())))
                                 .collect(Collectors.toList());
-                        additionalList.forEach(o -> log.debug("asda" + o.getValue().getEventDateTime()));
+                      
                         perDayList.addAll(additionalList);
                         if (!additionalList.isEmpty()) {
                             result.put(new Pair(perDayList.get(0).getKey().getEventDateTime(), additionalList.get(additionalList.size() - 1).getValue().getEventDateTime()), perDayList);

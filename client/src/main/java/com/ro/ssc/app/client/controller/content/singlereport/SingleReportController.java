@@ -191,23 +191,7 @@ public class SingleReportController implements Initializable {
         List<GenericModel> ll=DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate);
        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
     
-    if(ll.stream().allMatch(o->o.getEight().equals("")))
-    {
-    absenceTableColumn.setVisible(false);
-    }
-    
-     if(ll.stream().allMatch(o->o.getSeven().equals("00:00:00")))
-    {
-    overtimeTableColumn.setVisible(false);
-    }
-      if(ll.stream().allMatch(o->o.getNine().equals("00:00:00")))
-    {
-    lateTableColumn.setVisible(false);
-    }
-       if(ll.stream().allMatch(o->o.getTen().equals("00:00:00")))
-    {
-    earlyTableColumn.setVisible(false);
-    }
+  
        
     }
 

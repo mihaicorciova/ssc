@@ -74,6 +74,10 @@ public class OverallReportController implements Initializable {
     @FXML
     private TableColumn<GenericModel, Object> overtimeTableColumn;
     @FXML
+    private TableColumn<GenericModel, Object> undertimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> allovertimeTableColumn;
+    @FXML
     private TableColumn<GenericModel, Object> absenceTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> lateTableColumn;
@@ -93,10 +97,9 @@ public class OverallReportController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
-            
             iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
             endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
-            
+
             iniDatePicker.setOnAction((final ActionEvent e) -> {
                 iniDate = DateTime.parse(iniDatePicker.getValue().format(formatter), dtf);
                 populateMyTable();
@@ -115,7 +118,6 @@ public class OverallReportController implements Initializable {
             });
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
-
 
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
@@ -158,7 +160,8 @@ public class OverallReportController implements Initializable {
                     content[rowNo][6] = (String) tableData.getSeven();
                     content[rowNo][7] = (String) tableData.getEight();
                     content[rowNo][8] = (String) tableData.getNine();
-
+                    content[rowNo][9] = (String) tableData.getTen();
+                    content[rowNo][10] = (String) tableData.getEleven();
                     rowNo++;
                 }
                 return content;
@@ -176,7 +179,7 @@ public class OverallReportController implements Initializable {
     }
 
     public void populateMyTable() {
-        
+
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         departmentTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
@@ -186,6 +189,8 @@ public class OverallReportController implements Initializable {
         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
         earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+        undertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
+        allovertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("eleven"));
 
         earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -196,6 +201,8 @@ public class OverallReportController implements Initializable {
         absenceTableColumn.setStyle("-fx-alignment:CENTER;");
         lateTableColumn.setStyle("-fx-alignment:CENTER;");
         overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
+        undertimeTableColumn.setStyle("-fx-alignment:CENTER;");
+        allovertimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
         Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1 = ((String) o1).replace("!", "").split(":");
@@ -208,27 +215,12 @@ public class OverallReportController implements Initializable {
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
         overtimeTableColumn.setComparator(timeComparator);
- List<GenericModel> ll= DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString());
-     
+   allovertimeTableColumn.setComparator(timeComparator);
+        undertimeTableColumn.setComparator(timeComparator);
+        List<GenericModel> ll = DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString());
+
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
-     if(ll.stream().allMatch(o->o.getSeven().equals("0")))
-    {
-    absenceTableColumn.setVisible(false);
-    }
-    
-     if(ll.stream().allMatch(o->o.getSix().equals("00:00:00")))
-    {
-    overtimeTableColumn.setVisible(false);
-    }
-      if(ll.stream().allMatch(o->o.getEight().equals("00:00:00")))
-    {
-    lateTableColumn.setVisible(false);
-    }
-       if(ll.stream().allMatch(o->o.getNine().equals("00:00:00")))
-    {
-    earlyTableColumn.setVisible(false);
-    }
-     
+
     }
 
 }
