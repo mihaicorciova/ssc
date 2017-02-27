@@ -271,6 +271,16 @@ public enum DataProviderImpl implements DataProvider {
             }
         }
 
+        @Override
+        public String getCellData(String u, String d) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public String getDepartmentFromUser(String entry) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
     };
 
     public static DataProviderImpl getInstance() {
@@ -281,4 +291,7 @@ public enum DataProviderImpl implements DataProvider {
         getInstance().setTime(lt);
     }
 
+    
+
+   
 }

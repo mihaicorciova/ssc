@@ -17,21 +17,28 @@ import org.joda.time.DateTime;
  */
 public interface DataProvider {
 
-    public  List<GenericModel>  getUserData();
+    public List<GenericModel> getUserData();
 
     public void importUserData(File file);
-       
-    public List<GenericModel> getOverallTableData (DateTime iniDate,DateTime endDate,String department);
-      
-    public List<GenericModel> getUserSpecificTableData (String user,DateTime iniDate,DateTime endDate);
-    
+
+    public List<GenericModel> getOverallTableData(DateTime iniDate, DateTime endDate, String department);
+
+    public List<GenericModel> getUserSpecificTableData(String user, DateTime iniDate, DateTime endDate);
+
     public DateTime getPossibleDateStart(String userId);
+
+    public DateTime getPossibleDateEnd(String userId);
+
+    public List<String> getUsers();
+
+    public List<String> getDepartments();
+
+    public void saveMdbFile(File file);
+
+    public String getCellData(String u, String d);
+
+    public String getDepartmentFromUser(String entry);
     
-     public DateTime getPossibleDateEnd(String userId); 
-     
-     public List<String> getUsers();
-     
-     public List<String> getDepartments();
-     
-     public void saveMdbFile(File file);
+    public List<String> getDatesForMonth(String date);
+
 }
