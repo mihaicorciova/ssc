@@ -22,30 +22,30 @@
           <RowConstraints maxHeight="1200.0" minHeight="10.0" prefHeight="515.0" valignment="CENTER" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
-               <children>
-                  <ChoiceBox fx:id="monthChoiceBox" prefWidth="75.0">
-                     <HBox.margin>
-                        <Insets left="10.0" />
-                     </HBox.margin>
-                  </ChoiceBox>
-                  <ChoiceBox fx:id="yearChoiceBox" prefWidth="75.0">
-                     <HBox.margin>
-                        <Insets left="10.0" />
-                     </HBox.margin>
-                  </ChoiceBox>
-                  <ChoiceBox fx:id="departmentChoiceBox" prefWidth="150.0">
-                     <HBox.margin>
-                        <Insets left="10.0" />
-                     </HBox.margin>
-                  </ChoiceBox>
-                  <Button fx:id="exportButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#exportTableToPPT" text="Salvare Raport">
-                     <HBox.margin>
-                        <Insets left="20.0" />
-                     </HBox.margin>
-                  </Button>
-               </children>
-            </HBox>
+             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
+                 <children>
+                     <DatePicker fx:id="iniDatePicker">
+                         <HBox.margin>
+                             <Insets left="10.0" />
+                         </HBox.margin>
+                     </DatePicker>
+                     <DatePicker fx:id="endDatePicker">
+                         <HBox.margin>
+                             <Insets left="10.0" />
+                         </HBox.margin>
+                     </DatePicker>
+                     <ChoiceBox fx:id="departmentChoiceBox" prefWidth="150.0">
+                         <HBox.margin>
+                             <Insets left="10.0" />
+                         </HBox.margin>
+                     </ChoiceBox>
+                     <Button fx:id="exportButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#exportTableToPPT" text="Salvare Raport">
+                         <HBox.margin>
+                             <Insets left="20.0" />
+                         </HBox.margin>
+                     </Button>
+                 </children>
+             </HBox>
             
              <SpreadsheetView fx:id="monthlySpreadsheetView" editable="false" 
                          showRowHeader="true"

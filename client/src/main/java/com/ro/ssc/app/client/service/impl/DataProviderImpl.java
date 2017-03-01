@@ -291,7 +291,9 @@ public enum DataProviderImpl implements DataProvider {
                     List<User> users = new ArrayList(userData.values());
                     users.sort((User u1, User u2) -> u1.getDepartment().compareTo(u2.getDepartment()));
                     List<String> result = new ArrayList<>();
+
                     for (User user : users) {
+
                         result.add(user.getName());
                     }
                     return result;
