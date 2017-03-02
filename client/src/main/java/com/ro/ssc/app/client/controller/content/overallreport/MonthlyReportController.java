@@ -1,6 +1,7 @@
 package com.ro.ssc.app.client.controller.content.overallreport;
 
 import com.ro.ssc.app.client.exporter.PptTableExporter;
+import com.ro.ssc.app.client.exporter.XlsTableExporter;
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
@@ -110,46 +111,19 @@ public class MonthlyReportController implements Initializable {
 
     @FXML
     private void exportTableToPPT() {
-        String[] ext = {".xls", ".ppt"};
+        String[] ext = {".xls"};
 
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLS files (*.xls)", Arrays.asList(ext));
 
         if (file == null) {
             return;
         }
 
-        PptTableExporter pptExporter = new PptTableExporter() {
-
-            @Override
-            public String[][] getTableContent(TableView<?> fxTable) {
-                String[][] content = new String[fxTable.getItems().size()][fxTable.getColumns().size()];
-
-                int rowNo = 0;
-                for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
-                    content[rowNo][0] = (String) tableData.getOne();
-                    content[rowNo][1] = (String) tableData.getTwo();
-                    content[rowNo][2] = (String) tableData.getThree();
-                    content[rowNo][3] = (String) tableData.getFour();
-                    content[rowNo][4] = (String) tableData.getFive();
-                    content[rowNo][5] = (String) tableData.getSix();
-                    content[rowNo][6] = (String) tableData.getSeven();
-                    content[rowNo][7] = (String) tableData.getEight();
-                    content[rowNo][8] = (String) tableData.getNine();
-
-                    rowNo++;
-                }
-                return content;
-            }
-        };
-        if (!file.getPath().endsWith(ext[0])) {
-            //     pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ de la " + iniDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
-            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
-        } else {
-
-            //  pptExporter.exportTableToXls(overallReportTableView, file, "Raport individual absente pentru ");
+        XlsTableExporter pptExporter = new XlsTableExporter();
+      
+              pptExporter.exportTableToXls(monthlySpreadsheetView.getGrid(), file, "Raport individual absente pentru ");
             fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
-        }
-
+        
     }
 
     public void populateMyTable() {

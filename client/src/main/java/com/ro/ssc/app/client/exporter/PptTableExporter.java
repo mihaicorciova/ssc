@@ -191,18 +191,6 @@ public abstract class PptTableExporter {
     }
 
     public abstract String[][] getTableContent(TableView<?> fxTable);
-
-//    private String[][] getTableContent(TableView<TableData> fxTable) {
-//        String[][] content = new String[fxTable.getItems().size()][fxTable.getColumns().size()];
-//
-//        int rowNo = 0;
-//        for (TableData tableData : fxTable.getItems()) {
-//            content[rowNo][0] = tableData.getId();
-//            content[rowNo][1] = tableData.getStringTwo();
-//            content[rowNo][2] = "" + tableData.getDoubleValue();
-//            content[rowNo][3] = DateParser.format(tableData.getDate());
-//            rowNo++;
-//        }
-//        return content;
-//    }
+    
+    
 }
