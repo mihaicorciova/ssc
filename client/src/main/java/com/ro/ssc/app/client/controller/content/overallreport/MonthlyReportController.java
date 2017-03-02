@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author DauBufu
  */
 public class MonthlyReportController implements Initializable {
-    
+
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(MonthlyReportController.class);
     private static final String ALL = "all";
@@ -65,15 +65,14 @@ public class MonthlyReportController implements Initializable {
     public void initialize(final URL url, final ResourceBundle rb) {
         log.info("Initializing Sumary controller");
 
-
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
             iniDate = DataProviderImpl.getInstance().getPossibleDateStart(ALL);
             endDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
 
-            if(endDate.minusMonths(1).isAfter(iniDate)){
-                iniDate=endDate.minusMonths(1);
+            if (endDate.minusMonths(1).isAfter(iniDate)) {
+                iniDate = endDate.minusMonths(1);
             }
 
             iniDatePicker.setOnAction((final ActionEvent e) -> {
@@ -95,8 +94,6 @@ public class MonthlyReportController implements Initializable {
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
 
-
-
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
             }
@@ -108,25 +105,25 @@ public class MonthlyReportController implements Initializable {
             populateMyTable();
 
         }
-        
+
     }
-    
+
     @FXML
     private void exportTableToPPT() {
         String[] ext = {".xls", ".ppt"};
-        
+
         File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
-        
+
         if (file == null) {
             return;
         }
-        
+
         PptTableExporter pptExporter = new PptTableExporter() {
-            
+
             @Override
             public String[][] getTableContent(TableView<?> fxTable) {
                 String[][] content = new String[fxTable.getItems().size()][fxTable.getColumns().size()];
-                
+
                 int rowNo = 0;
                 for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
                     content[rowNo][0] = (String) tableData.getOne();
@@ -138,7 +135,7 @@ public class MonthlyReportController implements Initializable {
                     content[rowNo][6] = (String) tableData.getSeven();
                     content[rowNo][7] = (String) tableData.getEight();
                     content[rowNo][8] = (String) tableData.getNine();
-                    
+
                     rowNo++;
                 }
                 return content;
@@ -152,28 +149,40 @@ public class MonthlyReportController implements Initializable {
             //  pptExporter.exportTableToXls(overallReportTableView, file, "Raport individual absente pentru ");
             fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
         }
-        
-    }
-    
-    public void populateMyTable() {
-        monthlySpreadsheetView.setGrid(getGridBase(ALL));
-        monthlySpreadsheetView.setRowHeaderWidth(150);
 
     }
-    
-    private GridBase getGridBase(String date) {
-        
-        List<String> users = DataProviderImpl.getInstance().getUsersDep();
-        
-        List<String> dates = getDatesForMonth();
+
+    public void populateMyTable() {
+        monthlySpreadsheetView.setGrid(getGridBase(departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? ALL : departmentChoiceBox.getSelectionModel().getSelectedItem().toString()));
+        monthlySpreadsheetView.setRowHeaderWidth(150);
+        for (int i = 0; i < monthlySpreadsheetView.getColumns().size(); i++) {
+            if (i > 0 && i < monthlySpreadsheetView.getColumns().size() - 3) {
+                SpreadsheetColumn col = monthlySpreadsheetView.getColumns().get(i);
+                col.setPrefWidth(50);
+            } else if (i == 0) {
+                SpreadsheetColumn col = monthlySpreadsheetView.getColumns().get(i);
+                col.setPrefWidth(150);
+            } else {
+                SpreadsheetColumn col = monthlySpreadsheetView.getColumns().get(i);
+                col.setPrefWidth(100);
+            }
+
+        }
+    }
+
+    private GridBase getGridBase(String department) {
+
+        List<String> users = DataProviderImpl.getInstance().getUsersDep(department);
+
+        List<DateTime> dates = getDatesForMonth();
         int i = 0;
-        
+
         final GridBase grid = new GridBase(users.size(), dates.size() + 4);
-        
+
         grid.getColumnHeaders().clear();
         grid.getRowHeaders().clear();
-        String department = "����";
-        
+        String idepartment = "����";
+
         for (String entry : users) {
 
             if (!department.equals(DataProviderImpl.getInstance().getDepartmentFromUser(entry))) {
@@ -184,63 +193,62 @@ public class MonthlyReportController implements Initializable {
             }
 
         }
-        
+
         for (int column = 0; column < grid.getColumnCount(); ++column) {
 
             if (column == 0) {
                 grid.getColumnHeaders().add("Nume");
-            } else if(column==grid.getColumnCount()-2){
+            } else if (column == grid.getColumnCount() - 3) {
                 grid.getColumnHeaders().add("Timp lucrat");
-            }
-            else if(column==grid.getColumnCount()-1){
+            } else if (column == grid.getColumnCount() - 2) {
                 grid.getColumnHeaders().add("Timp pauza");
-            }
-            else if(column==grid.getColumnCount()){
+            } else if (column == grid.getColumnCount() - 1) {
                 grid.getColumnHeaders().add("Timp total");
-            }
-            else{
-                grid.getColumnHeaders().add(dates.get(column-1));
-                if(column<15) {
-                    SpreadsheetColumn col = monthlySpreadsheetView.getColumns().get(column);
-                    col.setPrefWidth(20);
-                }
+            } else {
+                grid.getColumnHeaders().add(dates.get(column - 1).toString(dtf2));
 
             }
 
         }
+
         final ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
         for (int row = 0; row < grid.getRowCount(); ++row) {
-            
+
             final ObservableList<SpreadsheetCell> list = FXCollections.observableArrayList();
-            
+
             for (int column = 0; column < grid.getColumnCount(); ++column) {
-//
-////                    final SpreadsheetCell cell
-////                            = SpreadsheetCellType.STRING
-////                           .createCell(row, column, 1, 1, DataProviderImpl.getInstance().getCellData(users.get(row), dates.get(column)));
-                //      list.add(cell);
+              
                 if (column == 0) {
                     list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row)));
-                } else if(column==grid.getColumnCount()){
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, "r" + row + "c" + column));
-                }else{
-                       list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, ""));  
-                        }
+                }  else if (column == grid.getColumnCount()-1) {
+                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                            DataProviderImpl.getInstance().getCellData(users.get(row),iniDate,endDate,1)));
+                } else if (column == grid.getColumnCount()-2) {
+                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate,endDate,2)));
+                } else if (column == grid.getColumnCount()-3) {
+                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate,endDate,3)));
+                }else {
+                     final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                        DataProviderImpl.getInstance().getCellData(users.get(row), dates.get(column-1),dates.get(column-1),0));
+                list.add(cell);
+                }
             }
             rows.add(list);
         }
         grid.setRows(rows);
-        
+
         return grid;
     }
-    
-    private List<String> getDatesForMonth() {
-      final List<String> result = new ArrayList<>();
-        for(DateTime dd= iniDate; dd.isBefore(endDate); dd=dd.plusDays(1)) {
-      result.add(dd.toString(dtf2));
-      }
-      return result;
 
-          }
-    
+    private List<DateTime> getDatesForMonth() {
+        final List<DateTime> result = new ArrayList<>();
+        for (DateTime dd = iniDate; dd.isBefore(endDate.plusDays(1)); dd = dd.plusDays(1)) {
+            result.add(dd);
+        }
+        return result;
+
+    }
+
 }

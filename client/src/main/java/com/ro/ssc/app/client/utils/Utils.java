@@ -228,4 +228,9 @@ public class Utils {
         return hms;
     }
 
+     public static String formatMillis2(Long millis) {
+        String hms = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+                TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
+        return hms;
+    }
 }

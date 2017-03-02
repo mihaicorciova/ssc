@@ -16,6 +16,8 @@ import static com.ro.ssc.app.client.utils.AccessReader.getShiftData;
 import static com.ro.ssc.app.client.utils.AccessReader.updateUserMap;
 import static com.ro.ssc.app.client.utils.ExcelReader.readExcel;
 import static com.ro.ssc.app.client.utils.Utils.formatMillis;
+import static com.ro.ssc.app.client.utils.Utils.formatMillis2;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
@@ -51,6 +54,7 @@ public enum DataProviderImpl implements DataProvider {
                 private Set<String> excludedUsers;
                 private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
                 private DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
+                 private DateTimeFormatter dtf3 = DateTimeFormat.forPattern("dd-MM-yyyy");
                 private LocalTime time;
                 private DecimalFormat df = new DecimalFormat();
                 private final Logger log = LoggerFactory.getLogger(DataProviderImpl.class);
@@ -273,8 +277,67 @@ public enum DataProviderImpl implements DataProvider {
                 }
 
                 @Override
-                public String getCellData(String u, String d) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                public String getCellData(String u, DateTime ini, DateTime end, int ordinal) {
+                   
+                    
+                                Long tduration = 0L;
+                                Long tpause = 0L;
+                                Long tovertime = 0L;
+                                Long tundertime = 0l;
+                                int tabsent = 0;
+                                int tlaters = 0;
+                                long tlate = 0;
+                                int tearlys = 0;
+                                long tearly = 0;
+                                boolean withWrongEv = false;
+                            
+                    List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini,end);
+                         for (DailyData day : dailyList) {
+
+                                    if (day.getLateTime() > 0) {
+                                        tlaters++;
+                                    }
+                                    tlate += day.getLateTime();
+                                    if (day.getEarlyTime() > 0) {
+                                        tearlys++;
+                                    }
+                                    tearly += day.getEarlyTime();
+                                    if (day.getFirstInEvent().equals("") || day.getLastOutEvent().equals("")) {
+                                        if (day.getWrongEvents().size() > 0) {
+                                            withWrongEv = true;
+                                        }
+
+                                        tabsent++;
+
+                                    }
+                                    tduration += day.getWorkTime();
+                                    tpause += day.getPauseTime();
+                                    if (day.getOverTime() > 0) {
+                                        tovertime += day.getOverTime();
+                                    } else {
+                                        tundertime += Math.abs(day.getOverTime());
+                                    }
+                                }
+
+                               
+                    if(!ini.equals(end)){
+                    if (ordinal==1) {
+                        return formatMillis2(tduration+tpause);
+                    } else if (ordinal==2) {
+                        return formatMillis2(tpause);
+
+                    } else if (ordinal==3) {     
+                        return formatMillis2(tduration);
+
+                    }
+                    
+                    } else{
+                        if (!dailyList.isEmpty()) {
+                            return formatMillis2(dailyList.get(0).getWorkTime());
+                        }
+                    }
+
+                    return "";
                 }
 
                 @Override
@@ -287,14 +350,15 @@ public enum DataProviderImpl implements DataProvider {
                 }
 
                 @Override
-                public List<String> getUsersDep() {
+                public List<String> getUsersDep(String department) {
                     List<User> users = new ArrayList(userData.values());
                     users.sort((User u1, User u2) -> u1.getDepartment().compareTo(u2.getDepartment()));
                     List<String> result = new ArrayList<>();
 
                     for (User user : users) {
-
-                        result.add(user.getName());
+                        if (department.equals("all") || department.equals(user.getDepartment())) {
+                            result.add(user.getName());
+                        }
                     }
                     return result;
                 }

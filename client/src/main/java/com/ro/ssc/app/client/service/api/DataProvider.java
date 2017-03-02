@@ -31,13 +31,13 @@ public interface DataProvider {
 
     public List<String> getUsers();
     
-    public List<String> getUsersDep();
+    public List<String> getUsersDep(String department);
 
     public List<String> getDepartments();
 
     public void saveMdbFile(File file);
 
-    public String getCellData(String u, String d);
+    public String getCellData(String u, DateTime ini, DateTime end, int ordinal);
 
     public String getDepartmentFromUser(String entry);
     
