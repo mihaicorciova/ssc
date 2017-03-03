@@ -165,7 +165,12 @@ public enum DataProviderImpl implements DataProvider {
                     return data;
                 }
 
-                @Override
+        @Override
+        public List<GenericModel> getDaySpecificTableData(String department, DateTime iniDate) {
+            return null;
+        }
+
+        @Override
                 public DateTime getPossibleDateEnd(String user) {
                     DateTime result = new DateTime().withYear(1970);
 

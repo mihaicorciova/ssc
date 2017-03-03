@@ -25,6 +25,9 @@ public interface DataProvider {
 
     public List<GenericModel> getUserSpecificTableData(String user, DateTime iniDate, DateTime endDate);
 
+
+    public List<GenericModel> getDaySpecificTableData(String department, DateTime iniDate);
+
     public DateTime getPossibleDateStart(String userId);
 
     public DateTime getPossibleDateEnd(String userId);
