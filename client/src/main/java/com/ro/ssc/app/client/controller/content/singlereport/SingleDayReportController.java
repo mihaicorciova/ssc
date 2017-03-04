@@ -37,7 +37,7 @@ public class SingleDayReportController implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(SingleDayReportController.class);
-    private static final String ALL="all";
+    private static final String ALL = "all";
     private DateTime iniDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
     private final org.joda.time.format.DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
@@ -49,7 +49,6 @@ public class SingleDayReportController implements Initializable {
     @FXML
     private DatePicker iniDatePicker;
 
-
     @FXML
     private TableView singleReportTableView;
     @FXML
@@ -57,7 +56,7 @@ public class SingleDayReportController implements Initializable {
     @FXML
     private TableColumn<GenericModel, Object> totalTimeTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object> dateTableColumn;
+    private TableColumn<GenericModel, Object> nameTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> workTimeTableColumn;
 
@@ -66,13 +65,7 @@ public class SingleDayReportController implements Initializable {
     @FXML
     private TableColumn<GenericModel, Object> exitTimeTableColumn;
     @FXML
-    private TableColumn<GenericModel, Object> overtimeTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> absenceTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> lateTableColumn;
-    @FXML
-    private TableColumn<GenericModel, Object> earlyTableColumn;
+    private TableColumn<GenericModel, Object> innertimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -87,9 +80,7 @@ public class SingleDayReportController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
-          
             iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
-
 
             iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -99,7 +90,6 @@ public class SingleDayReportController implements Initializable {
                     populateMyTable();
                 }
             });
-
 
             departmentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 
@@ -111,12 +101,11 @@ public class SingleDayReportController implements Initializable {
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
             departmentChoiceBox.getSelectionModel().selectFirst();
-            
-                log.debug("DAte "+iniDate.toString());
+
+            log.debug("Date " + iniDate.toString());
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
             }
-
 
         }
 
@@ -124,60 +113,50 @@ public class SingleDayReportController implements Initializable {
 
     public void populateMyTable() {
 
-        dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
+        nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
         exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
-        
+
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
-          overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
-        absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
-        lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
- earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
-        
- 
-    earlyTableColumn.setStyle("-fx-alignment:CENTER;");
-        dateTableColumn.setStyle("-fx-alignment:CENTER;");
+        innertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
+
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         totalTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-  absenceTableColumn.setStyle("-fx-alignment:CENTER;");
-        lateTableColumn.setStyle("-fx-alignment:CENTER;");
-        overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
+        nameTableColumn.setStyle("-fx-alignment:CENTER;");
+        innertimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
-        Comparator timeComparator=(Comparator<Object>) (Object o1, Object o2) -> {
-            String[] s1= ((String) o1).replace("!", "").split(":");
-             String[] s2= ((String) o2).replace("!", "").split(":");
-            return Long.compare(Long.valueOf(s1[0].trim())*3600+Long.valueOf(s1[1].trim())*60+Long.valueOf(s1[2].trim()), Long.valueOf(s2[0])*3600+Long.valueOf(s2[1].trim())*60+Long.valueOf(s2[2].trim()));
-     
+        Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
+            String[] s1 = ((String) o1).replace("!", "").split(":");
+            String[] s2 = ((String) o2).replace("!", "").split(":");
+            return Long.compare(Long.valueOf(s1[0].trim()) * 3600 + Long.valueOf(s1[1].trim()) * 60 + Long.valueOf(s1[2].trim()), Long.valueOf(s2[0]) * 3600 + Long.valueOf(s2[1].trim()) * 60 + Long.valueOf(s2[2].trim()));
+
         };
-        
-        Comparator dateComparator=(Comparator<Object>) (Object o1, Object o2) -> {
+
+        Comparator dateComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
             DateTime d1 = DateTime.parse((String) o1, format);
             DateTime d2 = DateTime.parse((String) o2, format);
             return Long.compare(d1.getMillis(), d2.getMillis());
         };
-        
+
         workTimeTableColumn.setComparator(timeComparator);
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
-        
-        dateTableColumn.setComparator(dateComparator);
-        log.debug("DAte "+iniDate.toString());
-        List<GenericModel> ll=DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate);
-       singleReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
-    
-  
-       
+
+        log.debug("DAte " + iniDate.toString());
+        List<GenericModel> ll = DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate);
+        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
+
     }
 
     @FXML
     private void exportTableToPPT() {
-           String[] ext = { ".xls" ,".ppt"};
+        String[] ext = {".xls", ".ppt"};
 
         File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
 
@@ -195,29 +174,22 @@ public class SingleDayReportController implements Initializable {
                 for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
                     content[rowNo][0] = (String) tableData.getOne();
                     content[rowNo][1] = (String) tableData.getTwo();
-                    content[rowNo][2] = (String) tableData.getThree();
-                    content[rowNo][3] = (String) tableData.getFour();
-                    content[rowNo][4] = (String) tableData.getFive();
-                    content[rowNo][5] = (String) tableData.getSix();
-                      content[rowNo][6] = (String) tableData.getSeven();
-                    content[rowNo][7] = (String) tableData.getEight();
-                    content[rowNo][8] = (String) tableData.getNine();
-                    content[rowNo][9] = (String) tableData.getTen();
-                  
+                    content[rowNo][3] = (String) tableData.getThree();
+                    content[rowNo][4] = (String) tableData.getFour();
+                    content[rowNo][5] = (String) tableData.getFive();
+                    content[rowNo][6] = (String) tableData.getSix();
+                    content[rowNo][2] = (String) tableData.getSeven();
+
                     rowNo++;
                 }
                 return content;
             }
         };
-  if (!file.getPath().endsWith(ext[0])) {
-            pptExporter.exportTableToPpt(singleReportTableView, file, "Raport individual absente pentru " + departmentChoiceBox.getSelectionModel().getSelectedItem().toString() + " in ziua" + iniDatePicker.getValue().format(formatter) );
- fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
-        } else {
-           
-            pptExporter.exportTableToXls(singleReportTableView, file, "Raport individual absente pentru " + departmentChoiceBox.getSelectionModel().getSelectedItem().toString()+ " in ziua" + iniDatePicker.getValue().format(formatter) );
-fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
-        }
-       
+        
+            pptExporter.exportTableToXls(singleReportTableView, file, "Raport individual absente pentru " + departmentChoiceBox.getSelectionModel().getSelectedItem().toString() + " in ziua" + iniDatePicker.getValue().format(formatter));
+            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
+        
+
     }
 
 }

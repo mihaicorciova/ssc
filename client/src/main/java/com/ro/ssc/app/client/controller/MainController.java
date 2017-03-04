@@ -38,7 +38,9 @@ public class MainController implements Initializable {
     private static final String SINGLEREPORT_LAYOUT_FILE = "/fxml/SingleReport.fxml";
     private static final String SINGLEABS_LAYOUT_FILE = "/fxml/SingleAbs.fxml";
     private static final String OVERALLABS_LAYOUT_FILE = "/fxml/OverallAbs.fxml";
-     private static final String MONTHLY_LAYOUT_FILE = "/fxml/MonthlyReport.fxml";
+    private static final String MONTHLY_LAYOUT_FILE = "/fxml/MonthlyReport.fxml";
+    private static final String DAILY_LAYOUT_FILE = "/fxml/SingleDayReport.fxml";
+
     // style sheet files
     private static final String SIDE_MENU_CSS_FILE = "/styles/SideMenu.css";
     private static final String STATUS_BAR_CSS_FILE = "/styles/StatusBar.css";
@@ -59,7 +61,8 @@ public class MainController implements Initializable {
     private AnchorPane singleReportPane;
     private AnchorPane overallAbsPane;
     private AnchorPane singleAbsPane;
-       private AnchorPane monthlyReportPane;
+    private AnchorPane monthlyReportPane;
+    private AnchorPane dailyReportPane;
 
     private String MDB_PATH = "opt";
 
@@ -196,7 +199,7 @@ public class MainController implements Initializable {
         contentContainer.getChildren().setAll(overallAbsPane);
     }
 
-      public void handleMonthlyViewLaunch() throws IOException {
+    public void handleMonthlyViewLaunch() throws IOException {
         // load side menu
 
         final FXMLLoader overallReportPaneLoader = new FXMLLoader();
@@ -208,7 +211,7 @@ public class MainController implements Initializable {
 
         contentContainer.getChildren().setAll(monthlyReportPane);
     }
-      
+
     public void handleSingleAbsViewLaunch() throws IOException {
 
         final FXMLLoader singleReportPaneLoader = new FXMLLoader();
@@ -221,5 +224,16 @@ public class MainController implements Initializable {
         contentContainer.getChildren().setAll(singleAbsPane);
     }
 
-   
+    public void handleDailyViewLaunch() throws IOException {
+
+        final FXMLLoader singleReportPaneLoader = new FXMLLoader();
+        dailyReportPane = singleReportPaneLoader.load(getClass().getResourceAsStream(DAILY_LAYOUT_FILE));
+        AnchorPane.setLeftAnchor(dailyReportPane, 0.0);
+        AnchorPane.setTopAnchor(dailyReportPane, 0.0);
+        AnchorPane.setRightAnchor(dailyReportPane, 0.0);
+        AnchorPane.setBottomAnchor(dailyReportPane, 0.0);
+
+        contentContainer.getChildren().setAll(dailyReportPane);
+    }
+
 }

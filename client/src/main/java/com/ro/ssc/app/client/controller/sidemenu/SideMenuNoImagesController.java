@@ -38,8 +38,8 @@ import org.joda.time.format.DateTimeFormatter;
 public class SideMenuNoImagesController implements Initializable {
 
     private static final Logger log = LoggerFactory.getLogger(SideMenuNoImagesController.class);
- private static final java.time.format.DateTimeFormatter dtf4 = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
-    
+    private static final java.time.format.DateTimeFormatter dtf4 = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+
     // content controllers
     private MainController mainController;
 
@@ -54,7 +54,7 @@ public class SideMenuNoImagesController implements Initializable {
 
     @FXML
     private AnchorPane imageViewAnchorPane;
-    
+
     @FXML
     private TextField timeTextField;
 
@@ -77,27 +77,27 @@ public class SideMenuNoImagesController implements Initializable {
         navigationTree.getRoot().getChildren().stream().forEach((item) -> {
             item.setExpanded(true);
         });
-        
-         try {
-                 LocalTime lt= LocalTime.from(dtf4.parse(timeTextField.getText()));
-                  DataProviderImpl.getInstance().setTime(lt);
-                } catch (Exception e) {
-                    log.debug("Exception",e);
-                }
-         
+
+        try {
+            LocalTime lt = LocalTime.from(dtf4.parse(timeTextField.getText()));
+            DataProviderImpl.getInstance().setTime(lt);
+        } catch (Exception e) {
+            log.debug("Exception", e);
+        }
+
         timeTextField.textProperty().addListener(new ChangeListener<String>() {
 
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 try {
-                 LocalTime lt= LocalTime.from(dtf4.parse(newValue));
-                  DataProviderImpl.getInstance().setTime(lt);
+                    LocalTime lt = LocalTime.from(dtf4.parse(newValue));
+                    DataProviderImpl.getInstance().setTime(lt);
                 } catch (Exception e) {
-                    log.debug("Exception",e);
+                    log.debug("Exception", e);
                 }
- }
+            }
         });
-        
+
         final Timeline digitalTime = new Timeline(
                 new KeyFrame(Duration.seconds(0),
                         new EventHandler<ActionEvent>() {
@@ -155,9 +155,16 @@ public class SideMenuNoImagesController implements Initializable {
                         java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     break;
-                      case "Raport Lunar":
+                case "Raport Lunar":
                     try {
                         mainController.handleMonthlyViewLaunch();
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+                case "Raport Zilnic":
+                    try {
+                        mainController.handleDailyViewLaunch();
                     } catch (IOException ex) {
                         java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
                     }
