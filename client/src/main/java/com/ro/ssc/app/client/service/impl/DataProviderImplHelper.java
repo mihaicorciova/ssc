@@ -127,7 +127,7 @@ public class DataProviderImplHelper {
                             }
                         }
                     }
-                    result.add(new DailyData(userId, date, entry.getKey().getKey().toString(dtf), entry.getKey().getValue().toString(dtf), earlytime, duration, duration, pause, overtime, latetime, wrongPerDay.get(currentDateAsDateTime)));
+                    result.add(new DailyData(userId, date, entry.getKey().getKey().toString(dtf), entry.getKey().getValue().toString(dtf), earlytime,  duration, pause, overtime, latetime, wrongPerDay.get(currentDateAsDateTime),""));
                     usedDates.add(currentDateAsDateTime.toString(dtf3));
                 }
                 
@@ -152,16 +152,35 @@ public class DataProviderImplHelper {
                         String ev = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getEventDateTime().toString(dtf);
                         Boolean isIn = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getAddr().contains("In");
 
-                        result.add(new DailyData(userId, DateTime.parse(day, dtf3), isIn == true ? ev : "", isIn == false ? ev : "", 0, 0, 0, 0, dailyPause-dailyHours, 0, wrongPerDay.get(DateTime.parse(day, dtf3))));
+                        result.add(new DailyData(userId, DateTime.parse(day, dtf3), isIn == true ? ev : "", isIn == false ? ev : "", 0, 0, 0, dailyPause-dailyHours, 0, wrongPerDay.get(DateTime.parse(day, dtf3)),""));
                     } else {
-                        result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, 0, dailyPause-dailyHours, 0, new ArrayList<>()));
+                        result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0,  0, 0, dailyPause-dailyHours, 0, new ArrayList<>(),""));
 
                     }
                 } else {
-                    result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, 0, dailyPause-dailyHours, 0, new ArrayList<>()));
+                    result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0 , 0, 0, dailyPause-dailyHours, 0, new ArrayList<>(),""));
 
                 }
             }
+        }
+
+        return result;
+    }
+
+    public static List<DailyData> getListOfDay(String userName,Map<String,User> userData, DateTime dateTime,LocalTime time, Set<String> excludedGates){
+        List<DailyData> result = new ArrayList();
+        Collections.sort(userData.get(userName).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+        Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
+        Map<DateTime, List<Event>> wrongPerDay;
+        Set<String> usedDates = new HashSet<>();
+        String userId = userData.get(userName).getUserId().trim();
+        if (Configuration.IS_EXPIRED.getAsBoolean()) {
+            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(0), dateTime, dateTime);
+            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(1), dateTime, dateTime);
+        } else {
+            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, userData.get(userName).getEvents()).get(0), dateTime, dateTime);
+            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, userData.get(userName).getEvents()).get(1), dateTime, dateTime);
+
         }
 
         return result;

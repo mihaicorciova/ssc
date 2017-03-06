@@ -167,7 +167,14 @@ public enum DataProviderImpl implements DataProvider {
 
         @Override
         public List<GenericModel> getDaySpecificTableData(String department, DateTime iniDate) {
-            return null;
+
+            List<GenericModel> data = new ArrayList<>();
+            for (Map.Entry<String, User> entry : userData.entrySet()) {
+                if (!excludedUsers.contains(entry.getKey()) && entry.getValue().getDepartment().equals(department)) {
+                    List<DailyData> dd= DataProviderImplHelper.getListOfDay(entry.getKey(), userData,iniDate,time,  excludedGates);
+                }
+            }
+               return data;
         }
 
         @Override

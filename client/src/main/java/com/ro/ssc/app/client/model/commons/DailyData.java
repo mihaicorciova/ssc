@@ -20,36 +20,26 @@ public class DailyData {
     String lastOutEvent;
     long earlyTime;
     long workTime;
-    long cworkTime;
     long pauseTime;
     long overTime;
     long lateTime;
     List<Event> wrongEvents;
+    String additionalDetails;
 
-    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, long earlyTime, long workTime, long cworkTime, long pauseTime, long overTime, long lateTime, List<Event> wrongEvents) {
+    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, long earlyTime, long workTime, long pauseTime, long overTime, long lateTime, List<Event> wrongEvents, String additionalDetails) {
         this.userId = userId;
         this.date = date;
         this.firstInEvent = firstInEvent;
         this.lastOutEvent = lastOutEvent;
         this.earlyTime = earlyTime;
         this.workTime = workTime;
-        this.cworkTime = cworkTime;
         this.pauseTime = pauseTime;
         this.overTime = overTime;
         this.lateTime = lateTime;
         this.wrongEvents = wrongEvents;
+        this.additionalDetails = additionalDetails;
     }
 
-    
-    public long getCworkTime() {
-        return cworkTime;
-    }
-
-    public void setCworkTime(long cworkTime) {
-        this.cworkTime = cworkTime;
-    }
-
-   
     public long getEarlyTime() {
         return earlyTime;
     }
