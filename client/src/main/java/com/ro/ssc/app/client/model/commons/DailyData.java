@@ -120,4 +120,7 @@ public class DailyData {
         this.wrongEvents = wrongEvents;
     }
 
+    public String getAdditionalDetails() {
+        return additionalDetails;
+    }
 }

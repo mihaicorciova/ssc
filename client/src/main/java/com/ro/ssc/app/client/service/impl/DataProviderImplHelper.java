@@ -183,6 +183,32 @@ public class DataProviderImplHelper {
 
         }
 
+
+        for (Map.Entry<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> entry : eventsPerDay.entrySet()) {
+            if (entry.getKey().getKey().withTimeAtStartOfDay().isEqual(dateTime)) {
+                Long duration = 0l;
+                String aditional="";
+                for (Pair<Event, Event> pair : entry.getValue()) {
+                    duration = duration + pair.getValue().getEventDateTime().getMillis() - pair.getKey().getEventDateTime().getMillis();
+                    if(!pair.getKey().getEventDateTime().equals(entry.getKey().getKey())) {
+                        aditional = aditional + " in " + pair.getKey().getEventDateTime().toString(dtf) + "\n";
+                    }
+
+                    if(!pair.getValue().getEventDateTime().equals(entry.getKey().getValue())) {
+                        aditional = aditional  +" out "+pair.getValue().getEventDateTime().toString(dtf) + "\n";
+                    }
+
+
+                }
+                Long pause = entry.getKey().getValue().getMillis() - entry.getKey().getKey().getMillis() - duration;
+
+                result.add(new DailyData(userId, dateTime, entry.getKey().getKey().toString(dtf), entry.getKey().getValue().toString(dtf), 0,  duration, pause, 0, 0, new ArrayList<>(),aditional));
+
+
+            }
+        }
+
+
         return result;
     }
 

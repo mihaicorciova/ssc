@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
+
+import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -172,6 +174,10 @@ public enum DataProviderImpl implements DataProvider {
             for (Map.Entry<String, User> entry : userData.entrySet()) {
                 if (!excludedUsers.contains(entry.getKey()) && entry.getValue().getDepartment().equals(department)) {
                     List<DailyData> dd= DataProviderImplHelper.getListOfDay(entry.getKey(), userData,iniDate,time,  excludedGates);
+
+                    for(DailyData d:dd) {
+                        data.add(new GenericModel(entry.getKey(),d.getFirstInEvent(),d.getLastOutEvent(),d.getAdditionalDetails(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime())));
+                    }
                 }
             }
                return data;
