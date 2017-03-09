@@ -6,12 +6,13 @@
 package com.ro.ssc.app.client.model.commons;
 
 /**
- *
  * @author DauBufu
  */
-import java.lang.reflect.Field;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
 
 /**
  * Generic data model is a wrapper for ArrayList to easily populate tableViews
@@ -21,23 +22,23 @@ import org.slf4j.LoggerFactory;
  */
 public class GenericModel {
 
+    private static final Logger log = LoggerFactory.getLogger(ExcelEnum.class);
     /**
      * The indexed list of objects
      */
-  
+
     private Object one;
     private Object two;
     private Object three;
     private Object four;
     private Object five;
     private Object six;
-private Object seven;
-private Object eight;
-private Object nine;
-private Object ten;
-private Object eleven;
+    private Object seven;
+    private Object eight;
+    private Object nine;
+    private Object ten;
+    private Object eleven;
 
- private static final Logger log = LoggerFactory.getLogger(ExcelEnum.class);
     public GenericModel(Object... args) {
         Field[] fields = getClass().getDeclaredFields();
         int i = 0;
@@ -91,10 +92,11 @@ private Object eleven;
     public Object getSix() {
         return six;
     }
-    
+
     public Object getSeven() {
         return seven;
     }
+
     public Object getEight() {
         return eight;
     }
@@ -110,6 +112,6 @@ private Object eleven;
     public Object getEleven() {
         return eleven;
     }
-    
-    
+
+
 }

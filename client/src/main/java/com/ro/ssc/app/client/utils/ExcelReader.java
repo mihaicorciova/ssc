@@ -5,6 +5,7 @@
  */
 package com.ro.ssc.app.client.utils;
 
+import com.ro.ssc.app.client.model.commons.DailyData;
 import com.ro.ssc.app.client.model.commons.Event;
 import com.ro.ssc.app.client.model.commons.ExcelEnum;
 import com.ro.ssc.app.client.model.commons.User;
@@ -97,5 +98,7 @@ public class ExcelReader {
         }
         return result;
     }
+
+   // public static List<DailyData>
 
 }
