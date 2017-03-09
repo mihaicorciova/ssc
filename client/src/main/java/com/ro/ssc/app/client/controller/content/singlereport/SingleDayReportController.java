@@ -41,7 +41,7 @@ public class SingleDayReportController implements Initializable {
     private DateTime iniDate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
     private final org.joda.time.format.DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
-
+    private final org.joda.time.format.DateTimeFormatter dtf2 = DateTimeFormat.forPattern("MM-yyyy");
     @FXML
     private ChoiceBox departmentChoiceBox;
     @FXML
@@ -80,7 +80,7 @@ public class SingleDayReportController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
-            iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL);
+            iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStartOfDay();
 
             iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -156,9 +156,9 @@ public class SingleDayReportController implements Initializable {
 
     @FXML
     private void exportTableToPPT() {
-        String[] ext = {".xls", ".ppt"};
+        String[] ext = {".xls"};
 
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "PPT files (*.ppt);XLS files (*.xls)", Arrays.asList(ext));
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLS files (*.xls)", Arrays.asList(ext), iniDate.toString(dtf2) , departmentChoiceBox.getValue().toString()+ "-"+iniDate.toString(dtf));
 
         if (file == null) {
             return;
@@ -173,12 +173,12 @@ public class SingleDayReportController implements Initializable {
                 int rowNo = 0;
                 for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
                     content[rowNo][0] = (String) tableData.getOne();
-                    content[rowNo][1] = (String) tableData.getTwo();
-                    content[rowNo][3] = (String) tableData.getThree();
-                    content[rowNo][4] = (String) tableData.getFour();
-                    content[rowNo][5] = (String) tableData.getFive();
-                    content[rowNo][6] = (String) tableData.getSix();
-                    content[rowNo][2] = (String) tableData.getSeven();
+                    content[rowNo][2] = (String) tableData.getTwo();
+                    content[rowNo][1] = (String) tableData.getThree();
+                    content[rowNo][3] = (String) tableData.getFour();
+                    content[rowNo][4] = (String) tableData.getFive();
+                    content[rowNo][5] = (String) tableData.getSix();
+                    content[rowNo][6] = (String) tableData.getSeven();
 
                     rowNo++;
                 }

@@ -48,6 +48,25 @@ public class UiCommonTools {
     /**
      * Opens a FileChooser to let the user select a file to save to.
      */
+    public File getFileByChooser(ContextMenu context, String description, List<String> fileExtension, String dir, String filename) {
+        FileChooser fileChooser = new FileChooser();
+        File destDir = new File(dir);
+        if (!destDir.exists()) {
+            destDir.mkdirs();
+        }
+        fileChooser.setInitialDirectory(destDir);
+        fileChooser.setInitialFileName(filename);
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                description, fileExtension);
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        // Show save file dialog
+        File file = fileChooser.showSaveDialog(context);
+
+        return file;
+    }
+
+
     public File getFileByChooser(ContextMenu context, String description, List<String> fileExtension) {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
@@ -59,7 +78,6 @@ public class UiCommonTools {
 
         return file;
     }
-
     /**
      * Opens an information pop-up dialog
      */

@@ -176,11 +176,8 @@ public class DataProviderImplHelper {
         String userId = userData.get(userName).getUserId().trim();
         if (Configuration.IS_EXPIRED.getAsBoolean()) {
             eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(0), dateTime, dateTime);
-            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(1), dateTime, dateTime);
         } else {
             eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, userData.get(userName).getEvents()).get(0), dateTime, dateTime);
-            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, userData.get(userName).getEvents()).get(1), dateTime, dateTime);
-
         }
 
 
