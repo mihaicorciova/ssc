@@ -5,10 +5,8 @@
  */
 package com.ro.ssc.app.client.utils;
 
-import com.ro.ssc.app.client.model.commons.DailyData;
-import com.ro.ssc.app.client.model.commons.Event;
-import com.ro.ssc.app.client.model.commons.ExcelEnum;
-import com.ro.ssc.app.client.model.commons.User;
+import com.ro.ssc.app.client.model.commons.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -99,6 +97,53 @@ public class ExcelReader {
         return result;
     }
 
-   // public static List<DailyData>
+    public static List<DailyData> readFile(File file){
+        final List<DailyData> result = new ArrayList<>();
+        try {
+            POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
+            HSSFWorkbook wb = new HSSFWorkbook(fs);
+            HSSFSheet sheet = wb.getSheetAt(0);
+            HSSFRow row;
+            HSSFCell cell;
+
+            int rows; // No of rows
+            rows = sheet.getPhysicalNumberOfRows();
+
+            int cols = 0; // No of columns
+            int tmp = 0;
+
+            // This trick ensures that we get the data properly even if it doesn't start from first few rows
+            for (int i = 0; i < 10 || i < rows; i++) {
+                row = sheet.getRow(i);
+                if (row != null) {
+                    tmp = sheet.getRow(i).getPhysicalNumberOfCells();
+                    if (tmp > cols) {
+                        cols = tmp;
+                    }
+                }
+            }
+
+            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss EEEE");
+            for (int r = 1; r < rows; r++) {
+                row = sheet.getRow(r);
+
+                if (row != null) {
+                    try {
+
+                        if(!row.getCell(ExcelEnum2.CONTROL.getAsInteger()).toString().isEmpty()){
+
+                          //      result.add (new DailyData(row.getCell(ExcelEnum2.USER_NAME.getAsInteger()).toString().trim(),file.getName().split("")[0]));
+
+                        }
+                    } catch (Exception e) {
+                        log.error("Exception" + e.getMessage());
+                    }
+                }
+            }
+        } catch (Exception ioe) {
+            log.error("Exception" + ioe.getMessage());
+        }
+        return result;
+    }
 
 }
