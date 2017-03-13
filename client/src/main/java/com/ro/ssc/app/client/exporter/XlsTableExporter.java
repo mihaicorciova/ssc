@@ -3,42 +3,25 @@
  */
 package com.ro.ssc.app.client.exporter;
 
-import java.awt.Color;
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import javafx.scene.control.TableView;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.xslf.usermodel.SlideLayout;
-
-import org.apache.poi.xslf.usermodel.TextAlign;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
-import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
-import org.apache.poi.xslf.usermodel.XSLFTable;
-import org.apache.poi.xslf.usermodel.XSLFTableCell;
-import org.apache.poi.xslf.usermodel.XSLFTableRow;
-import org.apache.poi.xslf.usermodel.XSLFTextBox;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.controlsfx.control.spreadsheet.Grid;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * @author bbenga
- *
  */
 public class XlsTableExporter {
 
     public static final String POTX_PATH = "/template/template.potm";
 
 
-    public void exportTableToXls(Grid fxTable, File file, String title) {
+    public void exportTableToXls(Grid fxTable, File file, String title, String department, String iniDate, String outDate) {
         try {
 
             HSSFWorkbook wb = new HSSFWorkbook();
@@ -47,26 +30,82 @@ public class XlsTableExporter {
             int colNo = fxTable.getColumnCount();
             int rowNo = fxTable.getRowCount();
             // Create a row and put some cells in it. Rows are 0 based.
-          
-            HSSFRow row = sheet.createRow(0);
-            for (int i = 0; i < colNo; i++) {
-                HSSFCell cell = row.createCell(i);
-                cell.setCellValue(fxTable.getColumnHeaders().get(i));
 
+            HSSFRow row = sheet.createRow(0);
+            row = sheet.createRow(1);
+            for (int i = 0; i < 3; i++) {
+                HSSFCell cell = row.createCell(i);
+                if (i == 2) {
+                    cell.setCellValue(title);
+                }
             }
 
-            for (int r = 1; r <= rowNo; r++) {
+            row = sheet.createRow(2);
+            if (!department.equals("")) {
+                for (int i = 0; i < 4; i++) {
+                    HSSFCell cell = row.createCell(i);
+                    if (i == 3) {
+                        cell.setCellValue(department);
+                    } else if (i == 1) {
+                        cell.setCellValue("Departament");
+                    }
+                }
+            }
+
+            row = sheet.createRow(3);
+            for (int i = 0; i < 6; i++) {
+                HSSFCell cell = row.createCell(i);
+                if (i == 2) {
+                    cell.setCellValue("de la ");
+                } else if (i == 3) {
+                    cell.setCellValue(iniDate);
+                } else if (i == 4) {
+                    cell.setCellValue("pana la ");
+                } else if (i == 5) {
+                    cell.setCellValue(outDate);
+                } else if (i == 1) {
+                    cell.setCellValue("Perioada");
+                }
+            }
+            row = sheet.createRow(4);
+            row = sheet.createRow(5);
+            if (department.equals("")) {
+                HSSFCell cell = row.createCell(0);
+                cell.setCellValue("Departament");
+                for (int i = 1; i <= colNo; i++) {
+
+                    cell = row.createCell(i);
+                    cell.setCellValue(fxTable.getColumnHeaders().get(i - 1));
+
+                }
+            } else {
+                for (int i = 0; i < colNo; i++) {
+
+                    HSSFCell cell = row.createCell(i);
+                    cell.setCellValue(fxTable.getColumnHeaders().get(i));
+
+                }
+            }
+
+            for (int r = 6; r <= rowNo+5; r++) {
                 row = sheet.createRow(r);
 
                 // header
-                for (int col = 0; col <=colNo; col++) {
 
-                    if(col==0)
-                    {
-                         row.createCell(col).setCellValue(fxTable.getRowHeaders().get(r-1));
+                if (department.equals("")) {
+                    for (int col = 0; col <= colNo; col++) {
 
-                    }else{
-                    row.createCell(col).setCellValue(fxTable.getRows().get(r-1).get(col-1).getText());
+                        if (col == 0) {
+                            row.createCell(col).setCellValue(fxTable.getRowHeaders().get(r - 6));
+                        } else {
+                            row.createCell(col).setCellValue(fxTable.getRows().get(r - 6).get(col - 1).getText());
+                        }
+                    }
+                } else {
+                    for (int col = 0; col < colNo; col++) {
+
+                        row.createCell(col).setCellValue(fxTable.getRows().get(r - 6).get(col).getText());
+
                     }
                 }
             }
@@ -84,7 +123,5 @@ public class XlsTableExporter {
         }
     }
 
-   
-    
-    
+
 }

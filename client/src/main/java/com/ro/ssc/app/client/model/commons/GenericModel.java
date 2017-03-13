@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
  */
 public class GenericModel {
 
-    private static final Logger log = LoggerFactory.getLogger(ExcelEnum.class);
+
     /**
      * The indexed list of objects
      */
@@ -46,7 +46,7 @@ public class GenericModel {
             try {
                 fields[i++].set(this, arg);
             } catch (IllegalArgumentException | IllegalAccessException ex) {
-                log.error(ex.getMessage());
+                System.out.println(ex.getMessage());
             }
         }
     }

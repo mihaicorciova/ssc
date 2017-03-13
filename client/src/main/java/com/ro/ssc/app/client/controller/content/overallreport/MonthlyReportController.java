@@ -1,15 +1,8 @@
 package com.ro.ssc.app.client.controller.content.overallreport;
 
-import com.ro.ssc.app.client.exporter.PptTableExporter;
 import com.ro.ssc.app.client.exporter.XlsTableExporter;
-import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
-import java.io.File;
-import java.net.URL;
-import java.time.LocalDate;
-import java.util.*;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -20,17 +13,19 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.TableView;
 import org.controlsfx.control.spreadsheet.*;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URL;
+import java.time.LocalDate;
+import java.util.*;
+
 /**
- *
  * @author DauBufu
  */
 public class MonthlyReportController implements Initializable {
@@ -40,11 +35,11 @@ public class MonthlyReportController implements Initializable {
     private static final String ALL = "all";
     private static final String[] MONTHS = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
     private static final String[] YEARS = {"2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"};
-    private DateTime iniDate;
-    private DateTime endDate;
     private final java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
     private final DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private final DateTimeFormatter dtf2 = DateTimeFormat.forPattern("dd/MM");
+    private DateTime iniDate;
+    private DateTime endDate;
     @FXML
     private ChoiceBox departmentChoiceBox;
     @FXML
@@ -60,7 +55,7 @@ public class MonthlyReportController implements Initializable {
      * Initializes the controller class.
      *
      * @param url URL
-     * @param rb resource bundle
+     * @param rb  resource bundle
      */
     @Override
     public void initialize(final URL url, final ResourceBundle rb) {
@@ -120,10 +115,11 @@ public class MonthlyReportController implements Initializable {
         }
 
         XlsTableExporter pptExporter = new XlsTableExporter();
-      
-              pptExporter.exportTableToXls(monthlySpreadsheetView.getGrid(), file, "Raport individual absente pentru ");
-            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
-        
+
+        pptExporter.exportTableToXls(monthlySpreadsheetView.getGrid(), file, "Raport lunar ",
+                departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? "" : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate.toString(dtf), endDate.toString(dtf));
+        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
+
     }
 
     public void populateMyTable() {
@@ -191,22 +187,22 @@ public class MonthlyReportController implements Initializable {
             final ObservableList<SpreadsheetCell> list = FXCollections.observableArrayList();
 
             for (int column = 0; column < grid.getColumnCount(); ++column) {
-              
+
                 if (column == 0) {
                     list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row)));
-                }  else if (column == grid.getColumnCount()-1) {
+                } else if (column == grid.getColumnCount() - 1) {
                     list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataProviderImpl.getInstance().getCellData(users.get(row),iniDate,endDate,1)));
-                } else if (column == grid.getColumnCount()-2) {
+                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1)));
+                } else if (column == grid.getColumnCount() - 2) {
                     list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate,endDate,2)));
-                } else if (column == grid.getColumnCount()-3) {
+                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2)));
+                } else if (column == grid.getColumnCount() - 3) {
                     list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate,endDate,3)));
-                }else {
-                     final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                        DataProviderImpl.getInstance().getCellData(users.get(row), dates.get(column-1),dates.get(column-1),0));
-                list.add(cell);
+                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3)));
+                } else {
+                    final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                            DataProviderImpl.getInstance().getCellData(users.get(row), dates.get(column - 1), dates.get(column - 1), 0));
+                    list.add(cell);
                 }
             }
             rows.add(list);

@@ -148,6 +148,84 @@ public abstract class PptTableExporter {
         }
     }
 
+
+
+    public void exportTableToXls(TableView<?> fxTable, File file, String title, String department, String date) {
+        try {
+
+            HSSFWorkbook wb = new HSSFWorkbook();
+            HSSFSheet sheet = wb.createSheet("new sheet");
+
+            int colNo = fxTable.getColumns().size();
+            int rowNo = fxTable.getItems().size();
+            // Create a row and put some cells in it. Rows are 0 based.
+            String[][] content = getTableContent(fxTable);
+
+            HSSFRow row = sheet.createRow(0);
+
+
+            row = sheet.createRow(1);
+            for (int i = 0; i < 3; i++) {
+                HSSFCell cell = row.createCell(i);
+                if (i == 2) {
+                    cell.setCellValue(title);
+                }
+            }
+
+            row = sheet.createRow(2);
+            if (!department.equals("")) {
+                for (int i = 0; i < 4; i++) {
+                    HSSFCell cell = row.createCell(i);
+                    if (i == 3) {
+                        cell.setCellValue(department);
+                    } else if (i == 1) {
+                        cell.setCellValue("Departament");
+                    }
+                }
+            }
+
+            row = sheet.createRow(3);
+            for (int i = 0; i < 3; i++) {
+                HSSFCell cell = row.createCell(i);
+                if (i == 2) {
+                    cell.setCellValue(date);
+                }  else if (i == 1) {
+                    cell.setCellValue("Data ");
+                }
+            }
+            row = sheet.createRow(4);
+            row = sheet.createRow(5);
+
+                for (int i = 0; i < colNo; i++) {
+
+                    HSSFCell cell = row.createCell(i);
+                    cell.setCellValue(fxTable.getColumns().get(i).getText());
+
+                }
+
+
+            for (int r = 6; r <= rowNo+5; r++) {
+                row = sheet.createRow(r);
+                    for (int col = 0; col < colNo; col++) {
+                        row.createCell(col).setCellValue(content[r - 6][col]);
+                    }
+                            }
+
+
+
+            // Write the output to a file
+            FileOutputStream fileOut = new FileOutputStream(file);
+            wb.write(fileOut);
+            fileOut.close();
+
+            wb = null;
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     public void exportTableToXls(TableView<?> fxTable, File file, String title) {
         try {
 

@@ -115,9 +115,8 @@ public class SingleDayReportController implements Initializable {
 
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
-        exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
-        innertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
-
+        innertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
+        exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
@@ -173,8 +172,8 @@ public class SingleDayReportController implements Initializable {
                 int rowNo = 0;
                 for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
                     content[rowNo][0] = (String) tableData.getOne();
-                    content[rowNo][2] = (String) tableData.getTwo();
-                    content[rowNo][1] = (String) tableData.getThree();
+                    content[rowNo][1] = (String) tableData.getTwo();
+                    content[rowNo][2] = (String) tableData.getThree();
                     content[rowNo][3] = (String) tableData.getFour();
                     content[rowNo][4] = (String) tableData.getFive();
                     content[rowNo][5] = (String) tableData.getSix();
@@ -186,7 +185,7 @@ public class SingleDayReportController implements Initializable {
             }
         };
         
-            pptExporter.exportTableToXls(singleReportTableView, file, "Raport individual absente pentru " + departmentChoiceBox.getSelectionModel().getSelectedItem().toString() + " in ziua" + iniDatePicker.getValue().format(formatter));
+            pptExporter.exportTableToXls(singleReportTableView, file, "Raport zilnic " , departmentChoiceBox.getSelectionModel().getSelectedItem().toString() , iniDatePicker.getValue().format(formatter));
             fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
         
 
