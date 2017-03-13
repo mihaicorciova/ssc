@@ -30,7 +30,8 @@ public enum Configuration {
     TRIAL_KEY("ssc.licensing.trialKey", null),
     // encrypted expiration date of the application
     IS_EXPIRED("ssc.mdb.status", "false"),
-    
+    IS_STB("ssc.stb.flag",null),
+      IS_MON("ssc.mon.flag",null),
     HAS_LOGO("ssc.logo.present",null),
     // application version (value has to be set by another object)
     VERSION(Configuration.NON_CONFIGURABLE, "2.0");

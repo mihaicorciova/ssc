@@ -1,6 +1,7 @@
 package com.ro.ssc.app.client.controller.content.overallreport;
 
 import com.ro.ssc.app.client.exporter.XlsTableExporter;
+import com.ro.ssc.app.client.service.impl.DataImportImpl;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
 import javafx.beans.value.ChangeListener;
@@ -24,11 +25,12 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
+import javafx.stage.DirectoryChooser;
 
 /**
  * @author DauBufu
  */
-public class MonthlyReportController implements Initializable {
+public class MonthlyReportController<T> implements Initializable {
 
     private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
     private static final Logger log = LoggerFactory.getLogger(MonthlyReportController.class);
@@ -103,6 +105,27 @@ public class MonthlyReportController implements Initializable {
         }
 
     }
+    
+     @FXML
+    private void importFiles() {
+        DirectoryChooser dc= new DirectoryChooser();
+       File dir= dc.showDialog(exportButton.getContextMenu());
+         DataImportImpl.getInstance().importData(dir);
+         if(!DataImportImpl.getInstance().getUsers().isEmpty()){
+                    departmentChoiceBox.setItems(FXCollections.observableArrayList(DataImportImpl.getInstance().getDepartments()));
+     iniDate=DataImportImpl.getInstance().getPossibleDateEnd(ALL);
+          endDate=DataImportImpl.getInstance().getPossibleDateEnd(ALL);
+  if (iniDate != null) {
+                iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
+            }
+
+            if (endDate != null) {
+                endDatePicker.setValue(LocalDate.parse(endDate.toString(dtf), formatter));
+            }
+
+         }
+    
+    }
 
     @FXML
     private void exportTableToPPT() {
@@ -123,7 +146,10 @@ public class MonthlyReportController implements Initializable {
     }
 
     public void populateMyTable() {
-        monthlySpreadsheetView.setGrid(getGridBase(departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? ALL : departmentChoiceBox.getSelectionModel().getSelectedItem().toString()));
+        
+        int in=1;
+        
+        monthlySpreadsheetView.setGrid(getGridBase(departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? ALL : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(),in));
         monthlySpreadsheetView.setRowHeaderWidth(150);
         for (int i = 0; i < monthlySpreadsheetView.getColumns().size(); i++) {
             if (i > 0 && i < monthlySpreadsheetView.getColumns().size() - 3) {
@@ -140,7 +166,7 @@ public class MonthlyReportController implements Initializable {
         }
     }
 
-    private GridBase getGridBase(String department) {
+    private GridBase getGridBase(String department,int p) {
 
         List<String> users = DataProviderImpl.getInstance().getUsersDep(department);
 
@@ -221,4 +247,5 @@ public class MonthlyReportController implements Initializable {
 
     }
 
+    
 }

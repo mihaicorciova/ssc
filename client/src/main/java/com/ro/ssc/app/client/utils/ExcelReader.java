@@ -19,7 +19,9 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.joda.time.DateTime;
+import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -72,19 +74,19 @@ public class ExcelReader {
                 if (row != null) {
                     try {
                         String user = WordUtils.capitalizeFully(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim());
-                        if(row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")){
-                        if (result.containsKey(user)) {
-                            events = result.get(user).getEvents();
+                        if (row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")) {
+                            if (result.containsKey(user)) {
+                                events = result.get(user).getEvents();
 
-                            events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
-                            result.get(user).setEvents(events);
+                                events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
+                                result.get(user).setEvents(events);
 
-                        } else {
-                            events = new ArrayList();
-                            events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
-                            String id = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
-                            result.put(user, new User(user, id.contains(".") ? id.split("\\.")[0] : id, row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString().trim(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString().trim()), events));
-                        }
+                            } else {
+                                events = new ArrayList();
+                                events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
+                                String id = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
+                                result.put(user, new User(user, id.contains(".") ? id.split("\\.")[0] : id, row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString().trim(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString().trim()), events));
+                            }
                         }
                     } catch (Exception e) {
                         log.error("Exception" + e.getMessage());
@@ -97,7 +99,7 @@ public class ExcelReader {
         return result;
     }
 
-    public static List<DailyData> readFile(File file){
+    public static List<DailyData> readFile(File file) {
         final List<DailyData> result = new ArrayList<>();
         try {
             POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
@@ -105,6 +107,7 @@ public class ExcelReader {
             HSSFSheet sheet = wb.getSheetAt(0);
             HSSFRow row;
             HSSFCell cell;
+FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
 
             int rows; // No of rows
             rows = sheet.getPhysicalNumberOfRows();
@@ -123,16 +126,38 @@ public class ExcelReader {
                 }
             }
 
-            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss EEEE");
+            DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
+            DateTimeFormatter dtf2 = DateTimeFormat.forPattern("HH:mm:ss");
+ DateTimeFormatter dtf3 = DateTimeFormat.forPattern("HH:mm");
             for (int r = 1; r < rows; r++) {
                 row = sheet.getRow(r);
 
                 if (row != null) {
                     try {
 
-                        if(!row.getCell(ExcelEnum2.CONTROL.getAsInteger()).toString().isEmpty()){
+                        if (!row.getCell(ExcelEnum2.I.getAsInteger()).toString().isEmpty()) {
+                           log.info(file.getName());
+                          
+                            final String user = row.getCell(ExcelEnum2.USER_NAME.getAsInteger()).toString().trim();
+                             log.info(user);
+                            final String dep = file.getName().split("-")[0];
+                             log.info(dep);
+                            final String date = file.getName().substring(dep.length()+1, file.getName().replace(".xls","").length());
+                            log.info(date);
+                            final LocalTime in = LocalTime.parse(row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(),dtf2);
+                           final LocalTime out = LocalTime.parse(row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(),dtf2);
+                           final LocalTime in2 = LocalTime.parse(row.getCell(ExcelEnum2.I.getAsInteger()).toString().trim(),dtf2);
+                           final LocalTime out2 = LocalTime.parse(row.getCell(ExcelEnum2.O.getAsInteger()).toString().trim(),dtf2);
+                           final LocalTime w = LocalTime.parse(row.getCell(ExcelEnum2.W.getAsInteger()).toString().trim(),dtf3);
+                                                        
 
-                          //      result.add (new DailyData(row.getCell(ExcelEnum2.USER_NAME.getAsInteger()).toString().trim(),file.getName().split("")[0]));
+                           
+                            final String pt = row.getCell(ExcelEnum2.PAUSE.getAsInteger()).toString().trim();
+                            log.info(pt);
+                            final long wtime =w.getMillisOfDay()-in.getMillisOfDay()+in2.getMillisOfDay()+out.getMillisOfDay()-out2.getMillisOfDay();
+                            final long ptime = LocalTime.parse(pt, dtf3).getMillisOfDay();
+
+                            result.add(new DailyData(user, DateTime.parse(date, dtf),row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), 0, wtime, ptime, 0, 0, new ArrayList(), dep));
 
                         }
                     } catch (Exception e) {
