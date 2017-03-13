@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
@@ -370,13 +371,18 @@ public enum DataProviderImpl implements DataProvider {
 
                 @Override
                 public List<String> getUsersDep(String department) {
-                    List<User> users = new ArrayList(userData.values());
-                    users.sort((User u1, User u2) -> u1.getDepartment().compareTo(u2.getDepartment()));
+
+
                     List<String> result = new ArrayList<>();
 
-                    for (User user : users) {
-                        if (department.equals("all") || department.equals(user.getDepartment())) {
-                            result.add(user.getName());
+                    for (Map.Entry<String,List<User>> entry : userData.values().stream().collect(Collectors.groupingBy(u->u.getDepartment())).entrySet()) {
+
+                        if (department.equals("all") || department.equals(entry.getKey())) {
+                            final List<User> userList= entry.getValue();
+                            userList.sort((Comparator.comparing(User::getName)));
+                            for(User user: userList){
+                                result.add(user.getName());
+                            }
                         }
                     }
                     return result;
