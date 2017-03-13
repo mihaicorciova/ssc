@@ -139,11 +139,9 @@ FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
                            log.info(file.getName());
                           
                             final String user = row.getCell(ExcelEnum2.USER_NAME.getAsInteger()).toString().trim();
-                             log.info(user);
                             final String dep = file.getName().split("-")[0];
-                             log.info(dep);
                             final String date = file.getName().substring(dep.length()+1, file.getName().replace(".xls","").length());
-                            log.info(date);
+                           
                             final LocalTime in = LocalTime.parse(row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(),dtf2);
                            final LocalTime out = LocalTime.parse(row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(),dtf2);
                            final LocalTime in2 = LocalTime.parse(row.getCell(ExcelEnum2.I.getAsInteger()).toString().trim(),dtf2);
@@ -153,10 +151,11 @@ FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
 
                            
                             final String pt = row.getCell(ExcelEnum2.PAUSE.getAsInteger()).toString().trim();
-                            log.info(pt);
+                            
                             final long wtime =w.getMillisOfDay()-in.getMillisOfDay()+in2.getMillisOfDay()+out.getMillisOfDay()-out2.getMillisOfDay();
                             final long ptime = LocalTime.parse(pt, dtf3).getMillisOfDay();
 
+                            
                             result.add(new DailyData(user, DateTime.parse(date, dtf),row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), 0, wtime, ptime, 0, 0, new ArrayList(), dep));
 
                         }

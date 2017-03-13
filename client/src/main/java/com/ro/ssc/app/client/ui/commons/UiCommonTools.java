@@ -50,7 +50,7 @@ public class UiCommonTools {
      */
     public File getFileByChooser(ContextMenu context, String description, List<String> fileExtension, String dir, String filename) {
         FileChooser fileChooser = new FileChooser();
-        File destDir = new File(dir);
+        File destDir = new File(System.getProperty("user.home") +  File.separatorChar +dir);
         if (!destDir.exists()) {
             destDir.mkdirs();
         }
