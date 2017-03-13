@@ -3,34 +3,23 @@
  */
 package com.ro.ssc.app.client.exporter;
 
-import java.awt.Color;
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import javafx.scene.control.TableView;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.xslf.usermodel.SlideLayout;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.xslf.usermodel.*;
 
-import org.apache.poi.xslf.usermodel.TextAlign;
-import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.apache.poi.xslf.usermodel.XSLFSlide;
-import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
-import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
-import org.apache.poi.xslf.usermodel.XSLFTable;
-import org.apache.poi.xslf.usermodel.XSLFTableCell;
-import org.apache.poi.xslf.usermodel.XSLFTableRow;
-import org.apache.poi.xslf.usermodel.XSLFTextBox;
-import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
-import org.apache.poi.xslf.usermodel.XSLFTextRun;
+import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * @author bbenga
- *
  */
 public abstract class PptTableExporter {
 
@@ -149,7 +138,6 @@ public abstract class PptTableExporter {
     }
 
 
-
     public void exportTableToXls(TableView<?> fxTable, File file, String title, String department, String date) {
         try {
 
@@ -189,28 +177,57 @@ public abstract class PptTableExporter {
                 HSSFCell cell = row.createCell(i);
                 if (i == 2) {
                     cell.setCellValue(date);
-                }  else if (i == 1) {
+                } else if (i == 1) {
                     cell.setCellValue("Data ");
                 }
             }
             row = sheet.createRow(4);
             row = sheet.createRow(5);
 
-                for (int i = 0; i < colNo; i++) {
+            for (int i = 0; i < colNo; i++) {
 
-                    HSSFCell cell = row.createCell(i);
-                    cell.setCellValue(fxTable.getColumns().get(i).getText());
+                HSSFCell cell = row.createCell(i);
+                cell.setCellValue(fxTable.getColumns().get(i).getText());
 
+            }
+            CellStyle cellStyle = wb.createCellStyle();
+            CreationHelper createHelper = wb.getCreationHelper();
+            cellStyle.setDataFormat(
+                    createHelper.createDataFormat().getFormat("h:mm"));
+
+
+            for (int r = 6; r <= rowNo + 5; r++) {
+                row = sheet.createRow(r);
+                int a=r+1;
+                for (int col = 0; col < colNo; col++) {
+                    HSSFCell cell = row.createCell(col);
+                    if(col==4){
+                        cell.setCellStyle(cellStyle);
+                       cell.setCellType(Cell.CELL_TYPE_FORMULA);
+                       cell.setCellFormula("TIME(HOUR(CY"+a+")+HOUR(CW"+a+")-HOUR(B"+a+")+HOUR(D"+a+")-HOUR(CX"+a+"),MINUTE(CY"+a+")+MINUTE(CW"+a+")+MINUTE(D"+a+")-MINUTE(B"+a+")-MINUTE(CX"+a+"),0)");
+                    }else if(col==6){
+                        cell.setCellStyle(cellStyle);
+                        cell.setCellType(Cell.CELL_TYPE_FORMULA);
+                        cell.setCellFormula("TIME(HOUR(E"+a+")+HOUR(F"+a+"),MINUTE(E"+a+")+MINUTE(F"+a+"),0)");
+                    } else{
+                        cell.setCellValue(content[r - 6][col]);
+                }
                 }
 
-
-            for (int r = 6; r <= rowNo+5; r++) {
-                row = sheet.createRow(r);
-                    for (int col = 0; col < colNo; col++) {
-                        row.createCell(col).setCellValue(content[r - 6][col]);
+                for (int col = 100; col < 104; col++) {
+                    HSSFCell cell = row.createCell(col);
+                    if (col == 100) {
+                        cell.setCellValue(content[r - 6][1]);
+                    } else if (col == 101) {
+                        cell.setCellValue(content[r - 6][3]);
+                    } else if (col == 102) {
+                        cell.setCellValue(content[r - 6][4]);
+                    } else if (col == 103) {
+                        cell.setCellValue(content[r - 6][5]);
                     }
-                            }
+                }
 
+            }
 
 
             // Write the output to a file
@@ -269,6 +286,6 @@ public abstract class PptTableExporter {
     }
 
     public abstract String[][] getTableContent(TableView<?> fxTable);
-    
-    
+
+
 }
