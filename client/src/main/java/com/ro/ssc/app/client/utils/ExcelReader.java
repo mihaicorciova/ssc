@@ -19,6 +19,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -135,13 +137,19 @@ FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
                 if (row != null) {
                     try {
 
+                        if (row.getCell(ExcelEnum2.I.getAsInteger()) == null || row.getCell(ExcelEnum2.I.getAsInteger()).getCellType() == Cell.CELL_TYPE_BLANK) {
+        
+    } else  
+
                         if (!row.getCell(ExcelEnum2.I.getAsInteger()).toString().isEmpty()) {
                            log.info(file.getName());
-                          
+                          DataFormatter df = new DataFormatter(); 
+df.formatCellValue(row.getCell(ExcelEnum2.IN.getAsInteger()));
                             final String user = row.getCell(ExcelEnum2.USER_NAME.getAsInteger()).toString().trim();
                             final String dep = file.getName().split("-")[0];
                             final String date = file.getName().substring(dep.length()+1, file.getName().replace(".xls","").length());
-                           
+                             log.debug(user+ " "+ dep+" "+ date);
+                            log.debug(row.getCell(ExcelEnum2.IN.getAsInteger()).toString()+ " "+ row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim()+" "+ date); 
                             final LocalTime in = LocalTime.parse(row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(),dtf2);
                            final LocalTime out = LocalTime.parse(row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(),dtf2);
                            final LocalTime in2 = LocalTime.parse(row.getCell(ExcelEnum2.I.getAsInteger()).toString().trim(),dtf2);
@@ -149,6 +157,7 @@ FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
                            final LocalTime w = LocalTime.parse(row.getCell(ExcelEnum2.W.getAsInteger()).toString().trim(),dtf3);
                                                         
 
+                           log.debug(user+ " "+ dep+" "+ date+ in.toString()+" "+ out.toString()+" "+ in2.toString()+" "+ out2.toString()+" "+ w.toString());
                            
                             final String pt = row.getCell(ExcelEnum2.PAUSE.getAsInteger()).toString().trim();
                             

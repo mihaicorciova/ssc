@@ -29,20 +29,22 @@ public enum DataImportImpl implements DataImport {
                         dd.addAll(ExcelReader.readFile(file));
 
                     }
-                    dd.forEach(day -> System.out.println(day.toString()));
+                   // dd.forEach(day -> System.out.println(day.toString()));
                 }
 
-             
                 @Override
                 public DailyData getWorkData(String u, DateTime date) {
                     return dd.stream().filter(d -> d.getUserId().equals(u) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(0);
                 }
 
-        @Override
-        public boolean hasDayUserDepartment(String user, String department, DateTime date) {
-
-        return dd.stream().anyMatch(d->d.getUserId().equals(user) &&  d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay()) && d.getAdditionalDetails().equals(department));
-        }
+                @Override
+                public boolean hasDayUserDepartment(String user, String department, DateTime date) {
+                    if (dd.isEmpty()) {
+                        return false;
+                    } else {
+                        return dd.stream().anyMatch(d -> d.getUserId().equals(user) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay()) && d.getAdditionalDetails().equals(department));
+                    }
+                }
             };
 
     public static DataImportImpl getInstance() {

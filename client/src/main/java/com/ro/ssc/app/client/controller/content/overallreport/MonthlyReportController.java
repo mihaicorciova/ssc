@@ -112,7 +112,7 @@ public class MonthlyReportController<T> implements Initializable {
         File dir = dc.showDialog(exportButton.getContextMenu());
         DataImportImpl.getInstance().importData(dir);
        
-
+populateMyTable();
         
 
     }

@@ -353,7 +353,13 @@ public enum DataProviderImpl implements DataProvider {
                     
                     } else{
                         if (!dailyList.isEmpty()) {
-                            return formatMillis2(dailyList.get(0).getWorkTime());
+                            if(DataImportImpl.getInstance().hasDayUserDepartment(u, userData.get(u).getDepartment(), dailyList.get(0).getDate()))
+                            {
+                                log.debug("aici"+ DataImportImpl.getInstance().getWorkData(u,  dailyList.get(0).getDate()).getWorkTime() );
+                            return formatMillis2(DataImportImpl.getInstance().getWorkData(u,  dailyList.get(0).getDate()).getWorkTime());
+                            }
+                                
+                                return formatMillis2(dailyList.get(0).getWorkTime());
                         }
                     }
 
