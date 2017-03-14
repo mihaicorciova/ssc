@@ -1,5 +1,6 @@
 package com.ro.ssc.app.client.service.api;
 
+import com.ro.ssc.app.client.model.commons.DailyData;
 import java.io.File;
 import java.util.List;
 import org.joda.time.DateTime;
@@ -11,17 +12,8 @@ public interface DataImport {
 
     public void importData(File dir);
 
-    public DateTime getPossibleDateStart(String userId);
+    public DailyData getWorkData(String u, DateTime date);
 
-    public DateTime getPossibleDateEnd(String userId);
-
-    public List<String> getUsers();
-
-    public List<String> getUsersDep(String department);
-
-    public List<String> getDepartments();
-
-    public String getCellData(String u, DateTime ini, DateTime end, int ordinal);
-
-    public String getDepartmentFromUser(String entry);
+   
+    public boolean hasDayUserDepartment(String user, String department, DateTime date);
 }

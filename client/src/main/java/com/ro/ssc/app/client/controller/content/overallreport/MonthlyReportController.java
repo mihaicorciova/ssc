@@ -111,19 +111,9 @@ public class MonthlyReportController<T> implements Initializable {
         DirectoryChooser dc = new DirectoryChooser();
         File dir = dc.showDialog(exportButton.getContextMenu());
         DataImportImpl.getInstance().importData(dir);
-        if (!DataImportImpl.getInstance().getUsers().isEmpty()) {
-            departmentChoiceBox.setItems(FXCollections.observableArrayList(DataImportImpl.getInstance().getDepartments()));
-            iniDate = DataImportImpl.getInstance().getPossibleDateEnd(ALL);
-            endDate = DataImportImpl.getInstance().getPossibleDateEnd(ALL);
-            if (iniDate != null) {
-                iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
-            }
+       
 
-            if (endDate != null) {
-                endDatePicker.setValue(LocalDate.parse(endDate.toString(dtf), formatter));
-            }
-
-        }
+        
 
     }
 
@@ -169,12 +159,9 @@ public class MonthlyReportController<T> implements Initializable {
     private GridBase getGridBase(String department, int p) {
 
         List<String> users = new ArrayList();
-        if (p == 1) {
+        
             users.addAll(DataProviderImpl.getInstance().getUsersDep(department));
-        } else {
-                        users.addAll(DataImportImpl.getInstance().getUsersDep(department));
-
-        }
+        
         List<DateTime> dates = getDatesForMonth();
         int i = 0;
 
@@ -186,23 +173,15 @@ public class MonthlyReportController<T> implements Initializable {
 
         for (String entry : users) {
 
-            if(p==1){
+       
             if (!department.equals(DataProviderImpl.getInstance().getDepartmentFromUser(entry))) {
                 department = DataProviderImpl.getInstance().getDepartmentFromUser(entry);
                 grid.getRowHeaders().add(department);
             } else {
                 grid.getRowHeaders().add("");
             }
-            }else
-            {
-             if (!department.equals(DataImportImpl.getInstance().getDepartmentFromUser(entry))) {
-                department = DataImportImpl.getInstance().getDepartmentFromUser(entry);
-                grid.getRowHeaders().add(department);
-            } else {
-                grid.getRowHeaders().add("");
-            }
+           
             
-            }
 
         }
 
@@ -248,25 +227,7 @@ public class MonthlyReportController<T> implements Initializable {
                     list.add(cell);
                 }
             }
-                else
-                {
-                      if (column == 0) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row)));
-                } else if (column == grid.getColumnCount() - 1) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataImportImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1)));
-                } else if (column == grid.getColumnCount() - 2) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataImportImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2)));
-                } else if (column == grid.getColumnCount() - 3) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataImportImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3)));
-                } else {
-                    final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataImportImpl.getInstance().getCellData(users.get(row), dates.get(column - 1), dates.get(column - 1), 0));
-                    list.add(cell);
                 }
-                }}
             rows.add(list);
         }
         grid.setRows(rows);

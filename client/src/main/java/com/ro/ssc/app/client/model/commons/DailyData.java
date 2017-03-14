@@ -123,4 +123,11 @@ public class DailyData {
     public String getAdditionalDetails() {
         return additionalDetails;
     }
+
+    @Override
+    public String toString() {
+        return "DailyData{" + "userId=" + userId + ", date=" + date + ", firstInEvent=" + firstInEvent + ", lastOutEvent=" + lastOutEvent + ", workTime=" + workTime + ", pauseTime=" + pauseTime + ", additionalDetails=" + additionalDetails + '}';
+    }
+    
+    
 }

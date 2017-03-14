@@ -1,12 +1,16 @@
 package com.ro.ssc.app.client.service.impl;
 
 import com.ro.ssc.app.client.model.commons.DailyData;
+import com.ro.ssc.app.client.model.commons.User;
 import com.ro.ssc.app.client.service.api.DataImport;
 import com.ro.ssc.app.client.utils.ExcelReader;
+import static com.ro.ssc.app.client.utils.Utils.formatMillis2;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 
@@ -23,47 +27,22 @@ public enum DataImportImpl implements DataImport {
                     dd.clear();
                     for (File file : dir.listFiles()) {
                         dd.addAll(ExcelReader.readFile(file));
+
                     }
+                    dd.forEach(day -> System.out.println(day.toString()));
                 }
 
+             
                 @Override
-                public DateTime getPossibleDateEnd(String userId) {
-                    final List<DailyData> daily= dd;
-                    daily.sort((o1,o2)->o1.getDate().isBefore(o2.getDate())==true?1:-1);
-                    return daily.get(daily.size()-1).getDate();
+                public DailyData getWorkData(String u, DateTime date) {
+                    return dd.stream().filter(d -> d.getUserId().equals(u) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(0);
                 }
 
-                @Override
-                public List<String> getUsers() {
-                    return new ArrayList(dd.stream().collect(Collectors.groupingBy(d -> d.getUserId())).keySet());
-                }
+        @Override
+        public boolean hasDayUserDepartment(String user, String department, DateTime date) {
 
-                @Override
-                public List<String> getUsersDep(String department) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-
-                @Override
-                public List<String> getDepartments() {
-                    return new ArrayList(dd.stream().collect(Collectors.groupingBy(d -> d.getAdditionalDetails())).keySet());
-                }
-
-                @Override
-                public String getCellData(String u, DateTime ini, DateTime end, int ordinal) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-
-                @Override
-                public String getDepartmentFromUser(String entry) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-
-                @Override
-                public DateTime getPossibleDateStart(String userId) {
-                   final List<DailyData> daily= dd;
-                    daily.sort((o1,o2)->o1.getDate().isBefore(o2.getDate())==true?1:-1);
-                    return daily.get(0).getDate();
-                }
+        return dd.stream().anyMatch(d->d.getUserId().equals(user) &&  d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay()) && d.getAdditionalDetails().equals(department));
+        }
             };
 
     public static DataImportImpl getInstance() {
