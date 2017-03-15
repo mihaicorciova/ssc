@@ -9,10 +9,8 @@ import com.ro.ssc.app.client.model.commons.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.commons.lang.WordUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -109,8 +107,6 @@ public class ExcelReader {
             HSSFSheet sheet = wb.getSheetAt(0);
             HSSFRow row;
             HSSFCell cell;
-FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
-
             int rows; // No of rows
             rows = sheet.getPhysicalNumberOfRows();
 
@@ -130,7 +126,10 @@ FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
 
             DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
             DateTimeFormatter dtf2 = DateTimeFormat.forPattern("HH:mm:ss");
+            final java.time.format.DateTimeFormatter dtf4 = java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z YYYY");
  DateTimeFormatter dtf3 = DateTimeFormat.forPattern("HH:mm");
+            FormulaEvaluator formulaEvaluator = wb.getCreationHelper().createFormulaEvaluator();
+            formulaEvaluator.evaluateAll();
             for (int r = 1; r < rows; r++) {
                 row = sheet.getRow(r);
 
@@ -142,30 +141,67 @@ FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
     } else  
 
                         if (!row.getCell(ExcelEnum2.I.getAsInteger()).toString().isEmpty()) {
-                           log.info(file.getName());
-                          DataFormatter df = new DataFormatter(); 
-df.formatCellValue(row.getCell(ExcelEnum2.IN.getAsInteger()));
+
+
                             final String user = row.getCell(ExcelEnum2.USER_NAME.getAsInteger()).toString().trim();
                             final String dep = file.getName().split("-")[0];
                             final String date = file.getName().substring(dep.length()+1, file.getName().replace(".xls","").length());
-                             log.debug(user+ " "+ dep+" "+ date);
-                            log.debug(row.getCell(ExcelEnum2.IN.getAsInteger()).toString()+ " "+ row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim()+" "+ date); 
-                            final LocalTime in = LocalTime.parse(row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(),dtf2);
-                           final LocalTime out = LocalTime.parse(row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(),dtf2);
+                            log.debug(row.getCell(ExcelEnum2.IN.getAsInteger()).toString()+ " "+ row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim()+" "+ date);
+
+                            long in=0;
+                            if(!row.getCell(ExcelEnum2.IN.getAsInteger()).toString().contains("1899")) {
+                                in = LocalTime.parse(row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), dtf2).getMillisOfDay();
+                            }
+                            else{
+                                in=java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.IN.getAsInteger()).getDateCellValue().toString())).toNanoOfDay()/1000000;
+
+                            }
+                            long out=0;
+                            if(!row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().contains("1899")) {
+                                out = LocalTime.parse(row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), dtf2).getMillisOfDay();
+                            }
+                            else{
+                                out=java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.OUT.getAsInteger()).getDateCellValue().toString())).toNanoOfDay()/1000000;
+
+                            }
+                            long work=0;
+
+                            if(row.getCell(ExcelEnum2.WORK.getAsInteger()).toString().contains("1899")) {
+                                work=java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.WORK.getAsInteger()).getDateCellValue().toString())).toNanoOfDay()/1000000;
+                            }
+
+                            long pen;
+                            if(!row.getCell(ExcelEnum2.WORK.getAsInteger()).toString().contains("1899")) {
+                                pen = LocalTime.parse(row.getCell(ExcelEnum2.PEN.getAsInteger()).toString().trim(), dtf3).getMillisOfDay();
+                            } else{
+                                pen=java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.PEN.getAsInteger()).getDateCellValue().toString())).toNanoOfDay()/1000000;
+
+                            }
+
                            final LocalTime in2 = LocalTime.parse(row.getCell(ExcelEnum2.I.getAsInteger()).toString().trim(),dtf2);
                            final LocalTime out2 = LocalTime.parse(row.getCell(ExcelEnum2.O.getAsInteger()).toString().trim(),dtf2);
                            final LocalTime w = LocalTime.parse(row.getCell(ExcelEnum2.W.getAsInteger()).toString().trim(),dtf3);
                                                         
 
-                           log.debug(user+ " "+ dep+" "+ date+ in.toString()+" "+ out.toString()+" "+ in2.toString()+" "+ out2.toString()+" "+ w.toString());
-                           
-                            final String pt = row.getCell(ExcelEnum2.PAUSE.getAsInteger()).toString().trim();
-                            
-                            final long wtime =w.getMillisOfDay()-in.getMillisOfDay()+in2.getMillisOfDay()+out.getMillisOfDay()-out2.getMillisOfDay();
-                            final long ptime = LocalTime.parse(pt, dtf3).getMillisOfDay();
 
-                            
-                            result.add(new DailyData(user, DateTime.parse(date, dtf),row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), 0, wtime, ptime, 0, 0, new ArrayList(), dep));
+
+                            long wtime =w.getMillisOfDay()-in+in2.getMillisOfDay()+out-out2.getMillisOfDay() -pen;
+                            if(work!=0) {
+                                wtime = work;
+                            }
+
+                            long ptime = 0;
+                            if(!row.getCell(ExcelEnum2.PAUSE.getAsInteger()).toString().contains("1899")){
+                                ptime = LocalTime.parse(row.getCell(ExcelEnum2.PAUSE.getAsInteger()).toString().trim(), dtf3).getMillisOfDay();
+                            }
+                            else{
+                                ptime=java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.PAUSE.getAsInteger()).getDateCellValue().toString())).toNanoOfDay()/1000000;
+
+                            }
+
+                            final DailyData dai=new DailyData(user, DateTime.parse(date, dtf),row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), 0, wtime, ptime, 0, 0, new ArrayList(), dep);
+                            result.add(dai);
+                            System.out.println(dai.toString());
 
                         }
                     } catch (Exception e) {

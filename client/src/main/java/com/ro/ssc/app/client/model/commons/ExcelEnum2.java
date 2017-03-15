@@ -16,7 +16,7 @@ public enum ExcelEnum2 {
     OUT("Iesire", 3),
     WORK("Timp Lucru", 4),
     PAUSE("Timp Pauza",5),
-    TOTAL("Timp Total",6),
+    PEN("Timp Total",7),
     I("Timp",100),
     O("Timp",101),
     W("Timp",102);

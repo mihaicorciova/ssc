@@ -184,11 +184,16 @@ public abstract class PptTableExporter {
             row = sheet.createRow(4);
             row = sheet.createRow(5);
 
-            for (int i = 0; i < colNo; i++) {
+            for (int i = 0; i <= colNo; i++) {
 
-                HSSFCell cell = row.createCell(i);
-                cell.setCellValue(fxTable.getColumns().get(i).getText());
-
+                if(i<colNo) {
+                    HSSFCell cell = row.createCell(i);
+                    cell.setCellValue(fxTable.getColumns().get(i).getText());
+                }else
+                {
+                    HSSFCell cell = row.createCell(i);
+                    cell.setCellValue("Penalizari");
+                }
             }
             CellStyle cellStyle = wb.createCellStyle();
             CreationHelper createHelper = wb.getCreationHelper();
@@ -199,17 +204,23 @@ public abstract class PptTableExporter {
             for (int r = 6; r <= rowNo + 5; r++) {
                 row = sheet.createRow(r);
                 int a=r+1;
-                for (int col = 0; col < colNo; col++) {
+                for (int col = 0; col <= colNo; col++) {
                     HSSFCell cell = row.createCell(col);
                     if(col==4){
                         cell.setCellStyle(cellStyle);
                        cell.setCellType(Cell.CELL_TYPE_FORMULA);
-                       cell.setCellFormula("TIME(HOUR(CY"+a+")+HOUR(CW"+a+")-HOUR(B"+a+")+HOUR(D"+a+")-HOUR(CX"+a+"),MINUTE(CY"+a+")+MINUTE(CW"+a+")+MINUTE(D"+a+")-MINUTE(B"+a+")-MINUTE(CX"+a+"),0)");
+                       cell.setCellFormula("TIME(HOUR(CY"+a+")+HOUR(CW"+a+")-HOUR(B"+a+")+HOUR(D"+a+")-HOUR(CX"+a+")-HOUR(H"+a+"),MINUTE(CY"+a+")+MINUTE(CW"+a+")+MINUTE(D"+a+")-MINUTE(B"+a+")-MINUTE(CX"+a+")-MINUTE(H"+a+"),0)");
                     }else if(col==6){
                         cell.setCellStyle(cellStyle);
                         cell.setCellType(Cell.CELL_TYPE_FORMULA);
                         cell.setCellFormula("TIME(HOUR(E"+a+")+HOUR(F"+a+"),MINUTE(E"+a+")+MINUTE(F"+a+"),0)");
-                    } else{
+                    }
+                    else if(col==7){
+                        cell.setCellStyle(cellStyle);
+                        cell.setCellValue("00:00");
+                    }
+                    else{
+                        cell.setCellStyle(cellStyle);
                         cell.setCellValue(content[r - 6][col]);
                 }
                 }
