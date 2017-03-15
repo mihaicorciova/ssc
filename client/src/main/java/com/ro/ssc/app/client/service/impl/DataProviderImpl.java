@@ -330,8 +330,16 @@ public enum DataProviderImpl implements DataProvider {
                                         tabsent++;
 
                                     }
+                                    if(DataImportImpl.getInstance().hasDayUserDepartment(u, userData.get(u).getDepartment(), day.getDate()))
+                                    {
+                                    final DailyData da=DataImportImpl.getInstance().getWorkData(u,  day.getDate());
+                                     tduration += da.getWorkTime();
+                                       tpause += da.getPauseTime();
+                                    }else{
                                     tduration += day.getWorkTime();
-                                    tpause += day.getPauseTime();
+                                       tpause += day.getPauseTime();
+                                    }
+                                 
                                     if (day.getOverTime() > 0) {
                                         tovertime += day.getOverTime();
                                     } else {
@@ -355,7 +363,6 @@ public enum DataProviderImpl implements DataProvider {
                         if (!dailyList.isEmpty()) {
                             if(DataImportImpl.getInstance().hasDayUserDepartment(u, userData.get(u).getDepartment(), dailyList.get(0).getDate()))
                             {
-                                log.debug("aici"+ DataImportImpl.getInstance().getWorkData(u,  dailyList.get(0).getDate()).getWorkTime() );
                             return formatMillis2(DataImportImpl.getInstance().getWorkData(u,  dailyList.get(0).getDate()).getWorkTime());
                             }
                                 

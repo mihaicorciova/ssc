@@ -29,7 +29,6 @@ public enum DataImportImpl implements DataImport {
                         dd.addAll(ExcelReader.readFile(file));
 
                     }
-                   // dd.forEach(day -> System.out.println(day.toString()));
                 }
 
                 @Override
