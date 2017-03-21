@@ -80,7 +80,7 @@ public class SingleDayReportController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
-            iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStartOfDay();
+iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStartOfDay();
 
             iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -100,15 +100,15 @@ public class SingleDayReportController implements Initializable {
             });
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
-            departmentChoiceBox.getSelectionModel().selectFirst();
 
+         
             log.debug("Date " + iniDate.toString());
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
             }
-
+              populateMyTable();
         }
-
+ 
     }
 
     public void populateMyTable() {
@@ -148,7 +148,9 @@ public class SingleDayReportController implements Initializable {
         offTimeTableColumn.setComparator(timeComparator);
 
         log.debug("DAte " + iniDate.toString());
-        List<GenericModel> ll = DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate);
+        List<GenericModel> ll = DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem()==null?null:departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate);
+        
+     //   ll.sort((o1,o2)->o1.getOne().toString().compareTo(o2.getOne().toString()));
         singleReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
 
     }
@@ -157,7 +159,7 @@ public class SingleDayReportController implements Initializable {
     private void exportTableToPPT() {
         String[] ext = {".xls"};
 
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLS files (*.xls)", Arrays.asList(ext), iniDate.toString(dtf2) , departmentChoiceBox.getValue().toString()+ "-"+iniDate.toString(dtf));
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLS files (*.xls)", Arrays.asList(ext), iniDate.toString(dtf2) , departmentChoiceBox.getSelectionModel().getSelectedItem()==null?"Toate Departamentele"+ "-"+iniDate.toString(dtf):departmentChoiceBox.getValue().toString()+ "-"+iniDate.toString(dtf));
 
         if (file == null) {
             return;
@@ -185,7 +187,7 @@ public class SingleDayReportController implements Initializable {
             }
         };
         
-            pptExporter.exportTableToXls(singleReportTableView, file, "Raport zilnic " , departmentChoiceBox.getSelectionModel().getSelectedItem().toString() , iniDatePicker.getValue().format(formatter));
+            pptExporter.exportTableToXls(singleReportTableView, file, "Raport zilnic " , departmentChoiceBox.getSelectionModel().getSelectedItem()==null?"":departmentChoiceBox.getSelectionModel().getSelectedItem().toString() , iniDatePicker.getValue().format(formatter));
             fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
         
 

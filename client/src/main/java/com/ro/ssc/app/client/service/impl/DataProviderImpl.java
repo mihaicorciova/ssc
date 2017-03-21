@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -68,7 +69,7 @@ public enum DataProviderImpl implements DataProvider {
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
                         for (Event ev : entry.getValue().getEvents()) {
                             try {
-                                if (entry.getKey().contains("*")) {
+                                if (entry.getValue().getName().contains("*")) {
 
                                     data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
                                 } else {
@@ -91,7 +92,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     List<GenericModel> data = new ArrayList<>();
                     for (Map.Entry<String, User> entry : userData.entrySet()) {
-                        if (!excludedUsers.contains(entry.getKey())) {
+                        if (!excludedUsers.contains(entry.getValue().getName())) {
                             if (department == null || (entry.getValue().getDepartment().equals(department))) {
 
                                 Long tduration = 0L;
@@ -173,18 +174,44 @@ public enum DataProviderImpl implements DataProvider {
 
             List<GenericModel> data = new ArrayList<>();
             for (Map.Entry<String, User> entry : userData.entrySet()) {
-                if (!excludedUsers.contains(entry.getKey()) && entry.getValue().getDepartment().equals(department)) {
-                    List<DailyData> dd= DataProviderImplHelper.getListOfDay(entry.getKey(), userData,iniDate,time,  excludedGates);
+                if(!excludedUsers.contains(entry.getKey())){
+                    if( department == null || entry.getValue().getDepartment().equals(department)){
+                       
+                                  List<DailyData> dd= DataProviderImplHelper.getListOfDay(entry.getKey(), userData,iniDate,time,  excludedGates);
 
                     for(DailyData d:dd) {
 
                          data.add(new GenericModel(entry.getValue().getName(),d.getFirstInEvent(),d.getAdditionalDetails(),d.getLastOutEvent(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime())));
                     }
                 }
+                }
+                
             }
-               return data;
+            
+            
+             List<GenericModel> result = new ArrayList<>();
+             Map<String,List<GenericModel>> tm= new TreeMap();
+             tm.putAll(data.stream().collect(Collectors.groupingBy(o->getDepartmentFromUser(getKeyFromUser(o.getOne().toString())))));
+             for(Map.Entry<String,List<GenericModel>>d:tm.entrySet())
+             {
+                 if(department==null){
+                 result.add(new GenericModel(d.getKey()));
+                 }
+                  List<GenericModel> r = new ArrayList<>();
+                  r=d.getValue();
+                  r.sort((o1,o2)->o1.getOne().toString().compareTo(o2.getOne().toString()));
+             result.addAll(r);
+             }
+               return result;
         }
 
+        
+        private String getKeyFromUser(String user){
+         List<Map.Entry<String,User>> l=  userData.entrySet().stream().filter(p->p.getValue().getName().equals(user)).collect(Collectors.toList());
+            return l.get(0).getKey();
+    
+        }
+        
         @Override
                 public DateTime getPossibleDateEnd(String user) {
                     DateTime result = new DateTime().withYear(1970);
@@ -284,10 +311,10 @@ public enum DataProviderImpl implements DataProvider {
                     File dir = new File(MDB_PATH);
                     if (dir.exists()) {
                         updateUserMap(dir.listFiles()[0]).get(0).stream().forEach(p -> {
-                            String userId = p.split("-")[0];
-                            String userName = p.split("-")[1];
-                            if (userData.containsKey(userName)) {
-                                userData.get(userName).setUserId(userId);
+                            String userId = p.split("-")[1];
+                            String userName = p.split("-")[0];
+                            if (userData.containsKey(p)) {
+                                userData.get(p).setUserId(userId);
                             }
                         });
                         excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
@@ -387,14 +414,15 @@ public enum DataProviderImpl implements DataProvider {
 
 
                     List<String> result = new ArrayList<>();
-
-                    for (Map.Entry<String,List<User>> entry : userData.values().stream().collect(Collectors.groupingBy(u->u.getDepartment())).entrySet()) {
+ Map<String,List<User>> tm= new TreeMap();
+           tm.putAll(userData.values().stream().collect(Collectors.groupingBy(u->u.getDepartment())));
+                    for (Map.Entry<String,List<User>> entry :tm.entrySet()) {
 
                         if (department.equals("all") || department.equals(entry.getKey())) {
                             final List<User> userList= entry.getValue();
                             userList.sort((Comparator.comparing(User::getName)));
                             for(User user: userList){
-                                result.add(user.getName());
+                                result.add(user.getName()+"-"+user.getUserId());
                             }
                         }
                     }
@@ -410,5 +438,8 @@ public enum DataProviderImpl implements DataProvider {
     public void setTime(LocalTime lt) {
         getInstance().setTime(lt);
     }
+    
+    
+    
 
 }

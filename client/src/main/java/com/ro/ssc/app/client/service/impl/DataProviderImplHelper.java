@@ -63,6 +63,8 @@ public class DataProviderImplHelper {
 
     public static List<DailyData> getListPerDay(Map<String, User> userData, LocalTime time, Map<String, Map<String, ShiftData>> shiftData, Set<String> excludedGates, String userName, DateTime iniDate, DateTime endDate) {
         List<DailyData> result = new ArrayList();
+                 
+        if(userData.containsKey(userName)){
         Collections.sort(userData.get(userName).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
         Map<DateTime, List<Event>> wrongPerDay;
@@ -163,7 +165,7 @@ public class DataProviderImplHelper {
                 }
             }
         }
-
+        }
         return result;
     }
 

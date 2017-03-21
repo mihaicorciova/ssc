@@ -49,7 +49,7 @@ public class AccessReader {
             table = DatabaseBuilder.open(file).getTable("t_b_Consumer");
             cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable()) {
-                idMapping.add(String.format("%s",row.get("f_ConsumerID")).trim()+"-"+WordUtils.capitalizeFully(String.format("%s",row.get("f_ConsumerName")).trim()));
+                idMapping.add(WordUtils.capitalizeFully(String.format("%s",row.get("f_ConsumerName")).trim())+"-"+String.format("%s",row.get("f_ConsumerID")).trim());
                 
                 if(!String.format("%s",row.get("f_AttendEnabled")).contains("1"))
                 {
