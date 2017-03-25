@@ -311,8 +311,8 @@ public enum DataProviderImpl implements DataProvider {
                     File dir = new File(MDB_PATH);
                     if (dir.exists()) {
                         updateUserMap(dir.listFiles()[0]).get(0).stream().forEach(p -> {
-                            String userId = p.split("-")[1];
-                            String userName = p.split("-")[0];
+                            String userId = p.split("#")[1];
+                            String userName = p.split("#")[0];
                             if (userData.containsKey(p)) {
                                 userData.get(p).setUserId(userId);
                             }
@@ -357,9 +357,9 @@ public enum DataProviderImpl implements DataProvider {
                                         tabsent++;
 
                                     }
-                                    if(DataImportImpl.getInstance().hasDayUserDepartment(u, userData.get(u).getDepartment(), day.getDate()))
+                                    if(DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), day.getDate()))
                                     {
-                                    final DailyData da=DataImportImpl.getInstance().getWorkData(u,  day.getDate());
+                                    final DailyData da=DataImportImpl.getInstance().getWorkData(u.split("#")[0],  day.getDate());
                                      tduration += da.getWorkTime();
                                        tpause += da.getPauseTime();
                                     }else{
@@ -388,9 +388,9 @@ public enum DataProviderImpl implements DataProvider {
                     
                     } else{
                         if (!dailyList.isEmpty()) {
-                            if(DataImportImpl.getInstance().hasDayUserDepartment(u, userData.get(u).getDepartment(), dailyList.get(0).getDate()))
+                            if(DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), dailyList.get(0).getDate()))
                             {
-                            return formatMillis2(DataImportImpl.getInstance().getWorkData(u,  dailyList.get(0).getDate()).getWorkTime());
+                            return formatMillis2(DataImportImpl.getInstance().getWorkData(u.split("#")[0],  dailyList.get(0).getDate()).getWorkTime());
                             }
                                 
                                 return formatMillis2(dailyList.get(0).getWorkTime());
@@ -422,7 +422,7 @@ public enum DataProviderImpl implements DataProvider {
                             final List<User> userList= entry.getValue();
                             userList.sort((Comparator.comparing(User::getName)));
                             for(User user: userList){
-                                result.add(user.getName()+"-"+user.getUserId());
+                                result.add(user.getName()+"#"+user.getUserId());
                             }
                         }
                     }

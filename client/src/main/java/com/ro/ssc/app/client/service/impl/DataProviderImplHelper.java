@@ -173,11 +173,9 @@ public class DataProviderImplHelper {
         List<DailyData> result = new ArrayList();
         Collections.sort(userData.get(userName).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
-        Map<DateTime, List<Event>> wrongPerDay;
-        Set<String> usedDates = new HashSet<>();
-        String userId = userData.get(userName).getUserId().trim();
+  String userId = userData.get(userName).getUserId().trim();
         if (Configuration.IS_EXPIRED.getAsBoolean()) {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(0), dateTime, dateTime);
+            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(0), dateTime.minusDays(1), dateTime.plusDays(1));
         } else {
             eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, userData.get(userName).getEvents()).get(0), dateTime, dateTime);
         }
@@ -185,6 +183,7 @@ public class DataProviderImplHelper {
 
         for (Map.Entry<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> entry : eventsPerDay.entrySet()) {
             if (entry.getKey().getKey().withTimeAtStartOfDay().isEqual(dateTime)) {
+               
                 Long duration = 0l;
                 String aditional="";
                 for (Pair<Event, Event> pair : entry.getValue()) {

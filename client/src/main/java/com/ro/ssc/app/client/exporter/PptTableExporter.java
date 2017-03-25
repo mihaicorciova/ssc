@@ -3,6 +3,7 @@
  */
 package com.ro.ssc.app.client.exporter;
 
+import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import javafx.scene.control.TableView;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -17,6 +18,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.util.HSSFColor;
 
 /**
  * @author bbenga
@@ -199,7 +202,8 @@ public abstract class PptTableExporter {
             CreationHelper createHelper = wb.getCreationHelper();
             cellStyle.setDataFormat(
                     createHelper.createDataFormat().getFormat("h:mm"));
-
+  
+       
 
             for (int r = 6; r <= rowNo + 5; r++) {
                 row = sheet.createRow(r);
@@ -220,8 +224,22 @@ public abstract class PptTableExporter {
                         cell.setCellValue("00:00");
                     }
                     else{
+                         HSSFFont font = wb.createFont();
+                        if(col==0&& DataProviderImpl.getInstance().getDepartments().contains(content[r - 6][col]) ){
+                            
+        font.setColor(HSSFColor.RED.index);
+       
+        
+                        }else{
+                         font.setColor(HSSFColor.BLACK.index);
+ 
+        
+                        }
+                         cellStyle.setFont(font);
                         cell.setCellStyle(cellStyle);
                         cell.setCellValue(content[r - 6][col]);
+                        
+                        
                 }
                 }
 

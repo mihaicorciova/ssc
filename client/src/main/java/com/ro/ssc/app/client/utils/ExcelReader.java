@@ -74,7 +74,7 @@ public class ExcelReader {
                 if (row != null) {
                     try {
                         String i=row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().contains(".")? row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().split("\\.")[0] : row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
-                        String user = row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim()+"-"+i;
+                        String user = row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim()+"#"+i;
                         if (row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")) {
                             if (result.containsKey(user)) {
                                 events = result.get(user).getEvents();
@@ -125,6 +125,13 @@ public class ExcelReader {
                 }
             }
 
+              final String dep = sheet.getRow(2).getCell(3).toString();
+                            
+
+                            final String date = sheet.getRow(3).getCell(2).toString();
+            
+                            log.debug(dep+" "+date);
+                            
             DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
             DateTimeFormatter dtf2 = DateTimeFormat.forPattern("HH:mm:ss");
             final java.time.format.DateTimeFormatter dtf4 = java.time.format.DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss z YYYY");
@@ -142,26 +149,27 @@ public class ExcelReader {
                         } else if (!row.getCell(ExcelEnum2.I.getAsInteger()).toString().isEmpty()) {
 
                             final String user = row.getCell(ExcelEnum2.USER_NAME.getAsInteger()).toString().trim();
-                            final String dep = file.getName().split("-")[0];
-                            final String date = file.getName().substring(dep.length() + 1, file.getName().replace(".xls", "").length());
-                            log.debug(user + " " + date + " " + row.getCell(ExcelEnum2.IN.getAsInteger()).toString() + " " + row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim());
-                            log.debug("aa " + row.getCell(ExcelEnum2.WORK.getAsInteger()).toString() + " " + row.getCell(ExcelEnum2.PAUSE.getAsInteger()).toString() + " " + row.getCell(ExcelEnum2.PEN.getAsInteger()).toString());
-
+                         
                             long in = 0;
                             if (!row.getCell(ExcelEnum2.IN.getAsInteger()).toString().contains("1899")) {
                                 in = LocalTime.parse(row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), dtf2).getMillisOfDay();
+                                                      log.debug("in1"+ in);
+
                             } else {
-                                log.debug("in"+row.getCell(ExcelEnum2.IN.getAsInteger()).getDateCellValue().toString());
- 
+                               
                                 in = java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.IN.getAsInteger()).getDateCellValue().toString())).toNanoOfDay() / 1000000;
+                             log.debug("in2"+ in);
+ 
                             }
                             long out = 0;
                             if (!row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().contains("1899")) {
                                 out = LocalTime.parse(row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), dtf2).getMillisOfDay();
+                            log.debug("out1"+ out);
                             } else {
                                 log.debug("out"+row.getCell(ExcelEnum2.OUT.getAsInteger()).getDateCellValue().toString());
 
                                 out = java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.OUT.getAsInteger()).getDateCellValue().toString())).toNanoOfDay() / 1000000;
+                             log.debug("out2"+ out);
 
                             }
                             long work = 0;
@@ -170,16 +178,21 @@ public class ExcelReader {
                                 log.debug("work"+row.getCell(ExcelEnum2.WORK.getAsInteger()).getDateCellValue().toString());
 
                                 work = java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.WORK.getAsInteger()).getDateCellValue().toString())).toNanoOfDay() / 1000000;
+                                                       log.debug("work"+ work);
+
                             }
 
                             long pen;
                             if (!row.getCell(ExcelEnum2.PEN.getAsInteger()).toString().contains("1899")) {
                                 pen = LocalTime.parse(row.getCell(ExcelEnum2.PEN.getAsInteger()).toString().trim(), dtf3).getMillisOfDay();
+                           log.debug("pen1"+ pen);
                             } else {
                                 log.debug("pen"+row.getCell(ExcelEnum2.PEN.getAsInteger()).getDateCellValue().toString());
                                 pen = java.time.LocalTime.from(dtf4.parse(row.getCell(ExcelEnum2.PEN.getAsInteger()).getDateCellValue().toString())).toNanoOfDay() / 1000000;
+                             log.debug("pen2"+ pen);
 
                             }
+
 
                             final LocalTime in2 = LocalTime.parse(row.getCell(ExcelEnum2.I.getAsInteger()).toString().trim(), dtf2);
                             final LocalTime out2 = LocalTime.parse(row.getCell(ExcelEnum2.O.getAsInteger()).toString().trim(), dtf2);
@@ -202,7 +215,7 @@ public class ExcelReader {
 
                             final DailyData dai = new DailyData(user, DateTime.parse(date, dtf), row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), 0, wtime, ptime, 0, 0, new ArrayList(), dep);
                             result.add(dai);
-                            System.out.println(dai.toString());
+                        
 
                         }
                     } catch (Exception e) {

@@ -211,7 +211,7 @@ populateMyTable();
 
                 if(p==1){
                 if (column == 0) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row).split("-")[0]));
+                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row).split("#")[0]));
                 } else if (column == grid.getColumnCount() - 1) {
                     list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
                             DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1)));

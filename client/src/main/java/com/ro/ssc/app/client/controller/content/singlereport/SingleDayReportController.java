@@ -28,6 +28,8 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 /**
  *
@@ -114,6 +116,28 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
     public void populateMyTable() {
 
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
+        nameTableColumn.setCellFactory(new Callback<TableColumn<GenericModel, Object>, TableCell<GenericModel, Object>>() {
+        public TableCell call(TableColumn<GenericModel, Object> param) {
+            return new TableCell<GenericModel, Object>() {
+
+                @Override
+                public void updateItem(Object item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (!isEmpty()) {
+                       
+                        // Get fancy and change color based on data
+                        if(DataProviderImpl.getInstance().getDepartments().contains(item.toString())) {
+                            log.debug(item.toString());
+                            this.setTextFill(Color.RED);
+                        }else{
+                        this.setTextFill(Color.BLACK);
+                        }
+                        setText(item.toString());
+                    }
+                }
+            };
+        }
+    });
         entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
         innertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));

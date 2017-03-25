@@ -27,17 +27,21 @@ public enum DataImportImpl implements DataImport {
                     dd.clear();
                     for (File file : dir.listFiles()) {
                         dd.addAll(ExcelReader.readFile(file));
-
+                        
                     }
+                    dd.forEach(d->System.out.println(d.toString()));
                 }
 
                 @Override
                 public DailyData getWorkData(String u, DateTime date) {
+                 //   System.out.println( dd.stream().filter(d -> d.getUserId().equals(u) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(0).toString());
                     return dd.stream().filter(d -> d.getUserId().equals(u) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(0);
                 }
 
                 @Override
                 public boolean hasDayUserDepartment(String user, String department, DateTime date) {
+                                     
+
                     if (dd.isEmpty()) {
                         return false;
                     } else {
