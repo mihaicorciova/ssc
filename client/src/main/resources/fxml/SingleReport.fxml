@@ -33,6 +33,11 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </DatePicker>
+                  <ChoiceBox fx:id="departmentChoiceBox" prefWidth="150.0">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </ChoiceBox>
                   <ChoiceBox fx:id="userChoiceBox" prefWidth="150.0">
                      <HBox.margin>
                         <Insets left="10.0" />
