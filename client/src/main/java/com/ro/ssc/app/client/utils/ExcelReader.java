@@ -213,6 +213,10 @@ public class ExcelReader {
 
                             }
 
+                            if(wtime+ptime>24*3600*1000){
+                                wtime=-1;
+                                ptime=-1;
+                            }
                             final DailyData dai = new DailyData(user, DateTime.parse(date, dtf), row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), 0, wtime, ptime, 0, 0, new ArrayList(), dep);
                             result.add(dai);
                         

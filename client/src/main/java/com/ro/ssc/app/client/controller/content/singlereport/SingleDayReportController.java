@@ -68,6 +68,8 @@ public class SingleDayReportController implements Initializable {
     private TableColumn<GenericModel, Object> exitTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> innertimeTableColumn;
+     @FXML
+    private TableColumn<GenericModel, Object> overtimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -144,6 +146,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
+        overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
 
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -170,8 +173,9 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         workTimeTableColumn.setComparator(timeComparator);
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
+        overtimeTableColumn.setComparator(timeComparator);
 
-        log.debug("DAte " + iniDate.toString());
+      
         List<GenericModel> ll = DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem()==null?null:departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate);
         
      //   ll.sort((o1,o2)->o1.getOne().toString().compareTo(o2.getOne().toString()));
@@ -204,7 +208,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
                     content[rowNo][4] = (String) tableData.getFive();
                     content[rowNo][5] = (String) tableData.getSix();
                     content[rowNo][6] = (String) tableData.getSeven();
-
+  content[rowNo][7] = (String) tableData.getEight();
                     rowNo++;
                 }
                 return content;

@@ -181,7 +181,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     for(DailyData d:dd) {
 
-                         data.add(new GenericModel(entry.getValue().getName(),d.getFirstInEvent(),d.getAdditionalDetails(),d.getLastOutEvent(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime())));
+                         data.add(new GenericModel(entry.getValue().getName(),d.getFirstInEvent(),d.getAdditionalDetails(),d.getLastOutEvent(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime()),formatMillis2(d.getOverTime())));
                     }
                 }
                 }
@@ -387,13 +387,23 @@ public enum DataProviderImpl implements DataProvider {
                     }
                     
                     } else{
+                        dailyList= DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini.minusDays(1),end.plusDays(1));
                         if (!dailyList.isEmpty()) {
-                            if(DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), dailyList.get(0).getDate()))
+                            if(DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), ini.withTimeAtStartOfDay()))
                             {
-                            return formatMillis2(DataImportImpl.getInstance().getWorkData(u.split("#")[0],  dailyList.get(0).getDate()).getWorkTime());
+                                long wt=DataImportImpl.getInstance().getWorkData(u.split("#")[0],  ini.withTimeAtStartOfDay()).getWorkTime();
+                                if(wt==-1){
+                                return "?";
+                                }
+                            return formatMillis2(wt);
                             }
-                                
-                                return formatMillis2(dailyList.get(0).getWorkTime());
+                                for(DailyData dd:dailyList){
+                                   // log.debug(u+" "+ini+" "+dd.toString());
+                                    if(dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())){
+                                        String ot=dd.getOverTime()==0?"": "\n"+formatMillis2(dd.getOverTime());
+                                return formatMillis2(dd.getWorkTime()) +""+ot  ;
+                                    }
+                                }
                         }
                     }
 
