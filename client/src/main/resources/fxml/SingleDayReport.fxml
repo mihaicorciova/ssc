@@ -42,7 +42,8 @@
                 </HBox>
                 <TableView fx:id="singleReportTableView" prefHeight="392.0" prefWidth="679.0" GridPane.rowIndex="2">
                     <columns>
-                        <TableColumn fx:id="nameTableColumn" prefWidth="118.0" text="Nume" />
+                        <TableColumn fx:id="depTableColumn" prefWidth="110.0" text="Departament" />
+                        <TableColumn fx:id="nameTableColumn" prefWidth="84.0" text="Nume" />
                         <TableColumn fx:id="entryTimeTableColumn" prefWidth="75.0" text="Intrare" />
                         <TableColumn fx:id="innertimeTableColumn" prefWidth="137.0" text="Evenimente intermediare" />
                         <TableColumn fx:id="exitTimeTableColumn" prefWidth="127.0" text="Iesire" />
@@ -63,14 +64,9 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Label>
-                <Label text="Data Sfarsit">
+                <Label text="Departament">
                     <GridPane.margin>
                         <Insets left="240.0" />
-                    </GridPane.margin>
-                </Label>
-                <Label text="Utilizator">
-                    <GridPane.margin>
-                        <Insets left="470.0" />
                     </GridPane.margin>
                 </Label>
             </children>

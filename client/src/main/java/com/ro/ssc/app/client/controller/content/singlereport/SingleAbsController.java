@@ -59,7 +59,8 @@ public class SingleAbsController implements Initializable {
     private DatePicker iniDatePicker;
     @FXML
     private DatePicker endDatePicker;
-
+ @FXML
+    private ChoiceBox     departmentChoiceBox;
     @FXML
     private TableView singleReportTableView;
 
@@ -110,13 +111,28 @@ public class SingleAbsController implements Initializable {
 
                 }
             });
-            userChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            ChangeListener cl=new ChangeListener<String>() {
 
                 @Override
                 public void changed(ObservableValue observable, String oldValue, String newValue) {
                     populateMyTable();
+                }};
+            
+            userChoiceBox.getSelectionModel().selectedItemProperty().addListener(cl);
+            
+              departmentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+                @Override
+                public void changed(ObservableValue observable, String oldValue, String newValue) {
+                     userChoiceBox.getSelectionModel().selectedItemProperty().removeListener(cl); 
+                    userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsersDep(newValue)));
+                     userChoiceBox.getSelectionModel().selectedItemProperty().addListener(cl);
+            userChoiceBox.getSelectionModel().selectFirst();
                 }
             });
+
+            departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
+           
 
             userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsers()));
             userChoiceBox.getSelectionModel().selectFirst();

@@ -181,7 +181,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     for(DailyData d:dd) {
 
-                         data.add(new GenericModel(entry.getValue().getName(),d.getFirstInEvent(),d.getAdditionalDetails(),d.getLastOutEvent(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime()),formatMillis2(d.getOverTime())));
+                         data.add(new GenericModel(entry.getValue().getName(),d.getFirstInEvent(),d.getAdditionalDetails(),d.getLastOutEvent(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime()),entry.getValue().getDepartment()));
                     }
                 }
                 }
@@ -194,9 +194,7 @@ public enum DataProviderImpl implements DataProvider {
              tm.putAll(data.stream().collect(Collectors.groupingBy(o->getDepartmentFromUser(getKeyFromUser(o.getOne().toString())))));
              for(Map.Entry<String,List<GenericModel>>d:tm.entrySet())
              {
-                 if(department==null){
-                 result.add(new GenericModel(d.getKey()));
-                 }
+                 
                   List<GenericModel> r = new ArrayList<>();
                   r=d.getValue();
                   r.sort((o1,o2)->o1.getOne().toString().compareTo(o2.getOne().toString()));

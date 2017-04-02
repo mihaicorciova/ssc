@@ -208,33 +208,24 @@ public abstract class PptTableExporter {
             for (int r = 6; r <= rowNo + 5; r++) {
                 row = sheet.createRow(r);
                 int a=r+1;
-                for (int col = 0; col <= colNo; col++) {
+                for (int col = 0; col <=colNo; col++) {
                     HSSFCell cell = row.createCell(col);
-                    if(col==4){
+                    if(col==5){
                         cell.setCellStyle(cellStyle);
                        cell.setCellType(Cell.CELL_TYPE_FORMULA);
-                       cell.setCellFormula("TIME(HOUR(CY"+a+")+HOUR(CW"+a+")-HOUR(B"+a+")+HOUR(D"+a+")-HOUR(CX"+a+")-HOUR(H"+a+"),MINUTE(CY"+a+")+MINUTE(CW"+a+")+MINUTE(D"+a+")-MINUTE(B"+a+")-MINUTE(CX"+a+")-MINUTE(H"+a+"),0)");
-                    }else if(col==6){
+                       cell.setCellFormula("TIME(HOUR(CX"+a+")+HOUR(CV"+a+")-HOUR(C"+a+")+HOUR(E"+a+")-HOUR(CW"+a+")-HOUR(I"+a+"),MINUTE(CX"+a+")+MINUTE(CV"+a+")+MINUTE(E"+a+")-MINUTE(C"+a+")-MINUTE(CW"+a+")-MINUTE(I"+a+"),0)");
+                    }else if(col==7){
                         cell.setCellStyle(cellStyle);
                         cell.setCellType(Cell.CELL_TYPE_FORMULA);
-                        cell.setCellFormula("TIME(HOUR(E"+a+")+HOUR(F"+a+"),MINUTE(E"+a+")+MINUTE(F"+a+"),0)");
+                        cell.setCellFormula("TIME(HOUR(G"+a+")+HOUR(F"+a+"),MINUTE(G"+a+")+MINUTE(F"+a+"),0)");
                     }
-                    else if(col==7){
+                    else if(col==8){
                         cell.setCellStyle(cellStyle);
                         cell.setCellValue("00:00");
                     }
                     else{
                          HSSFFont font = wb.createFont();
-                        if(col==0&& DataProviderImpl.getInstance().getDepartments().contains(content[r - 6][col]) ){
-                            
-        font.setColor(HSSFColor.RED.index);
-       
-        
-                        }else{
-                         font.setColor(HSSFColor.BLACK.index);
- 
-        
-                        }
+                        
                          cellStyle.setFont(font);
                         cell.setCellStyle(cellStyle);
                         cell.setCellValue(content[r - 6][col]);
@@ -243,16 +234,16 @@ public abstract class PptTableExporter {
                 }
                 }
 
-                for (int col = 100; col < 104; col++) {
+                for (int col = 99; col < 103; col++) {
                     HSSFCell cell = row.createCell(col);
-                    if (col == 100) {
-                        cell.setCellValue(content[r - 6][1]);
-                    } else if (col == 101) {
-                        cell.setCellValue(content[r - 6][3]);
-                    } else if (col == 102) {
+                    if (col == 99) {
+                        cell.setCellValue(content[r - 6][2]);
+                    } else if (col == 100) {
                         cell.setCellValue(content[r - 6][4]);
-                    } else if (col == 103) {
+                    } else if (col == 101) {
                         cell.setCellValue(content[r - 6][5]);
+                    } else if (col == 102) {
+                        cell.setCellValue(content[r - 6][6]);
                     }
                 }
 

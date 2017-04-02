@@ -118,7 +118,7 @@ public class DataProviderImplHelper {
                                         duration = duration - (dailyPause - pause) > 0 ? duration - (dailyPause - pause) : 0;
                                         pause = dailyPause;
                                     }
-                                    log.debug(userName+" data "+ currentDateAsDateTime.toString(dtf3) +" overtime "+overtime);
+                                 //   log.debug(userName+" data "+ currentDateAsDateTime.toString(dtf3) +" overtime "+overtime);
                                 } else {
                                     if (duration < dailyHours-dailyPause) {
                                         overtime = duration - dailyHours+dailyPause;

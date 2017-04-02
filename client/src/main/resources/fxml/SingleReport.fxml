@@ -81,9 +81,15 @@
                   <Insets left="240.0" />
                </GridPane.margin>
             </Label>
-            <Label text="Utilizator">
+            <Label text="Departament">
                <GridPane.margin>
                   <Insets left="470.0" />
+               </GridPane.margin>
+            </Label>
+            
+              <Label text="Utilizator">
+               <GridPane.margin>
+                  <Insets left="630.0" />
                </GridPane.margin>
             </Label>
          </children>

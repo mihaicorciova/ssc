@@ -11,15 +11,17 @@ package com.ro.ssc.app.client.model.commons;
  */
 public enum ExcelEnum2 {
 
-    USER_NAME("Nume", 0),
-    IN("Intrare", 1),
-    OUT("Iesire", 3),
-    WORK("Timp Lucru", 4),
-    PAUSE("Timp Pauza",5),
-    PEN("Timp Total",7),
-    I("Timp",100),
-    O("Timp",101),
-    W("Timp",102);
+        DEP("Departament", 0),
+
+    USER_NAME("Nume", 1),
+    IN("Intrare", 2),
+    OUT("Iesire", 4),
+    WORK("Timp Lucru", 5),
+    PAUSE("Timp Pauza",6),
+    PEN("Timp Total",8),
+    I("Timp",99),
+    O("Timp",100),
+    W("Timp",101);
 
 
     private final String key;

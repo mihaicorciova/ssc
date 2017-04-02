@@ -183,7 +183,8 @@ public class Utils {
                 additionalList.clear();
                 if (!perDayList.isEmpty()) {
                     final DateTime evt = perDayList.get(perDayList.size() - 1).getValue().getEventDateTime();
-                    if (evt.isAfter(date.plusDays(1).minusHours(1))) {
+                     final DateTime evti = perDayList.get(0).getKey().getEventDateTime();
+                    if (evt.isAfter(date.plusDays(1).minusHours(1)) || evti.isAfter(dd.plusHours(16))) {
                         additionalList = pairedEvents.stream()
                                 .filter(o -> o.getValue().getEventDateTime().isAfter(evt) && o.getValue().getEventDateTime().isBefore(dd.plusDays(1).plusHours(time.getHour()).plusMinutes(time.getMinute())))
                                 .collect(Collectors.toList());

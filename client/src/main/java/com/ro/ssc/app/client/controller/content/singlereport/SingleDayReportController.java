@@ -61,7 +61,8 @@ public class SingleDayReportController implements Initializable {
     private TableColumn<GenericModel, Object> nameTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> workTimeTableColumn;
-
+ @FXML
+    private TableColumn<GenericModel, Object> depTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> entryTimeTableColumn;
     @FXML
@@ -146,6 +147,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
+         depTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
 //        overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
 
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -155,7 +157,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         nameTableColumn.setStyle("-fx-alignment:CENTER;");
         innertimeTableColumn.setStyle("-fx-alignment:CENTER;");
-
+ depTableColumn.setStyle("-fx-alignment:CENTER;");
         Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1 = ((String) o1).replace("!", "").split(":");
             String[] s2 = ((String) o2).replace("!", "").split(":");
@@ -201,14 +203,15 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
 
                 int rowNo = 0;
                 for (GenericModel tableData : ((TableView<GenericModel>) fxTable).getItems()) {
-                    content[rowNo][0] = (String) tableData.getOne();
-                    content[rowNo][1] = (String) tableData.getTwo();
-                    content[rowNo][2] = (String) tableData.getThree();
-                    content[rowNo][3] = (String) tableData.getFour();
-                    content[rowNo][4] = (String) tableData.getFive();
-                    content[rowNo][5] = (String) tableData.getSix();
-                    content[rowNo][6] = (String) tableData.getSeven();
-                    //content[rowNo][7] = (String) tableData.getEight();
+                    content[rowNo][0] = (String) tableData.getEight();
+                    content[rowNo][1] = (String) tableData.getOne();
+                    content[rowNo][2] = (String) tableData.getTwo();
+                    content[rowNo][3] = (String) tableData.getThree();
+                    content[rowNo][4] = (String) tableData.getFour();
+                    content[rowNo][5] = (String) tableData.getFive();
+                    content[rowNo][6] = (String) tableData.getSix();
+                    content[rowNo][7] = (String) tableData.getSeven();
+                    
                     rowNo++;
                 }
                 return content;
