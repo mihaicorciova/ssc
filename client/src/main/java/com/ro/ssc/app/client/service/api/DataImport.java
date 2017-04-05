@@ -12,7 +12,7 @@ public interface DataImport {
 
     public void importData(File dir);
 
-    public DailyData getWorkData(String u, DateTime date);
+    public DailyData getWorkData(String u, String dep,DateTime date);
 
    
     public boolean hasDayUserDepartment(String user, String department, DateTime date);

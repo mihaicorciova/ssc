@@ -69,8 +69,8 @@ public class SingleDayReportController implements Initializable {
     private TableColumn<GenericModel, Object> exitTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> innertimeTableColumn;
-    @FXML
-   private TableColumn<GenericModel, Object> overtimeTableColumn;
+   // @FXML
+   //private TableColumn<GenericModel, Object> overtimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -148,7 +148,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
          depTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
-       overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+  //     overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
 
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -158,7 +158,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         nameTableColumn.setStyle("-fx-alignment:CENTER;");
         innertimeTableColumn.setStyle("-fx-alignment:CENTER;");
  depTableColumn.setStyle("-fx-alignment:CENTER;");
-  overtimeTableColumn          .setStyle("-fx-alignment:CENTER;");
+ // overtimeTableColumn          .setStyle("-fx-alignment:CENTER;");
 
         Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1 = ((String) o1).replace("!", "").split(":");
@@ -177,7 +177,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         workTimeTableColumn.setComparator(timeComparator);
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
-        overtimeTableColumn.setComparator(timeComparator);
+//        overtimeTableColumn.setComparator(timeComparator);
 
       
         List<GenericModel> ll = DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem()==null?null:departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate);
@@ -213,7 +213,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
                     content[rowNo][5] = (String) tableData.getFive();
                     content[rowNo][6] = (String) tableData.getSix();
                     content[rowNo][7] = (String) tableData.getSeven();
-                                        content[rowNo][8] = (String) tableData.getNine();
+//                                        content[rowNo][8] = (String) tableData.getNine();
 
                     rowNo++;
                 }
