@@ -76,4 +76,15 @@ public class Event {
         this.addr = addr;
     }
 
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eventDateTime=" + eventDateTime +
+                ", description='" + description + '\'' +
+                ", addr='" + addr + '\'' +
+                ", passed=" + passed +
+                ", isAccountable=" + isAccountable +
+                ", aaa=" + aaa +
+                '}';
+    }
 }

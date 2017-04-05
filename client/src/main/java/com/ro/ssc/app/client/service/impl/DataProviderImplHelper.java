@@ -16,12 +16,8 @@ import static com.ro.ssc.app.client.utils.Utils.splitPerDay;
 import static com.ro.ssc.app.client.utils.Utils.splitPerDayWrong;
 import java.text.DecimalFormat;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -65,17 +61,20 @@ public class DataProviderImplHelper {
         List<DailyData> result = new ArrayList();
                  
         if(userData.containsKey(userName)){
-        Collections.sort(userData.get(userName).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+            final List<Event> events=userData.get(userName).getEvents();
+            Collections.sort(events, Comparator.comparing(Event::getEventDateTime));
+
+
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
         Map<DateTime, List<Event>> wrongPerDay;
         Set<String> usedDates = new HashSet<>();
         String userId = userData.get(userName).getUserId().trim();
         if (Configuration.IS_EXPIRED.getAsBoolean()) {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(0), iniDate, endDate);
-            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(1), iniDate, endDate);
+            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), iniDate, endDate);
+            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), iniDate, endDate);
         } else {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, userData.get(userName).getEvents()).get(0), iniDate, endDate);
-            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, userData.get(userName).getEvents()).get(1), iniDate, endDate);
+            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), iniDate, endDate);
+            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), iniDate, endDate);
 
         }
 
@@ -171,13 +170,15 @@ public class DataProviderImplHelper {
 
     public static List<DailyData> getListOfDay(String userName,Map<String,User> userData, DateTime dateTime,LocalTime time, Set<String> excludedGates){
         List<DailyData> result = new ArrayList();
-        Collections.sort(userData.get(userName).getEvents(), (c1, c2) -> c1.getEventDateTime().compareTo(c2.getEventDateTime()));
+        final List<Event> events=userData.get(userName).getEvents();
+        Collections.sort(events, Comparator.comparing(Event::getEventDateTime));
+
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
   String userId = userData.get(userName).getUserId().trim();
         if (Configuration.IS_EXPIRED.getAsBoolean()) {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, userData.get(userName).getEvents()).get(0), dateTime.minusDays(1), dateTime.plusDays(1));
+            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), dateTime.minusDays(1), dateTime.plusDays(1));
         } else {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, userData.get(userName).getEvents()).get(0), dateTime, dateTime);
+            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates,events).get(0), dateTime, dateTime);
         }
 
 

@@ -21,6 +21,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -73,27 +75,41 @@ public class ExcelReader {
 
                 if (row != null) {
                     try {
-                        String i=row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().contains(".")? row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().split("\\.")[0] : row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
-                        String user = row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim()+"#"+i;
-                        if (row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")) {
-                            if (result.containsKey(user)) {
-                                events = result.get(user).getEvents();
+                        if (row.getCell(ExcelEnum.USER_ID.getAsInteger()) == null || row.getCell(ExcelEnum.USER_ID.getAsInteger()).getCellType() == Cell.CELL_TYPE_BLANK) {
 
-                                events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
-                                result.get(user).setEvents(events);
+            log.debug("Rand lipsa "+ r);
+                        } else {
+                            String i = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().contains(".") ? row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().split("\\.")[0] : row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
+                            String user = row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim() + "#" + i;
+                            if (row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")) {
+                                if (result.containsKey(user)) {
+                                    events = result.get(user).getEvents();
+                                    final DateTimeZone dtz = DateTimeZone.getDefault();
+                                    LocalDateTime dateTime= dtf.parseLocalDateTime(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString());
+                                    if(dtz.isLocalDateTimeGap(dateTime)){
+                                        dateTime=dateTime.withHourOfDay(4);
+                                    }
 
-                            } else {
-                                events = new ArrayList();
-                                events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
-                                String id = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
-                                result.put(user, new User(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim(), id.contains(".") ? id.split("\\.")[0] : id, row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString().trim(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString().trim()), events));
+                                    final Event event = new Event(dateTime.toDateTime(), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0"));
+                                    if (user.contains("SAFTOIU")) {
+                                        log.debug(user + " " + event.toString());
+                                    }
+                                    events.add(event);
+                                    result.get(user).setEvents(events);
+
+                                } else {
+                                    events = new ArrayList();
+                                    events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
+                                    String id = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
+                                    result.put(user, new User(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim(), id.contains(".") ? id.split("\\.")[0] : id, row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString().trim(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString().trim()), events));
+                                }
                             }
                         }
                     } catch (Exception e) {
                         log.error("Exception" + e.getMessage());
                     }
-                }
-            }
+
+                }}
         } catch (Exception ioe) {
             log.error("Exception" + ioe.getMessage());
         }

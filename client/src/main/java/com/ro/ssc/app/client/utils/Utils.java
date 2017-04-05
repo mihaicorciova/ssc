@@ -162,6 +162,7 @@ public class Utils {
 
     public static Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> splitPerDay(LocalTime time, List<Event> events, DateTime iniDate, DateTime endDate) {
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> result = new LinkedHashMap<>();
+
         List<Pair<Event, Event>> pairedEvents = new LinkedList<>();
         List<Pair<Event, Event>> perDayList = new LinkedList<>();
         List<Pair<Event, Event>> additionalList = new LinkedList<>();
