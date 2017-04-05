@@ -219,7 +219,7 @@ public abstract class PptTableExporter {
                         cell.setCellType(Cell.CELL_TYPE_FORMULA);
                         cell.setCellFormula("TIME(HOUR(G"+a+")+HOUR(F"+a+"),MINUTE(G"+a+")+MINUTE(F"+a+"),0)");
                     }
-                    else if(col==8){
+                    else if(col==9){
                         cell.setCellStyle(cellStyle);
                         cell.setCellValue("00:00");
                     }

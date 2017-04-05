@@ -181,7 +181,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     for(DailyData d:dd) {
 
-                         data.add(new GenericModel(entry.getValue().getName(),d.getFirstInEvent(),d.getAdditionalDetails(),d.getLastOutEvent(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime()),entry.getValue().getDepartment()));
+                         data.add(new GenericModel(entry.getValue().getName(),d.getFirstInEvent(),d.getAdditionalDetails(),d.getLastOutEvent(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime()),entry.getValue().getDepartment(),formatMillis2(d.getWorkTime())));
                     }
                 }
                 }
