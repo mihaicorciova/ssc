@@ -29,13 +29,30 @@ public enum DataImportImpl implements DataImport {
                         dd.addAll(ExcelReader.readFile(file));
                         
                     }
-                    dd.forEach(d->System.out.println(d.toString()));
+                    dd.forEach(d->{
+                            if(d.getAdditionalDetails().contains("Vaho"))
+                                    {
+                                        System.out.println(d.toString());
+                                            
+                                            };
+                    });
                 }
 
                 @Override
-                public DailyData getWorkData(String u, DateTime date) {
-                 //   System.out.println( dd.stream().filter(d -> d.getUserId().equals(u) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(0).toString());
-                    return dd.stream().filter(d -> d.getUserId().equals(u) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(0);
+                public DailyData getWorkData(String u, String department, DateTime date) {
+                  if(department.contains("Vaho"))
+                        {
+                      final List<DailyData> dai=  dd.stream().filter(d -> d.getUserId().equals(u) && d.getAdditionalDetails().equals(department) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList());    
+                  //  System.out.println(u+" "+date+" "+dai.size());
+                    if(dai.size()>1)
+                    {
+                                        System.out.println(u+" "+date+" "+dai.get(0));
+                                   return dd.stream().filter(d -> d.getUserId().equals(u) && d.getAdditionalDetails().equals(department)&& d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(1);
+
+
+                    }
+                        }
+                    return dd.stream().filter(d -> d.getUserId().equals(u) && d.getAdditionalDetails().equals(department)&& d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(0);
                 }
 
                 @Override
@@ -45,6 +62,11 @@ public enum DataImportImpl implements DataImport {
                     if (dd.isEmpty()) {
                         return false;
                     } else {
+                        if(department.contains("Vaho"))
+                        {
+                           System.out.println(user+" "+date+" "+ dd.stream().filter(d -> d.getUserId().equals(user) && d.getAdditionalDetails().equals(department) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).size());
+                 
+                        }
                         return dd.stream().anyMatch(d -> d.getUserId().equals(user) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay()) && d.getAdditionalDetails().equals(department));
                     }
                 }
