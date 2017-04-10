@@ -77,7 +77,7 @@ public class ExcelReader {
                     try {
                         if (row.getCell(ExcelEnum.USER_ID.getAsInteger()) == null || row.getCell(ExcelEnum.USER_ID.getAsInteger()).getCellType() == Cell.CELL_TYPE_BLANK) {
 
-            log.debug("Rand lipsa "+ r);
+
                         } else {
                             String i = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().contains(".") ? row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().split("\\.")[0] : row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
                             String user = row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim() + "#" + i;
@@ -91,9 +91,7 @@ public class ExcelReader {
                                     }
 
                                     final Event event = new Event(dateTime.toDateTime(), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0"));
-                                    if (user.contains("SAFTOIU")) {
-                                        log.debug(user + " " + event.toString());
-                                    }
+
                                     events.add(event);
                                     result.get(user).setEvents(events);
 

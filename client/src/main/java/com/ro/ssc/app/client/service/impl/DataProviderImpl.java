@@ -309,15 +309,18 @@ public enum DataProviderImpl implements DataProvider {
                     File dir = new File(MDB_PATH);
                     if (dir.exists()) {
                         updateUserMap(dir.listFiles()[0]).get(0).stream().forEach(p -> {
-                            String userId = p.split("#")[1];
-                            String userName = p.split("#")[0];
-                            if (userData.containsKey(p)) {
-                                userData.get(p).setUserId(userId);
+                            log.debug(p.toString());
+                            String[] st=p.split("~");
+                            String userId = st[1];
+                            String userName =st[0];
+                            if (userData.containsKey(userName)) {
+                                userData.get(userName).setUserId(userId);
                             }
                         });
                         excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
                         excludedUsers = updateUserMap(dir.listFiles()[0]).get(2);
                         shiftData = getShiftData(dir.listFiles()[0]);
+                        shiftData.entrySet().forEach(s->log.debug(s.getKey()+" "+s.getValue().entrySet().size()));
                     }
                 }
 

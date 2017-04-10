@@ -69,6 +69,8 @@ public class DataProviderImplHelper {
         Map<DateTime, List<Event>> wrongPerDay;
         Set<String> usedDates = new HashSet<>();
         String userId = userData.get(userName).getUserId().trim();
+        log.debug(userName+" "+userData.get(userName).getUserId()+" "+userData.get(userName).getUserNo());
+
         if (Configuration.IS_EXPIRED.getAsBoolean()) {
             eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), iniDate, endDate);
             wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), iniDate, endDate);
@@ -117,13 +119,18 @@ public class DataProviderImplHelper {
                                         duration = duration - (dailyPause - pause) > 0 ? duration - (dailyPause - pause) : 0;
                                         pause = dailyPause;
                                     }
-                                 //   log.debug(userName+" data "+ currentDateAsDateTime.toString(dtf3) +" overtime "+overtime);
                                 } else {
                                     if (duration < dailyHours-dailyPause) {
                                         overtime = duration - dailyHours+dailyPause;
                                     }
                                 }
-                                earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+                                if(entry.getKey().getValue().isAfter(date.plusDays(1)))
+                                {
+                                    earlytime = entry.getKey().getValue().getSecondOfDay() +24*3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+
+                                } else {
+                                    earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+                                }
                                 latetime = entry.getKey().getKey().getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (entry.getKey().getKey().getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
                             }
                         }
