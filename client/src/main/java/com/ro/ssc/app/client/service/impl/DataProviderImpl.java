@@ -58,7 +58,7 @@ public enum DataProviderImpl implements DataProvider {
                 private Set<String> excludedUsers;
                 private DateTimeFormatter dtf = DateTimeFormat.forPattern("HH:mm:ss");
                 private DateTimeFormatter dtf2 = DateTimeFormat.forPattern("EEE dd-MMM-yyyy");
-                 private DateTimeFormatter dtf3 = DateTimeFormat.forPattern("dd-MM-yyyy");
+                private DateTimeFormatter dtf3 = DateTimeFormat.forPattern("dd-MM-yyyy");
                 private LocalTime time;
                 private DecimalFormat df = new DecimalFormat();
                 private final Logger log = LoggerFactory.getLogger(DataProviderImpl.class);
@@ -169,48 +169,44 @@ public enum DataProviderImpl implements DataProvider {
                     return data;
                 }
 
-        @Override
-        public List<GenericModel> getDaySpecificTableData(String department, DateTime iniDate) {
+                @Override
+                public List<GenericModel> getDaySpecificTableData(String department, DateTime iniDate) {
 
-            List<GenericModel> data = new ArrayList<>();
-            for (Map.Entry<String, User> entry : userData.entrySet()) {
-                if(!excludedUsers.contains(entry.getKey())){
-                    if( department == null || entry.getValue().getDepartment().equals(department)){
-                       
-                                  List<DailyData> dd= DataProviderImplHelper.getListOfDay(entry.getKey(), userData,iniDate,time,  excludedGates);
+                    List<GenericModel> data = new ArrayList<>();
+                    for (Map.Entry<String, User> entry : userData.entrySet()) {
+                        if (!excludedUsers.contains(entry.getKey())) {
+                            if (department == null || entry.getValue().getDepartment().equals(department)) {
 
-                    for(DailyData d:dd) {
+                                List<DailyData> dd = DataProviderImplHelper.getListOfDay(entry.getKey(), userData, iniDate, time, excludedGates, shiftData);
 
-                         data.add(new GenericModel(entry.getValue().getName(),d.getFirstInEvent(),d.getAdditionalDetails(),d.getLastOutEvent(),formatMillis2(d.getWorkTime()),formatMillis2(d.getPauseTime()),formatMillis2(d.getWorkTime()+d.getPauseTime()),entry.getValue().getDepartment(),formatMillis2(d.getWorkTime())));
+                                for (DailyData d : dd) {
+                                    int absent = 0;
+
+                                    if (d.getFirstInEvent().equals("") || d.getLastOutEvent().equals("")) {
+                                        if (d.getWrongEvents().size() > 0) {
+                                            absent = 2;
+                                        } else {
+                                            absent = 1;
+                                        }
+                                    }
+                                    data.add(new GenericModel(entry.getValue().getName(), d.getFirstInEvent(), d.getAdditionalDetails(), d.getLastOutEvent(), formatMillis2(d.getWorkTime()), formatMillis2(d.getPauseTime()), formatMillis2(d.getWorkTime() + d.getPauseTime()), entry.getValue().getDepartment(), d.getDate().toString(dtf2), formatMillis(d.getOverTime()), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", formatMillis(d.getLateTime()), formatMillis(d.getEarlyTime())));
+                                }
+                            }
+                        }
+
                     }
-                }
-                }
-                
-            }
-            
-            
-             List<GenericModel> result = new ArrayList<>();
-             Map<String,List<GenericModel>> tm= new TreeMap();
-             tm.putAll(data.stream().collect(Collectors.groupingBy(o->getDepartmentFromUser(getKeyFromUser(o.getOne().toString())))));
-             for(Map.Entry<String,List<GenericModel>>d:tm.entrySet())
-             {
-                 
-                  List<GenericModel> r = new ArrayList<>();
-                  r=d.getValue();
-                  r.sort((o1,o2)->o1.getOne().toString().compareTo(o2.getOne().toString()));
-             result.addAll(r);
-             }
-               return result;
-        }
 
-        
-        private String getKeyFromUser(String user){
-         List<Map.Entry<String,User>> l=  userData.entrySet().stream().filter(p->p.getValue().getName().equals(user)).collect(Collectors.toList());
-            return l.get(0).getKey();
-    
-        }
-        
-        @Override
+                    return data;
+                }
+
+                @Override
+                public String getKeyFromUser(String user) {
+                    List<Map.Entry<String, User>> l = userData.entrySet().stream().filter(p -> p.getValue().getName().equals(user)).collect(Collectors.toList());
+                    return l.get(0).getKey();
+
+                }
+
+                @Override
                 public DateTime getPossibleDateEnd(String user) {
                     DateTime result = new DateTime().withYear(1970);
 
@@ -307,13 +303,13 @@ public enum DataProviderImpl implements DataProvider {
                 private void enrichUserData() {
 
                     File dir = new File(MDB_PATH);
-                    List<Set<String>> ls=  updateUserMap(dir.listFiles()[0]);
+                    List<Set<String>> ls = updateUserMap(dir.listFiles()[0]);
                     if (dir.exists()) {
-                      ls.get(0).stream().forEach(p -> {
-                           
-                            String[] st=p.split("~");
+                        ls.get(0).stream().forEach(p -> {
+
+                            String[] st = p.split("~");
                             String userId = st[1];
-                            String userName =st[0];
+                            String userName = st[0];
                             if (userData.containsKey(userName)) {
                                 userData.get(userName).setUserId(userId);
                             }
@@ -321,91 +317,87 @@ public enum DataProviderImpl implements DataProvider {
                         excludedGates = ls.get(1);
                         excludedUsers = ls.get(2);
                         shiftData = getShiftData(dir.listFiles()[0]);
-                    //    shiftData.entrySet().forEach(s->log.debug(s.getKey()+" "+s.getValue().entrySet().size()));
+                        //    shiftData.entrySet().forEach(s->log.debug(s.getKey()+" "+s.getValue().entrySet().size()));
                     }
                 }
 
                 @Override
                 public String getCellData(String u, DateTime ini, DateTime end, int ordinal) {
-                   
-                    
-                                Long tduration = 0L;
-                                Long tpause = 0L;
-                                Long tovertime = 0L;
-                                Long tundertime = 0l;
-                                int tabsent = 0;
-                                int tlaters = 0;
-                                long tlate = 0;
-                                int tearlys = 0;
-                                long tearly = 0;
-                                boolean withWrongEv = false;
-                            
-                    List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini,end);
-                         for (DailyData day : dailyList) {
 
-                                    if (day.getLateTime() > 0) {
-                                        tlaters++;
-                                    }
-                                    tlate += day.getLateTime();
-                                    if (day.getEarlyTime() > 0) {
-                                        tearlys++;
-                                    }
-                                    tearly += day.getEarlyTime();
-                                    if (day.getFirstInEvent().equals("") || day.getLastOutEvent().equals("")) {
-                                        if (day.getWrongEvents().size() > 0) {
-                                            withWrongEv = true;
-                                        }
+                    Long tduration = 0L;
+                    Long tpause = 0L;
+                    Long tovertime = 0L;
+                    Long tundertime = 0l;
+                    int tabsent = 0;
+                    int tlaters = 0;
+                    long tlate = 0;
+                    int tearlys = 0;
+                    long tearly = 0;
+                    boolean withWrongEv = false;
 
-                                        tabsent++;
+                    List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini, end);
+                    for (DailyData day : dailyList) {
 
-                                    }
-                                    if(DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), day.getDate()))
-                                    {
-                                    final DailyData da=DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), day.getDate());
-                                     tduration += da.getWorkTime();
-                                       tpause += da.getPauseTime();
-                                    }else{
-                                    tduration += day.getWorkTime();
-                                       tpause += day.getPauseTime();
-                                    }
-                                 
-                                    if (day.getOverTime() > 0) {
-                                        tovertime += day.getOverTime();
-                                    } else {
-                                        tundertime += Math.abs(day.getOverTime());
-                                    }
-                                }
-
-                               
-                    if(!ini.equals(end)){
-                    if (ordinal==1) {
-                        return formatMillis2(tduration+tpause);
-                    } else if (ordinal==2) {
-                        return formatMillis2(tpause);
-
-                    } else if (ordinal==3) {     
-                        return formatMillis2(tduration);
-
-                    }
-                    
-                    } else{
-                        dailyList= DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini.minusDays(1),end.plusDays(1));
-                        if (!dailyList.isEmpty()) {
-                            if(DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), ini.withTimeAtStartOfDay()))
-                            {
-                                long wt=DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), ini.withTimeAtStartOfDay()).getWorkTime();
-                                if(wt==-1){
-                                return "?";
-                                }
-                            return formatMillis2(wt);
+                        if (day.getLateTime() > 0) {
+                            tlaters++;
+                        }
+                        tlate += day.getLateTime();
+                        if (day.getEarlyTime() > 0) {
+                            tearlys++;
+                        }
+                        tearly += day.getEarlyTime();
+                        if (day.getFirstInEvent().equals("") || day.getLastOutEvent().equals("")) {
+                            if (day.getWrongEvents().size() > 0) {
+                                withWrongEv = true;
                             }
-                                for(DailyData dd:dailyList){
-                                   // log.debug(u+" "+ini+" "+dd.toString());
-                                    if(dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())){
-                                        String ot=dd.getOverTime()==0?"": "\n"+formatMillis2(dd.getOverTime());
-                                return formatMillis2(dd.getWorkTime()) +""+ot  ;
-                                    }
+
+                            tabsent++;
+
+                        }
+                        if (DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), day.getDate())) {
+                            final DailyData da = DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), day.getDate());
+                            tduration += da.getWorkTime();
+                            tpause += da.getPauseTime();
+                        } else {
+                            tduration += day.getWorkTime();
+                            tpause += day.getPauseTime();
+                        }
+
+                        if (day.getOverTime() > 0) {
+                            tovertime += day.getOverTime();
+                        } else {
+                            tundertime += Math.abs(day.getOverTime());
+                        }
+                    }
+
+                    if (!ini.equals(end)) {
+                        if (ordinal == 1) {
+                            return formatMillis2(tduration + tpause);
+                        } else if (ordinal == 2) {
+                            return formatMillis2(tpause);
+
+                        } else if (ordinal == 3) {
+                            return formatMillis2(tduration);
+
+                        }
+
+                    } else {
+                        dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini.minusDays(1), end.plusDays(1));
+                        if (!dailyList.isEmpty()) {
+                            if (DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), ini.withTimeAtStartOfDay())) {
+                                long wt = DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), ini.withTimeAtStartOfDay()).getWorkTime();
+                                if (wt == -1) {
+                                    return "?";
                                 }
+                                return formatMillis2(wt);
+                            }
+                            for (DailyData dd : dailyList) {
+                                // log.debug(u+" "+ini+" "+dd.toString());
+                                if (dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())) {
+                                    String ot = dd.getOverTime() == 0 ? "" : "\n" + formatMillis2(dd.getOverTime());
+                                    return formatMillis2(dd.getWorkTime()) + "" + ot;
+                                }
+                            }
                         }
                     }
 
@@ -424,17 +416,16 @@ public enum DataProviderImpl implements DataProvider {
                 @Override
                 public List<String> getUsersDep(String department) {
 
-
                     List<String> result = new ArrayList<>();
- Map<String,List<User>> tm= new TreeMap();
-           tm.putAll(userData.values().stream().collect(Collectors.groupingBy(u->u.getDepartment())));
-                    for (Map.Entry<String,List<User>> entry :tm.entrySet()) {
+                    Map<String, List<User>> tm = new TreeMap();
+                    tm.putAll(userData.values().stream().collect(Collectors.groupingBy(u -> u.getDepartment())));
+                    for (Map.Entry<String, List<User>> entry : tm.entrySet()) {
 
                         if (department.equals("all") || department.equals(entry.getKey())) {
-                            final List<User> userList= entry.getValue();
+                            final List<User> userList = entry.getValue();
                             userList.sort((Comparator.comparing(User::getName)));
-                            for(User user: userList){
-                                result.add(user.getName()+"#"+user.getUserNo());
+                            for (User user : userList) {
+                                result.add(user.getName() + "#" + user.getUserNo());
                             }
                         }
                     }
@@ -450,8 +441,5 @@ public enum DataProviderImpl implements DataProvider {
     public void setTime(LocalTime lt) {
         getInstance().setTime(lt);
     }
-    
-    
-    
 
 }

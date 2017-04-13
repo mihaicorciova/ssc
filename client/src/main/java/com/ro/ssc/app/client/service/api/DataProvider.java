@@ -34,6 +34,8 @@ public interface DataProvider {
 
     public List<String> getUsers();
     
+    public String getKeyFromUser(String user);
+    
     public List<String> getUsersDep(String department);
 
     public List<String> getDepartments();

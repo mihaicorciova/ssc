@@ -38,6 +38,10 @@ public class GenericModel {
     private Object nine;
     private Object ten;
     private Object eleven;
+        private Object twelve;
+
+            private Object thirteen;
+
 
     public GenericModel(Object... args) {
         Field[] fields = getClass().getDeclaredFields();
@@ -113,5 +117,13 @@ public class GenericModel {
         return eleven;
     }
 
+
+    public Object getTwelve() {
+        return twelve;
+    }
+
+    public Object getThirteen() {
+        return thirteen;
+    }
 
 }

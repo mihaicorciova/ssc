@@ -174,7 +174,7 @@ public class DataProviderImplHelper {
         return result;
     }
 
-    public static List<DailyData> getListOfDay(String userName,Map<String,User> userData, DateTime dateTime,LocalTime time, Set<String> excludedGates){
+    public static List<DailyData> getListOfDay(String userName,Map<String,User> userData, DateTime dateTime,LocalTime time, Set<String> excludedGates,  Map<String, Map<String, ShiftData>> shiftData){
         List<DailyData> result = new ArrayList();
         final List<Event> events=userData.get(userName).getEvents();
         Collections.sort(events, Comparator.comparing(Event::getEventDateTime));
@@ -206,8 +206,51 @@ public class DataProviderImplHelper {
 
                 }
                 Long pause = entry.getKey().getValue().getMillis() - entry.getKey().getKey().getMillis() - duration;
+      Long overtime = 0l;
+                    Long latetime = 0l;
+                    Long earlytime = 0l;
+                    if (shiftData.containsKey(userId)) {
+                        final Map<String, ShiftData> shiftDataMapForUser = shiftData.get(userId);
+                        if (shiftDataMapForUser.containsKey(dateTime.toString(dtf3))) {
 
-                result.add(new DailyData(userId, dateTime, entry.getKey().getKey().toString(dtf), entry.getKey().getValue().toString(dtf), 0,  duration, pause, 0, 0, new ArrayList<>(),aditional));
+                            ShiftData shiftDataInCurrentDate = shiftDataMapForUser.get(dateTime.toString(dtf3));
+                            if (shiftDataInCurrentDate.getShiftId().equals("0")) {
+                                if (shiftDataInCurrentDate.isHasOvertime()) {
+                                    overtime = duration;
+                                }
+                            } else {
+                                LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
+                                LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
+                                long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
+                                long dailyHours = officialEnd.isAfter(officialStart)
+                                        ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
+                                        : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
+                                if (shiftDataInCurrentDate.isHasOvertime()) {
+                                    
+                                    if (pause > dailyPause) {
+                                        overtime = duration - dailyHours + dailyPause;
+                                    } else {
+                                        overtime = duration + pause - dailyHours;
+                                        duration = duration - (dailyPause - pause) > 0 ? duration - (dailyPause - pause) : 0;
+                                        pause = dailyPause;
+                                    }
+                                } else {
+                                    if (duration < dailyHours-dailyPause) {
+                                        overtime = duration - dailyHours+dailyPause;
+                                    }
+                                }
+                                if(entry.getKey().getValue().isAfter(dateTime.plusDays(1)))
+                                {
+                                    earlytime = entry.getKey().getValue().getSecondOfDay() +24*3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+
+                                } else {
+                                    earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+                                }
+                                latetime = entry.getKey().getKey().getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (entry.getKey().getKey().getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
+                            }
+                        }
+                    }
+                result.add(new DailyData(userId, dateTime, entry.getKey().getKey().toString(dtf), entry.getKey().getValue().toString(dtf), earlytime,  duration, pause, overtime, latetime, new ArrayList<>(),aditional));
 
 
             }

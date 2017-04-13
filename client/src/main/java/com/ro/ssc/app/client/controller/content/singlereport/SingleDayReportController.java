@@ -28,6 +28,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
@@ -41,6 +42,8 @@ public class SingleDayReportController implements Initializable {
     private static final Logger log = LoggerFactory.getLogger(SingleDayReportController.class);
     private static final String ALL = "all";
     private DateTime iniDate;
+    private DateTime endDate;
+
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
     private final org.joda.time.format.DateTimeFormatter dtf = DateTimeFormat.forPattern("dd-MM-yyyy");
     private final org.joda.time.format.DateTimeFormatter dtf2 = DateTimeFormat.forPattern("MM-yyyy");
@@ -50,6 +53,8 @@ public class SingleDayReportController implements Initializable {
     private Button exportButton;
     @FXML
     private DatePicker iniDatePicker;
+    @FXML
+    private DatePicker endDatePicker;
 
     @FXML
     private TableView singleReportTableView;
@@ -61,7 +66,7 @@ public class SingleDayReportController implements Initializable {
     private TableColumn<GenericModel, Object> nameTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> workTimeTableColumn;
- @FXML
+    @FXML
     private TableColumn<GenericModel, Object> depTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> entryTimeTableColumn;
@@ -69,8 +74,16 @@ public class SingleDayReportController implements Initializable {
     private TableColumn<GenericModel, Object> exitTimeTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> innertimeTableColumn;
-   // @FXML
-   //private TableColumn<GenericModel, Object> overtimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> overtimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> absenceTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> lateTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> earlyTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> dateTableColumn;
 
     /**
      * Initializes the controller class.
@@ -85,7 +98,7 @@ public class SingleDayReportController implements Initializable {
         if (!DataProviderImpl.getInstance()
                 .getUserData().isEmpty()) {
 
-iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStartOfDay();
+            iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStartOfDay();
 
             iniDatePicker.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -96,6 +109,14 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
                 }
             });
 
+            endDatePicker.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(final ActionEvent e) {
+
+                    endDate = DateTime.parse(endDatePicker.getValue().format(formatter), dtf);
+                    populateMyTable();
+                }
+            });
             departmentChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 
                 @Override
@@ -106,50 +127,52 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
 
             departmentChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getDepartments()));
 
-         
             log.debug("Date " + iniDate.toString());
             if (iniDate != null) {
                 iniDatePicker.setValue(LocalDate.parse(iniDate.toString(dtf), formatter));
             }
-              populateMyTable();
+            populateMyTable();
         }
- 
+
     }
 
     public void populateMyTable() {
 
         nameTableColumn.setCellValueFactory(new PropertyValueFactory<>("one"));
         nameTableColumn.setCellFactory(new Callback<TableColumn<GenericModel, Object>, TableCell<GenericModel, Object>>() {
-        public TableCell call(TableColumn<GenericModel, Object> param) {
-            return new TableCell<GenericModel, Object>() {
+            public TableCell call(TableColumn<GenericModel, Object> param) {
+                return new TableCell<GenericModel, Object>() {
 
-                @Override
-                public void updateItem(Object item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (!isEmpty()) {
-                       
-                        // Get fancy and change color based on data
-                        if(DataProviderImpl.getInstance().getDepartments().contains(item.toString())) {
-                            log.debug(item.toString());
-                            this.setTextFill(Color.RED);
-                        }else{
-                        this.setTextFill(Color.BLACK);
+                    @Override
+                    public void updateItem(Object item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (!isEmpty()) {
+
+                            // Get fancy and change color based on data
+                            if (DataProviderImpl.getInstance().getDepartments().contains(item.toString())) {
+                                log.debug(item.toString());
+                                this.setTextFill(Color.RED);
+                            } else {
+                                this.setTextFill(Color.BLACK);
+                            }
+                            setText(item.toString());
                         }
-                        setText(item.toString());
                     }
-                }
-            };
-        }
-    });
+                };
+            }
+        });
         entryTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("two"));
         innertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("three"));
         exitTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("four"));
         workTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("five"));
         offTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("six"));
         totalTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("seven"));
-         depTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
-  //     overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
-
+        depTableColumn.setCellValueFactory(new PropertyValueFactory<>("eight"));
+        dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
+        overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
+        absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("eleven"));
+        earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
+        lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("thirteen"));
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -157,9 +180,12 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         exitTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         nameTableColumn.setStyle("-fx-alignment:CENTER;");
         innertimeTableColumn.setStyle("-fx-alignment:CENTER;");
- depTableColumn.setStyle("-fx-alignment:CENTER;");
- // overtimeTableColumn          .setStyle("-fx-alignment:CENTER;");
-
+        depTableColumn.setStyle("-fx-alignment:CENTER;");
+        overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
+        dateTableColumn.setStyle("-fx-alignment:CENTER;");
+        earlyTableColumn.setStyle("-fx-alignment:CENTER;");
+        lateTableColumn.setStyle("-fx-alignment:CENTER;");
+        absenceTableColumn.setStyle("-fx-alignment:CENTER;");
         Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1 = ((String) o1).replace("!", "").split(":");
             String[] s2 = ((String) o2).replace("!", "").split(":");
@@ -177,13 +203,34 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
         workTimeTableColumn.setComparator(timeComparator);
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
-//        overtimeTableColumn.setComparator(timeComparator);
+        overtimeTableColumn.setComparator(timeComparator);
+        earlyTableColumn.setComparator(timeComparator);
+        lateTableColumn.setComparator(timeComparator);
+        dateTableColumn.setComparator(dateComparator);
+        List<GenericModel> ll = new ArrayList();
+        if (endDate != null) {
+            log.debug("aici"+endDate.toString(dtf));
+            for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
+                ll.addAll(DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), date));
 
-      
-        List<GenericModel> ll = DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem()==null?null:departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate);
+            }
+        } else {
+
+            ll.addAll(DataProviderImpl.getInstance().getDaySpecificTableData(departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate));
+        }
         
-     //   ll.sort((o1,o2)->o1.getOne().toString().compareTo(o2.getOne().toString()));
-        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
+        List<GenericModel> result = new ArrayList<>();
+                    Map<String, List<GenericModel>> tm = new TreeMap();
+                    tm.putAll(ll.stream().collect(Collectors.groupingBy(o -> DataProviderImpl.getInstance().getDepartmentFromUser(DataProviderImpl.getInstance().getKeyFromUser(o.getOne().toString())))));
+                    for (Map.Entry<String, List<GenericModel>> d : tm.entrySet()) {
+
+                        List<GenericModel> r = new ArrayList<>();
+                        r = d.getValue();
+                        r.sort((o1, o2) -> o1.getOne().toString().compareTo(o2.getOne().toString()));
+                        result.addAll(r);
+                    }
+        //   ll.sort((o1,o2)->o1.getOne().toString().compareTo(o2.getOne().toString()));
+        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(result));
 
     }
 
@@ -191,7 +238,7 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
     private void exportTableToPPT() {
         String[] ext = {".xls"};
 
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLS files (*.xls)", Arrays.asList(ext), iniDate.toString(dtf2) , departmentChoiceBox.getSelectionModel().getSelectedItem()==null?"Toate Departamentele"+ "-"+iniDate.toString(dtf):departmentChoiceBox.getValue().toString()+ "-"+iniDate.toString(dtf));
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLS files (*.xls)", Arrays.asList(ext), iniDate.toString(dtf2), departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? "Toate Departamentele" + "-" + iniDate.toString(dtf) : departmentChoiceBox.getValue().toString() + "-" + iniDate.toString(dtf));
 
         if (file == null) {
             return;
@@ -213,17 +260,20 @@ iniDate = DataProviderImpl.getInstance().getPossibleDateEnd(ALL).withTimeAtStart
                     content[rowNo][5] = (String) tableData.getFive();
                     content[rowNo][6] = (String) tableData.getSix();
                     content[rowNo][7] = (String) tableData.getSeven();
-//                                        content[rowNo][8] = (String) tableData.getNine();
+                    content[rowNo][8] = (String) tableData.getNine();
+                    content[rowNo][9] = (String) tableData.getTen();
+                    content[rowNo][10] = (String) tableData.getEleven();
+                    content[rowNo][11] = (String) tableData.getTwelve();
+                    content[rowNo][12] = (String) tableData.getThirteen();
 
                     rowNo++;
                 }
                 return content;
             }
         };
-        
-            pptExporter.exportTableToXls(singleReportTableView, file, "Raport zilnic " , departmentChoiceBox.getSelectionModel().getSelectedItem()==null?"":departmentChoiceBox.getSelectionModel().getSelectedItem().toString() , iniDatePicker.getValue().format(formatter));
-            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
-        
+
+        pptExporter.exportTableToXls(singleReportTableView, file, "Raport zilnic ", departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? "" : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDatePicker.getValue().format(formatter));
+        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");
 
     }
 

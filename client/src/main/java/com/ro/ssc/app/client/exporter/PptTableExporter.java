@@ -189,13 +189,18 @@ public abstract class PptTableExporter {
 
             for (int i = 0; i <= colNo; i++) {
 
-                if(i<colNo) {
+                if(i<colNo-5) {
                     HSSFCell cell = row.createCell(i);
                     cell.setCellValue(fxTable.getColumns().get(i).getText());
-                }else
+                }else if(i==colNo)
                 {
-                    HSSFCell cell = row.createCell(i);
+                    HSSFCell cell = row.createCell(i-5);
                     cell.setCellValue("Penalizari");
+                }
+                else
+                {
+                  HSSFCell cell = row.createCell(i+1);
+                    cell.setCellValue(fxTable.getColumns().get(i).getText());
                 }
             }
             CellStyle cellStyle = wb.createCellStyle();
@@ -223,7 +228,7 @@ public abstract class PptTableExporter {
                         cell.setCellStyle(cellStyle);
                         cell.setCellValue("00:00");
                     }
-                    else{
+                    else if (col<8){
                          HSSFFont font = wb.createFont();
                         
                          cellStyle.setFont(font);
@@ -232,6 +237,11 @@ public abstract class PptTableExporter {
                         
                         
                 }
+                    else if(col>8)
+                    {
+                        cell.setCellStyle(cellStyle);
+                        cell.setCellValue(content[r - 6][col-1]);  
+                    }
                 }
 
                 for (int col = 99; col < 103; col++) {
