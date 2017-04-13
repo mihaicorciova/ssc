@@ -69,7 +69,6 @@ public class DataProviderImplHelper {
         Map<DateTime, List<Event>> wrongPerDay;
         Set<String> usedDates = new HashSet<>();
         String userId = userData.get(userName).getUserId().trim();
-        log.debug(userName+" "+userData.get(userName).getUserId()+" "+userData.get(userName).getUserNo());
 
         if (Configuration.IS_EXPIRED.getAsBoolean()) {
             eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), iniDate, endDate);

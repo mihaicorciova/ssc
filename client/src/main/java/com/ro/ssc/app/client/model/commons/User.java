@@ -21,7 +21,7 @@ public class User {
 
     public User(String name, String userId, String cardNo, String department, List<Event> events) {
         this.name = name;
-        this.userId = "";
+        this.userId = userId;
         this.userNo = userId;
         this.cardNo = cardNo;
         this.events = events;

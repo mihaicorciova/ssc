@@ -80,7 +80,7 @@ public class ExcelReader {
 
                         } else {
                             String i = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().contains(".") ? row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim().split("\\.")[0] : row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
-                            String user = row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim() + "#" + i;
+                            String user = WordUtils.capitalizeFully(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim()) + "#" + i;
                             if (row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")) {
                                 if (result.containsKey(user)) {
                                     events = result.get(user).getEvents();
@@ -99,7 +99,7 @@ public class ExcelReader {
                                     events = new ArrayList();
                                     events.add(new Event(DateTime.parse(row.getCell(ExcelEnum.TIMESTAMP.getAsInteger()).toString(), dtf), row.getCell(ExcelEnum.DESCRIPTION.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.ADDRESS.getAsInteger()).toString().trim(), row.getCell(ExcelEnum.PASSED.getAsInteger()).toString().trim().equals("1.0")));
                                     String id = row.getCell(ExcelEnum.USER_ID.getAsInteger()).toString().trim();
-                                    result.put(user, new User(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim(), id.contains(".") ? id.split("\\.")[0] : id, row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString().trim(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString().trim()), events));
+                                    result.put(user, new User(WordUtils.capitalizeFully(row.getCell(ExcelEnum.USER_NAME.getAsInteger()).toString().trim()), id.contains(".") ? id.split("\\.")[0] : id, row.getCell(ExcelEnum.CARD_NO.getAsInteger()).toString().trim(), WordUtils.capitalizeFully(row.getCell(ExcelEnum.DEPARTMENT.getAsInteger()).toString().trim()), events));
                                 }
                             }
                         }

@@ -71,7 +71,7 @@ public enum DataProviderImpl implements DataProvider {
                             try {
                                 if (entry.getValue().getName().contains("*")) {
 
-                                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName().toUpperCase(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
+                                    data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
                                 } else {
 
                                     data.add(new GenericModel(ev.getEventDateTime().toString(dtf2), ev.getEventDateTime().toString(dtf), entry.getValue().getName(), df.parse(entry.getValue().getCardNo()), entry.getValue().getDepartment(), ev.getAddr().contains("In") ? "Intrare" : "Iesire"));
@@ -133,7 +133,7 @@ public enum DataProviderImpl implements DataProvider {
                                     }
                                 }
 
-                                data.add(new GenericModel(entry.getValue().getName().toUpperCase(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration), formatMillis(tovertime), withWrongEv == true ? tabsent + "***" : tabsent + "", formatMillis(tlate) + "(" + tlaters + ")", formatMillis(tearly) + "(" + tearlys + ")", formatMillis(tundertime), formatMillis(tovertime - tundertime)));
+                                data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration), formatMillis(tovertime), withWrongEv == true ? tabsent + "***" : tabsent + "", formatMillis(tlate) + "(" + tlaters + ")", formatMillis(tearly) + "(" + tearlys + ")", formatMillis(tundertime), formatMillis(tovertime - tundertime)));
                             }
                         }
 
@@ -307,9 +307,10 @@ public enum DataProviderImpl implements DataProvider {
                 private void enrichUserData() {
 
                     File dir = new File(MDB_PATH);
+                    List<Set<String>> ls=  updateUserMap(dir.listFiles()[0]);
                     if (dir.exists()) {
-                        updateUserMap(dir.listFiles()[0]).get(0).stream().forEach(p -> {
-                            log.debug(p.toString());
+                      ls.get(0).stream().forEach(p -> {
+                           
                             String[] st=p.split("~");
                             String userId = st[1];
                             String userName =st[0];
@@ -317,10 +318,10 @@ public enum DataProviderImpl implements DataProvider {
                                 userData.get(userName).setUserId(userId);
                             }
                         });
-                        excludedGates = updateUserMap(dir.listFiles()[0]).get(1);
-                        excludedUsers = updateUserMap(dir.listFiles()[0]).get(2);
+                        excludedGates = ls.get(1);
+                        excludedUsers = ls.get(2);
                         shiftData = getShiftData(dir.listFiles()[0]);
-                        shiftData.entrySet().forEach(s->log.debug(s.getKey()+" "+s.getValue().entrySet().size()));
+                    //    shiftData.entrySet().forEach(s->log.debug(s.getKey()+" "+s.getValue().entrySet().size()));
                     }
                 }
 
@@ -433,7 +434,7 @@ public enum DataProviderImpl implements DataProvider {
                             final List<User> userList= entry.getValue();
                             userList.sort((Comparator.comparing(User::getName)));
                             for(User user: userList){
-                                result.add(user.getName()+"#"+user.getUserId());
+                                result.add(user.getName()+"#"+user.getUserNo());
                             }
                         }
                     }
