@@ -36,13 +36,13 @@ public interface DataProvider {
     
     public String getKeyFromUser(String user);
     
-    public List<String> getUsersDep(String department);
+    public List<String> getUsersDep(String department,int i);
 
     public List<String> getDepartments();
 
     public void saveMdbFile(File file);
 
-    public String getCellData(String u, DateTime ini, DateTime end, int ordinal);
+    public String getCellData(String u, DateTime ini, DateTime end, int ordinal, int shift);
 
     public String getDepartmentFromUser(String entry);
     

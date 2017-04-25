@@ -91,12 +91,14 @@ public class XlsTableExporter {
                 row = sheet.createRow(r);
 
                 // header
+        String idepartment = "";
 
                 if (department.equals("")) {
                     for (int col = 0; col <= colNo; col++) {
 
                         if (col == 0) {
-                            row.createCell(col).setCellValue(fxTable.getRowHeaders().get(r - 6));
+                           
+                                row.createCell(col).setCellValue(fxTable.getRowHeaders().get(r - 6));
                         } else {
                             row.createCell(col).setCellValue(fxTable.getRows().get(r - 6).get(col - 1).getText());
                         }

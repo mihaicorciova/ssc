@@ -322,7 +322,7 @@ public enum DataProviderImpl implements DataProvider {
                 }
 
                 @Override
-                public String getCellData(String u, DateTime ini, DateTime end, int ordinal) {
+                public String getCellData(String u, DateTime ini, DateTime end, int ordinal, int shift) {
 
                     Long tduration = 0L;
                     Long tpause = 0L;
@@ -364,7 +364,7 @@ public enum DataProviderImpl implements DataProvider {
                         }
 
                         if (day.getOverTime() > 0) {
-                            tovertime += day.getOverTime();
+                            tovertime += day.getOverTime() ;
                         } else {
                             tundertime += Math.abs(day.getOverTime());
                         }
@@ -372,11 +372,14 @@ public enum DataProviderImpl implements DataProvider {
 
                     if (!ini.equals(end)) {
                         if (ordinal == 1) {
+ return formatMillis2(tovertime-tundertime);
+                        }
+                        if (ordinal == 2) {
                             return formatMillis2(tduration + tpause);
-                        } else if (ordinal == 2) {
+                        } else if (ordinal == 3) {
                             return formatMillis2(tpause);
 
-                        } else if (ordinal == 3) {
+                        } else if (ordinal == 4) {
                             return formatMillis2(tduration);
 
                         }
@@ -394,8 +397,13 @@ public enum DataProviderImpl implements DataProvider {
                             for (DailyData dd : dailyList) {
                                 // log.debug(u+" "+ini+" "+dd.toString());
                                 if (dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())) {
-                                    String ot = dd.getOverTime() == 0 ? "" : "\n" + formatMillis2(dd.getOverTime());
-                                    return formatMillis2(dd.getWorkTime()) + "" + ot;
+                                    if (shift == 0) {
+                                       
+                                        return  formatMillis2(dd.getOverTime());
+                                    } else {
+                                        return formatMillis2(dd.getWorkTime());
+
+                                    }
                                 }
                             }
                         }
@@ -414,7 +422,7 @@ public enum DataProviderImpl implements DataProvider {
                 }
 
                 @Override
-                public List<String> getUsersDep(String department) {
+                public List<String> getUsersDep(String department, int i) {
 
                     List<String> result = new ArrayList<>();
                     Map<String, List<User>> tm = new TreeMap();
@@ -426,10 +434,21 @@ public enum DataProviderImpl implements DataProvider {
                             userList.sort((Comparator.comparing(User::getName)));
                             for (User user : userList) {
                                 result.add(user.getName() + "#" + user.getUserNo());
+                                if(i==1 && hasShiftData(user.getName() + "#" + user.getUserNo())){
+                                 result.add(user.getName() + "#" + user.getUserNo()+"$1");
+                                }
                             }
                         }
                     }
                     return result;
+                }
+
+                               private boolean hasShiftData(String user) {
+                    if (userData.containsKey(user)) {
+                        return shiftData.containsKey(userData.get(user).getUserId());
+                    } else {
+                        return false;
+                    }
                 }
 
             };

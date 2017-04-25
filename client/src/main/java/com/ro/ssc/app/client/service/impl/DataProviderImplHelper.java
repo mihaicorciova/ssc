@@ -123,7 +123,7 @@ public class DataProviderImplHelper {
                                         overtime = duration - dailyHours+dailyPause;
                                     }
                                 }
-                                if(entry.getKey().getValue().isAfter(date.plusDays(1)))
+                                if(entry.getKey().getValue().isAfter(date.plusDays(1))&& officialStart.isBefore(officialEnd))
                                 {
                                     earlytime = entry.getKey().getValue().getSecondOfDay() +24*3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
 
@@ -239,7 +239,7 @@ public class DataProviderImplHelper {
                                         overtime = duration - dailyHours+dailyPause;
                                     }
                                 }
-                                if(entry.getKey().getValue().isAfter(dateTime.plusDays(1)))
+                                if(entry.getKey().getValue().isAfter(dateTime.plusDays(1))&& officialStart.isBefore(officialEnd) )
                                 {
                                     earlytime = entry.getKey().getValue().getSecondOfDay() +24*3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
 

@@ -111,9 +111,8 @@ public class MonthlyReportController<T> implements Initializable {
         DirectoryChooser dc = new DirectoryChooser();
         File dir = dc.showDialog(exportButton.getContextMenu());
         DataImportImpl.getInstance().importData(dir);
-       
-populateMyTable();
-        
+
+        populateMyTable();
 
     }
 
@@ -159,42 +158,39 @@ populateMyTable();
     private GridBase getGridBase(String department, int p) {
 
         List<String> users = new ArrayList();
-        
-            users.addAll(DataProviderImpl.getInstance().getUsersDep(department));
-        
-        List<DateTime> dates = getDatesForMonth();
-        int i = 0;
 
-        final GridBase grid = new GridBase(users.size(), dates.size() + 4);
+        users.addAll(DataProviderImpl.getInstance().getUsersDep(department,1));
+System.out.println("aa"+users.size());
+        List<DateTime> dates = getDatesForMonth();
+       
+        final GridBase grid = new GridBase(users.size(), dates.size() + 5);
 
         grid.getColumnHeaders().clear();
         grid.getRowHeaders().clear();
-        String idepartment = "����";
 
         for (String entry : users) {
 
-       
-            if (!department.equals(DataProviderImpl.getInstance().getDepartmentFromUser(entry))) {
-                department = DataProviderImpl.getInstance().getDepartmentFromUser(entry);
-                grid.getRowHeaders().add(department);
+            if(entry.contains("$1")){
+                department = DataProviderImpl.getInstance().getDepartmentFromUser(entry.substring(0, entry.length()-2));
+              
             } else {
-                grid.getRowHeaders().add("");
+                department = DataProviderImpl.getInstance().getDepartmentFromUser(entry);
             }
-           
-            
-
+  grid.getRowHeaders().add(department);
         }
 
         for (int column = 0; column < grid.getColumnCount(); ++column) {
 
             if (column == 0) {
                 grid.getColumnHeaders().add("Nume");
-            } else if (column == grid.getColumnCount() - 3) {
+            } else if (column == grid.getColumnCount() - 4) {
                 grid.getColumnHeaders().add("Timp lucrat");
-            } else if (column == grid.getColumnCount() - 2) {
+            } else if (column == grid.getColumnCount() - 3) {
                 grid.getColumnHeaders().add("Timp pauza");
-            } else if (column == grid.getColumnCount() - 1) {
+            } else if (column == grid.getColumnCount() - 2) {
                 grid.getColumnHeaders().add("Timp total");
+            } else if (column == grid.getColumnCount() - 1) {
+                grid.getColumnHeaders().add("Timp suplimentar");
             } else {
                 grid.getColumnHeaders().add(dates.get(column - 1).toString(dtf2));
 
@@ -209,25 +205,34 @@ populateMyTable();
 
             for (int column = 0; column < grid.getColumnCount(); ++column) {
 
-                if(p==1){
-                if (column == 0) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row).split("#")[0]));
-                } else if (column == grid.getColumnCount() - 1) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1)));
-                } else if (column == grid.getColumnCount() - 2) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2)));
-                } else if (column == grid.getColumnCount() - 3) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3)));
-                } else {
-                    final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataProviderImpl.getInstance().getCellData(users.get(row), dates.get(column - 1), dates.get(column - 1), 0));
-                    list.add(cell);
+                if (p == 1) {
+                    
+                    if (column == 0) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row).split("#")[0]));
+                    } else if (column == grid.getColumnCount() - 1) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1,1)));
+                    } else if (column == grid.getColumnCount() - 2) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2,1)));
+                    } else if (column == grid.getColumnCount() - 3) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3,1)));
+                    }  else if (column == grid.getColumnCount() - 4) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 4,1)));
+                    }else {
+                         String user=users.get(row);
+                        if(user.contains("$1")){
+                        user=user.substring(0,user.length()-2);
+                        }
+                        final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                
+                                DataProviderImpl.getInstance().getCellData(user, dates.get(column - 1), dates.get(column - 1), 0,users.get(row).contains("$1")?0:1));
+                        list.add(cell);
+                    }
                 }
             }
-                }
             rows.add(list);
         }
         grid.setRows(rows);

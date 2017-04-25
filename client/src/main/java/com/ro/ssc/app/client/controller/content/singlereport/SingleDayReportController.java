@@ -171,8 +171,8 @@ public class SingleDayReportController implements Initializable {
         dateTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
         overtimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("eleven"));
-        earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
-        lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("thirteen"));
+        lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
+        earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("thirteen"));
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");

@@ -135,7 +135,7 @@ public class SingleReportController implements Initializable {
                 @Override
                 public void changed(ObservableValue observable, String oldValue, String newValue) {
                      userChoiceBox.getSelectionModel().selectedItemProperty().removeListener(cl); 
-                    userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsersDep(newValue)));
+                    userChoiceBox.setItems(FXCollections.observableArrayList(DataProviderImpl.getInstance().getUsersDep(newValue,0)));
                      userChoiceBox.getSelectionModel().selectedItemProperty().addListener(cl);
             userChoiceBox.getSelectionModel().selectFirst();
                 }
