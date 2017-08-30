@@ -395,7 +395,7 @@ public enum DataProviderImpl implements DataProvider {
                                 return formatMillis2(wt);
                             }
                             for (DailyData dd : dailyList) {
-                                // log.debug(u+" "+ini+" "+dd.toString());
+                                 log.debug("apel lunar"+u+" "+ini+" "+dd.toString());
                                 if (dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())) {
                                     if (shift == 0) {
                                        

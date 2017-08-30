@@ -70,14 +70,16 @@ public class DataProviderImplHelper {
         Set<String> usedDates = new HashSet<>();
         String userId = userData.get(userName).getUserId().trim();
 
-        if (Configuration.IS_EXPIRED.getAsBoolean()) {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), iniDate, endDate);
-            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), iniDate, endDate);
-        } else {
+        //aici schimb tipurile
+        
+//        if (Configuration.IS_EXPIRED.getAsBoolean()) {
+//            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), iniDate, endDate);
+//            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), iniDate, endDate);
+//        } else {
             eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), iniDate, endDate);
             wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), iniDate, endDate);
 
-        }
+      //  }
 
         for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
             final DateTime currentDateAsDateTime = date;
@@ -93,6 +95,8 @@ public class DataProviderImplHelper {
                     Long overtime = 0l;
                     Long latetime = 0l;
                     Long earlytime = 0l;
+                    DateTime start= entry.getKey().getKey();
+                    DateTime end =  entry.getKey().getValue();
                     if (shiftData.containsKey(userId)) {
                         final Map<String, ShiftData> shiftDataMapForUser = shiftData.get(userId);
                         if (shiftDataMapForUser.containsKey(currentDateAsDateTime.toString(dtf3))) {
@@ -105,6 +109,28 @@ public class DataProviderImplHelper {
                             } else {
                                 LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
                                 LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
+                                Long correction=0L;
+                                if(start.getMillisOfDay()<officialStart.toSecondOfDay()*1000){
+                                  if(start.getMillisOfDay()>officialStart.toSecondOfDay()*1000-Long.valueOf(shiftDataInCurrentDate.getShiftAdjustIn())*60*1000)      
+                                  {
+                                      log.debug("aici"+start.toString());
+                                 correction=correction+officialStart.toSecondOfDay()*1000-start.getMillisOfDay();
+                                 start= start.withMillisOfDay(officialStart.toSecondOfDay()*1000);
+                                
+                                 
+                                  log.debug("aici dupa"+start.toString());
+                                  }
+                                }
+                                if(end.getMillisOfDay()>officialEnd.toSecondOfDay()*1000)
+                                {
+                                   if(end.getMillisOfDay()<officialEnd.toSecondOfDay()*1000+Long.valueOf(shiftDataInCurrentDate.getShiftAdjustOut())*60*1000)      
+                                  {
+                                       correction=correction+end.getMillisOfDay()-officialEnd.toSecondOfDay()*1000;
+                                 end= end.withMillisOfDay(officialEnd.toSecondOfDay()*1000);
+                                
+                                  }
+                                }    
+                                     duration =duration -correction;   
                                 long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
                                 long dailyHours = officialEnd.isAfter(officialStart)
                                         ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
@@ -134,7 +160,7 @@ public class DataProviderImplHelper {
                             }
                         }
                     }
-                    result.add(new DailyData(userId, date, entry.getKey().getKey().toString(dtf), entry.getKey().getValue().toString(dtf), earlytime,  duration, pause, overtime, latetime, wrongPerDay.get(currentDateAsDateTime),""));
+                    result.add(new DailyData(userId, date,start.toString(dtf),end.toString(dtf), earlytime,  duration, pause, overtime, latetime, wrongPerDay.get(currentDateAsDateTime),""));
                     usedDates.add(currentDateAsDateTime.toString(dtf3));
                 }
                 
@@ -181,11 +207,9 @@ public class DataProviderImplHelper {
 
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
   String userId = userData.get(userName).getUserId().trim();
-        if (Configuration.IS_EXPIRED.getAsBoolean()) {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), dateTime.minusDays(1), dateTime.plusDays(1));
-        } else {
+      
             eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates,events).get(0), dateTime, dateTime);
-        }
+       
 
 
         for (Map.Entry<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> entry : eventsPerDay.entrySet()) {
@@ -209,6 +233,8 @@ public class DataProviderImplHelper {
       Long overtime = 0l;
                     Long latetime = 0l;
                     Long earlytime = 0l;
+                       DateTime start= entry.getKey().getKey();
+                    DateTime end =  entry.getKey().getValue();
                     if (shiftData.containsKey(userId)) {
                         final Map<String, ShiftData> shiftDataMapForUser = shiftData.get(userId);
                         if (shiftDataMapForUser.containsKey(dateTime.toString(dtf3))) {
@@ -221,6 +247,27 @@ public class DataProviderImplHelper {
                             } else {
                                 LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
                                 LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
+                                
+                                Long correction=0L;
+                                if(start.getMillisOfDay()<officialStart.toSecondOfDay()*1000){
+                                  if(start.getMillisOfDay()>officialStart.toSecondOfDay()*1000-Long.valueOf(shiftDataInCurrentDate.getShiftAdjustIn())*60*1000)      
+                                  {
+                                 correction=correction+officialStart.toSecondOfDay()*1000-start.getMillisOfDay();
+                                 start= start.withMillisOfDay(officialStart.toSecondOfDay()*1000);
+                                
+                                
+                                  }
+                                }
+                                if(end.getMillisOfDay()>officialEnd.toSecondOfDay()*1000)
+                                {
+                                   if(end.getMillisOfDay()<officialEnd.toSecondOfDay()*1000+Long.valueOf(shiftDataInCurrentDate.getShiftAdjustOut())*60*1000)      
+                                  {
+                                       correction=correction+end.getMillisOfDay()-officialEnd.toSecondOfDay()*1000;
+                                 end= end.withMillisOfDay(officialEnd.toSecondOfDay()*1000);
+                                
+                                  }
+                                }    
+                                     duration =duration -correction;  
                                 long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
                                 long dailyHours = officialEnd.isAfter(officialStart)
                                         ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
@@ -250,7 +297,7 @@ public class DataProviderImplHelper {
                             }
                         }
                     }
-                result.add(new DailyData(userId, dateTime, entry.getKey().getKey().toString(dtf), entry.getKey().getValue().toString(dtf), earlytime,  duration, pause, overtime, latetime, new ArrayList<>(),aditional));
+                result.add(new DailyData(userId, dateTime, start.toString(dtf), end.toString(dtf), earlytime,  duration, pause, overtime, latetime, new ArrayList<>(),aditional));
 
 
             }

@@ -84,7 +84,17 @@ public class MainController implements Initializable {
                 String content = Files.toString(file, Charsets.UTF_8);
                 try {
                     if (DateTime.parse(content, dtf).isBeforeNow()) {
-                        return;
+                        Optional<String> result = UiCommonTools.getInstance().showExpDialogStatus("Licenta Expirata", "Va rugam contactati vanzatorul softului pentru codul de deblocare ", TrialKeyGenerator.generateKey(DateTime.now().toString(dtf)));
+                        if (result.isPresent()) {
+                            if (TrialKeyValidator.decodeKey(result.get()).equals(Files.toString(file, Charsets.UTF_8).concat("0"))) {
+                                Files.write("NO_EXP", file, Charsets.UTF_8);
+
+                            } else {
+                                return;
+                            }
+                        } else {
+                            return;
+                        }
                     }
                 } catch (Exception e) {
                 }

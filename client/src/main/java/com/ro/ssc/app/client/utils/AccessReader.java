@@ -49,17 +49,15 @@ public class AccessReader {
             table = DatabaseBuilder.open(file).getTable("t_b_Consumer");
             cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable()) {
-                idMapping.add(WordUtils.capitalizeFully(String.format("%s",row.get("f_ConsumerName")).trim())+"#"+String.format("%s",row.get("f_ConsumerNO")).trim()+"~"+String.format("%s",row.get("f_ConsumerID")).trim());
-                
-                if(!String.format("%s",row.get("f_AttendEnabled")).contains("1"))
-                {
-                excludedUsers.add(WordUtils.capitalizeFully(String.format("%s", row.get("f_ConsumerName"))));
+                idMapping.add(WordUtils.capitalizeFully(String.format("%s", row.get("f_ConsumerName")).trim()) + "#" + String.format("%s", row.get("f_ConsumerNO")).trim() + "~" + String.format("%s", row.get("f_ConsumerID")).trim());
+
+                if (!String.format("%s", row.get("f_AttendEnabled")).contains("1")) {
+                    excludedUsers.add(WordUtils.capitalizeFully(String.format("%s", row.get("f_ConsumerName"))));
                 }
-                }
-            
+            }
 
         } catch (IOException ex) {
-          log.error("Exceptie", ex);
+            log.error("Exceptie", ex);
         }
 
         result.add(idMapping);
@@ -79,18 +77,33 @@ public class AccessReader {
 
             table = DatabaseBuilder.open(file).getTable("t_b_ShiftSet");
             Cursor cursor = CursorBuilder.createCursor(table);
-            shiftMap.put("0",new ShiftData("0", "weekend", "", "", "", true));
+            shiftMap.put("0", new ShiftData("0", "weekend", "", "", "", "", "", true));
             for (Row row : cursor.newIterable()) {
 
-                shiftMap.put(String.format("%s", row.get("f_ShiftID")).trim(), new ShiftData(String.format("%s", row.get("f_ShiftID")), String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[0] : String.format("%s", row.get("f_ShiftName")),
-                        String.format("%s", row.get("f_ShiftName")).contains(":") ? String.format("%s", row.get("f_ShiftName")).split(":")[1] : "0",
-                        String.format("%s", row.get("f_OnDuty1")), String.format("%s", row.get("f_OffDuty1")), String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
+                final String shiftId = String.format("%s", row.get("f_ShiftID")).trim();
+                final String shiftNameInitial = String.format("%s", row.get("f_ShiftName")).trim();
+                final String shiftName = shiftNameInitial.contains(":") ? 
+                        shiftNameInitial.split(":")[0] : shiftNameInitial.contains("#")?shiftNameInitial.split("#")[0]: 
+                        shiftNameInitial.contains("£")?shiftNameInitial.split("£")[0]:shiftNameInitial;
+                
+                
+                final String shiftPauseInitial = shiftNameInitial.contains(":") ? shiftNameInitial.split(":")[1] :"0";
+                final String shiftPause = shiftPauseInitial.contains("#") ? shiftPauseInitial.split("#")[0] :shiftPauseInitial.contains("£")?shiftPauseInitial.split("£")[0]:shiftPauseInitial;
+                final String shiftAdjust = shiftNameInitial.contains("#") ? shiftNameInitial.split("#")[1] : "0";
+                final String shiftAdjustIn = shiftAdjust.contains("£") ? shiftAdjust.split("£")[0] : shiftAdjust;
+                final String shiftAdjustOut = shiftNameInitial.contains("£") ? shiftNameInitial.split("£")[1] : "0";
+
+                final String onDuty = String.format("%s", row.get("f_OnDuty1"));
+                final String offDuty = String.format("%s", row.get("f_OffDuty1"));
+
+                shiftMap.put(shiftId, new ShiftData(shiftId, shiftName,
+                        shiftPause, onDuty, offDuty, shiftAdjustIn, shiftAdjustOut, String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
 
             }
 
             table = DatabaseBuilder.open(file).getTable("t_d_ShiftData");
             cursor = CursorBuilder.createCursor(table);
-        
+
             for (Row row : cursor.newIterable()) {
                 String userId = String.format("%s", row.get("f_ConsumerID")).trim();
 
@@ -117,9 +130,8 @@ public class AccessReader {
             }
 
         } catch (IOException ex) {
-          log.error("Exceptie", ex);
+            log.error("Exceptie", ex);
         }
-      
 
         return result;
     }
