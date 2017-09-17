@@ -23,10 +23,11 @@ public class DailyData {
     long pauseTime;
     long overTime;
     long lateTime;
-    List<Event> wrongEvents;
+     String absence;
     String additionalDetails;
+     
 
-    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, long earlyTime, long workTime, long pauseTime, long overTime, long lateTime, List<Event> wrongEvents, String additionalDetails) {
+    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, long earlyTime, long workTime, long pauseTime, long overTime, long lateTime, String absence, String additionalDetails) {
         this.userId = userId;
         this.date = date;
         this.firstInEvent = firstInEvent;
@@ -36,7 +37,7 @@ public class DailyData {
         this.pauseTime = pauseTime;
         this.overTime = overTime;
         this.lateTime = lateTime;
-        this.wrongEvents = wrongEvents;
+        this.absence = absence;
         this.additionalDetails = additionalDetails;
     }
 
@@ -112,13 +113,15 @@ public class DailyData {
         this.lastOutEvent = lastOutEvent;
     }
 
-    public List<Event> getWrongEvents() {
-        return wrongEvents;
+    public String getAbsence() {
+        return absence;
     }
 
-    public void setWrongEvents(List<Event> wrongEvents) {
-        this.wrongEvents = wrongEvents;
+    public void setAbsence(String absence) {
+        this.absence = absence;
     }
+
+ 
 
     public String getAdditionalDetails() {
         return additionalDetails;

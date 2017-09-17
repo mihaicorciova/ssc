@@ -59,251 +59,286 @@ public class DataProviderImplHelper {
 
     public static List<DailyData> getListPerDay(Map<String, User> userData, LocalTime time, Map<String, Map<String, ShiftData>> shiftData, Set<String> excludedGates, String userName, DateTime iniDate, DateTime endDate) {
         List<DailyData> result = new ArrayList();
-                 
-        if(userData.containsKey(userName)){
-            final List<Event> events=userData.get(userName).getEvents();
+
+        if (userData.containsKey(userName)) {
+            final List<Event> events = userData.get(userName).getEvents();
             Collections.sort(events, Comparator.comparing(Event::getEventDateTime));
 
+            Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
+            Map<DateTime, List<Event>> wrongPerDay;
+            Set<String> usedDates = new HashSet<>();
+            String userId = userData.get(userName).getUserId().trim();
 
-        Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
-        Map<DateTime, List<Event>> wrongPerDay;
-        Set<String> usedDates = new HashSet<>();
-        String userId = userData.get(userName).getUserId().trim();
-
-        //aici schimb tipurile
-        
+            //aici schimb tipurile
 //        if (Configuration.IS_EXPIRED.getAsBoolean()) {
-//            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), iniDate, endDate);
-//            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), iniDate, endDate);
+            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), iniDate, endDate);
+            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), iniDate, endDate);
 //        } else {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), iniDate, endDate);
-            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), iniDate, endDate);
+            ////      eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), iniDate, endDate);
+            //      wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), iniDate, endDate);
 
-      //  }
+            //  }
+            for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
+                final DateTime currentDateAsDateTime = date;
 
-        for (DateTime date = iniDate.withTimeAtStartOfDay(); date.isBefore(endDate.plusDays(1).withTimeAtStartOfDay()); date = date.plusDays(1)) {
-            final DateTime currentDateAsDateTime = date;
+                for (Map.Entry<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> entry : eventsPerDay.entrySet()) {
+                    if (entry.getKey().getKey().withTimeAtStartOfDay().isEqual(currentDateAsDateTime)) {
 
-            for (Map.Entry<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> entry : eventsPerDay.entrySet()) {
-                if (entry.getKey().getKey().withTimeAtStartOfDay().isEqual(currentDateAsDateTime)) {
+                        Long duration = 0l;
+                        for (Pair<Event, Event> pair : entry.getValue()) {
+                            duration = duration + pair.getValue().getEventDateTime().getMillis() - pair.getKey().getEventDateTime().getMillis();
+                        }
+                        Long pause = entry.getKey().getValue().getMillis() - entry.getKey().getKey().getMillis() - duration;
+                        Long overtime = 0l;
+                        Long latetime = 0l;
+                        Long earlytime = 0l;
+                        DateTime start = entry.getKey().getKey();
+                        DateTime end = entry.getKey().getValue();
+                        if (shiftData.containsKey(userId)) {
+                            final Map<String, ShiftData> shiftDataMapForUser = shiftData.get(userId);
+                            if (shiftDataMapForUser.containsKey(currentDateAsDateTime.toString(dtf3))) {
 
-                    Long duration = 0l;
-                    for (Pair<Event, Event> pair : entry.getValue()) {
-                        duration = duration + pair.getValue().getEventDateTime().getMillis() - pair.getKey().getEventDateTime().getMillis();
-                    }
-                    Long pause = entry.getKey().getValue().getMillis() - entry.getKey().getKey().getMillis() - duration;
-                    Long overtime = 0l;
-                    Long latetime = 0l;
-                    Long earlytime = 0l;
-                    DateTime start= entry.getKey().getKey();
-                    DateTime end =  entry.getKey().getValue();
-                    if (shiftData.containsKey(userId)) {
-                        final Map<String, ShiftData> shiftDataMapForUser = shiftData.get(userId);
-                        if (shiftDataMapForUser.containsKey(currentDateAsDateTime.toString(dtf3))) {
+                                ShiftData shiftDataInCurrentDate = shiftDataMapForUser.get(currentDateAsDateTime.toString(dtf3));
+                                if (shiftDataInCurrentDate.getShiftId().equals("0")) {
+                                    if (shiftDataInCurrentDate.isHasOvertime()) {
+                                        overtime = duration;
+                                    }
+                                } else {
+                                    LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
+                                    LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
+                                    Long correction = 0L;
+                                    if (start.getMillisOfDay() < officialStart.toSecondOfDay() * 1000) {
+                                        if (start.getMillisOfDay() > officialStart.toSecondOfDay() * 1000 - Long.valueOf(shiftDataInCurrentDate.getShiftAdjustIn()) * 60 * 1000) {
+                                            log.debug("aici" + start.toString());
+                                            correction = correction + officialStart.toSecondOfDay() * 1000 - start.getMillisOfDay();
+                                            start = start.withMillisOfDay(officialStart.toSecondOfDay() * 1000);
 
-                            ShiftData shiftDataInCurrentDate = shiftDataMapForUser.get(currentDateAsDateTime.toString(dtf3));
-                            if (shiftDataInCurrentDate.getShiftId().equals("0")) {
-                                if (shiftDataInCurrentDate.isHasOvertime()) {
-                                    overtime = duration;
-                                }
-                            } else {
-                                LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
-                                LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
-                                Long correction=0L;
-                                if(start.getMillisOfDay()<officialStart.toSecondOfDay()*1000){
-                                  if(start.getMillisOfDay()>officialStart.toSecondOfDay()*1000-Long.valueOf(shiftDataInCurrentDate.getShiftAdjustIn())*60*1000)      
-                                  {
-                                      log.debug("aici"+start.toString());
-                                 correction=correction+officialStart.toSecondOfDay()*1000-start.getMillisOfDay();
-                                 start= start.withMillisOfDay(officialStart.toSecondOfDay()*1000);
-                                
-                                 
-                                  log.debug("aici dupa"+start.toString());
-                                  }
-                                }
-                                if(end.getMillisOfDay()>officialEnd.toSecondOfDay()*1000)
-                                {
-                                   if(end.getMillisOfDay()<officialEnd.toSecondOfDay()*1000+Long.valueOf(shiftDataInCurrentDate.getShiftAdjustOut())*60*1000)      
-                                  {
-                                       correction=correction+end.getMillisOfDay()-officialEnd.toSecondOfDay()*1000;
-                                 end= end.withMillisOfDay(officialEnd.toSecondOfDay()*1000);
-                                
-                                  }
-                                }    
-                                     duration =duration -correction;   
-                                long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
-                                long dailyHours = officialEnd.isAfter(officialStart)
-                                        ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
-                                        : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
-                                if (shiftDataInCurrentDate.isHasOvertime()) {
-                                    
-                                    if (pause > dailyPause) {
-                                        overtime = duration - dailyHours + dailyPause;
+                                            log.debug("aici dupa" + start.toString());
+                                        }
+                                    }
+                                    if (end.getMillisOfDay() > officialEnd.toSecondOfDay() * 1000) {
+                                        if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 + Long.valueOf(shiftDataInCurrentDate.getShiftAdjustOut()) * 60 * 1000) {
+                                            correction = correction + end.getMillisOfDay() - officialEnd.toSecondOfDay() * 1000;
+                                            end = end.withMillisOfDay(officialEnd.toSecondOfDay() * 1000);
+
+                                        }
+                                    }
+                                    duration = duration - correction;
+                                    long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
+                                    long dailyHours = officialEnd.isAfter(officialStart)
+                                            ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
+                                            : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
+                                    if (shiftDataInCurrentDate.isHasOvertime()) {
+
+                                        if (pause > dailyPause) {
+                                            overtime = duration - dailyHours + dailyPause;
+                                        } else {
+                                            overtime = duration + pause - dailyHours;
+                                            duration = duration - (dailyPause - pause) > 0 ? duration - (dailyPause - pause) : 0;
+                                            pause = dailyPause;
+                                        }
                                     } else {
-                                        overtime = duration + pause - dailyHours;
-                                        duration = duration - (dailyPause - pause) > 0 ? duration - (dailyPause - pause) : 0;
-                                        pause = dailyPause;
+                                        if (duration < dailyHours - dailyPause) {
+                                            overtime = duration - dailyHours + dailyPause;
+                                        }
                                     }
-                                } else {
-                                    if (duration < dailyHours-dailyPause) {
-                                        overtime = duration - dailyHours+dailyPause;
-                                    }
-                                }
-                                if(entry.getKey().getValue().isAfter(date.plusDays(1))&& officialStart.isBefore(officialEnd))
-                                {
-                                    earlytime = entry.getKey().getValue().getSecondOfDay() +24*3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+                                    if (entry.getKey().getValue().isAfter(date.plusDays(1)) && officialStart.isBefore(officialEnd)) {
+                                        earlytime = entry.getKey().getValue().getSecondOfDay() + 24 * 3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
 
-                                } else {
-                                    earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+                                    } else {
+                                        earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+                                    }
+                                    latetime = entry.getKey().getKey().getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (entry.getKey().getKey().getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
                                 }
-                                latetime = entry.getKey().getKey().getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (entry.getKey().getKey().getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
                             }
                         }
+                        result.add(new DailyData(userId, date, start.toString(dtf), end.toString(dtf), earlytime, duration, pause, overtime, latetime, "", ""));
+                        usedDates.add(currentDateAsDateTime.toString(dtf3));
                     }
-                    result.add(new DailyData(userId, date,start.toString(dtf),end.toString(dtf), earlytime,  duration, pause, overtime, latetime, wrongPerDay.get(currentDateAsDateTime),""));
-                    usedDates.add(currentDateAsDateTime.toString(dtf3));
+
                 }
-                
-                
+
             }
 
-        }
+            for (String day : getNeededPresence(userData, shiftData, userName, iniDate, endDate)) {
 
-        for (String day : getNeededPresence(userData, shiftData, userName, iniDate, endDate)) {
-            
-            if (!usedDates.contains(day)) {
-                ShiftData shiftDataInCurrentDate= shiftData.get(userId).get(day);
-                         LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
-                                LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
-                                long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
-                                long dailyHours = officialEnd.isAfter(officialStart)
-                                        ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
-                                        : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
-                     
-                if (wrongPerDay.containsKey(DateTime.parse(day, dtf3))) {
-                    if (wrongPerDay.get(DateTime.parse(day, dtf3)).size() > 0) {
-                        String ev = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getEventDateTime().toString(dtf);
-                        Boolean isIn = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getAddr().contains("In");
+                if (!usedDates.contains(day)) {
+                    ShiftData shiftDataInCurrentDate = shiftData.get(userId).get(day);
+                    LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
+                    LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
+                    long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
+                    long dailyHours = officialEnd.isAfter(officialStart)
+                            ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
+                            : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
+                    String holiday = shiftDataInCurrentDate.getHoliday();
 
-                        result.add(new DailyData(userId, DateTime.parse(day, dtf3), isIn == true ? ev : "", isIn == false ? ev : "", 0, 0, 0, dailyPause-dailyHours, 0, wrongPerDay.get(DateTime.parse(day, dtf3)),""));
+                    if (!holiday.equals("")) {
+                        result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, 0, 0, holiday, ""));
+
                     } else {
-                        result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0,  0, 0, dailyPause-dailyHours, 0, new ArrayList<>(),""));
+                        if (wrongPerDay.containsKey(DateTime.parse(day, dtf3))) {
+                            if (wrongPerDay.get(DateTime.parse(day, dtf3)).size() > 0) {
+                                String ev = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getEventDateTime().toString(dtf);
+                                Boolean isIn = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getAddr().contains("In");
 
+                                result.add(new DailyData(userId, DateTime.parse(day, dtf3), isIn == true ? ev : "", isIn == false ? ev : "", 0, 0, 0, dailyPause - dailyHours, 0, "Da***", ""));
+                            } else {
+                                result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, dailyPause - dailyHours, 0, "Da", ""));
+
+                            }
+                        } else {
+                            result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, dailyPause - dailyHours, 0, "Da", ""));
+
+                        }
                     }
-                } else {
-                    result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0 , 0, 0, dailyPause-dailyHours, 0, new ArrayList<>(),""));
-
                 }
             }
-        }
         }
         return result;
     }
 
-    public static List<DailyData> getListOfDay(String userName,Map<String,User> userData, DateTime dateTime,LocalTime time, Set<String> excludedGates,  Map<String, Map<String, ShiftData>> shiftData){
+    public static List<DailyData> getListOfDay(String userName, Map<String, User> userData, DateTime dateTime, LocalTime time, Set<String> excludedGates, Map<String, Map<String, ShiftData>> shiftData) {
         List<DailyData> result = new ArrayList();
-        final List<Event> events=userData.get(userName).getEvents();
+        final List<Event> events = userData.get(userName).getEvents();
         Collections.sort(events, Comparator.comparing(Event::getEventDateTime));
 
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
-  String userId = userData.get(userName).getUserId().trim();
-      
-            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates,events).get(0), dateTime, dateTime);
-       
-
-
+        String userId = userData.get(userName).getUserId().trim();
+     Set<String> usedDates = new HashSet<>();
+        eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), dateTime, dateTime);
+        Map<DateTime,List<Event>> wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), dateTime, dateTime);
         for (Map.Entry<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> entry : eventsPerDay.entrySet()) {
             if (entry.getKey().getKey().withTimeAtStartOfDay().isEqual(dateTime)) {
-               
+
                 Long duration = 0l;
-                String aditional="";
+                String aditional = "";
                 for (Pair<Event, Event> pair : entry.getValue()) {
                     duration = duration + pair.getValue().getEventDateTime().getMillis() - pair.getKey().getEventDateTime().getMillis();
-                    if(!pair.getKey().getEventDateTime().equals(entry.getKey().getKey())) {
+                    if (!pair.getKey().getEventDateTime().equals(entry.getKey().getKey())) {
                         aditional = aditional + " in " + pair.getKey().getEventDateTime().toString(dtf) + "\n";
                     }
 
-                    if(!pair.getValue().getEventDateTime().equals(entry.getKey().getValue())) {
-                        aditional = aditional  +" out "+pair.getValue().getEventDateTime().toString(dtf) + "\n";
+                    if (!pair.getValue().getEventDateTime().equals(entry.getKey().getValue())) {
+                        aditional = aditional + " out " + pair.getValue().getEventDateTime().toString(dtf) + "\n";
                     }
-
 
                 }
                 Long pause = entry.getKey().getValue().getMillis() - entry.getKey().getKey().getMillis() - duration;
-      Long overtime = 0l;
-                    Long latetime = 0l;
-                    Long earlytime = 0l;
-                       DateTime start= entry.getKey().getKey();
-                    DateTime end =  entry.getKey().getValue();
-                    if (shiftData.containsKey(userId)) {
-                        final Map<String, ShiftData> shiftDataMapForUser = shiftData.get(userId);
-                        if (shiftDataMapForUser.containsKey(dateTime.toString(dtf3))) {
+                Long overtime = 0l;
+                Long latetime = 0l;
+                Long earlytime = 0l;
+                DateTime start = entry.getKey().getKey();
+                DateTime end = entry.getKey().getValue();
+                String holiday = "";
+                if (shiftData.containsKey(userId)) {
+                    final Map<String, ShiftData> shiftDataMapForUser = shiftData.get(userId);
+                    if (shiftDataMapForUser.containsKey(dateTime.toString(dtf3))) {
 
-                            ShiftData shiftDataInCurrentDate = shiftDataMapForUser.get(dateTime.toString(dtf3));
-                            if (shiftDataInCurrentDate.getShiftId().equals("0")) {
-                                if (shiftDataInCurrentDate.isHasOvertime()) {
-                                    overtime = duration;
+                        ShiftData shiftDataInCurrentDate = shiftDataMapForUser.get(dateTime.toString(dtf3));
+                        holiday = shiftDataInCurrentDate.getHoliday();
+                        if (shiftDataInCurrentDate.getShiftId().equals("0")) {
+                            if (shiftDataInCurrentDate.isHasOvertime()) {
+                                overtime = duration;
+                            }
+                        } else {
+                            LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
+                            LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
+
+                            Long correction = 0L;
+                            if (start.getMillisOfDay() < officialStart.toSecondOfDay() * 1000) {
+                                if (start.getMillisOfDay() > officialStart.toSecondOfDay() * 1000 - Long.valueOf(shiftDataInCurrentDate.getShiftAdjustIn()) * 60 * 1000) {
+                                    correction = correction + officialStart.toSecondOfDay() * 1000 - start.getMillisOfDay();
+                                    start = start.withMillisOfDay(officialStart.toSecondOfDay() * 1000);
+
+                                }
+                            }
+                            
+                            if(end.getHourOfDay()==0 && officialEnd.getHour()==23)
+                            {
+                             if (end.getMillisOfDay() +24*3600*1000>  officialEnd.toSecondOfDay() * 1000) {
+                                if (end.getMillisOfDay() +24*3600*1000 < officialEnd.toSecondOfDay() * 1000 + Long.valueOf(shiftDataInCurrentDate.getShiftAdjustOut()) * 60 * 1000) {
+                                    correction = correction + end.getMillisOfDay() +24*3600*1000 - officialEnd.toSecondOfDay() * 1000;
+                                    end = end.withMillisOfDay(officialEnd.toSecondOfDay() * 1000);
+
+                                }
+                            }
+                            }else{
+                            if (end.getMillisOfDay() >  officialEnd.toSecondOfDay() * 1000) {
+                                if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 + Long.valueOf(shiftDataInCurrentDate.getShiftAdjustOut()) * 60 * 1000) {
+                                    correction = correction + end.getMillisOfDay() - officialEnd.toSecondOfDay() * 1000;
+                                    end = end.withMillisOfDay(officialEnd.toSecondOfDay() * 1000);
+
+                                }
+                            }
+                            }
+                            duration = duration - correction;
+                            long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
+                            long dailyHours = officialEnd.isAfter(officialStart)
+                                    ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
+                                    : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
+                            if (shiftDataInCurrentDate.isHasOvertime()) {
+
+                                if (pause > dailyPause) {
+                                    overtime = duration - dailyHours + dailyPause;
+                                } else {
+                                    overtime = duration + pause - dailyHours;
+                                    duration = duration - (dailyPause - pause) > 0 ? duration - (dailyPause - pause) : 0;
+                                    pause = dailyPause;
                                 }
                             } else {
-                                LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
-                                LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
-                                
-                                Long correction=0L;
-                                if(start.getMillisOfDay()<officialStart.toSecondOfDay()*1000){
-                                  if(start.getMillisOfDay()>officialStart.toSecondOfDay()*1000-Long.valueOf(shiftDataInCurrentDate.getShiftAdjustIn())*60*1000)      
-                                  {
-                                 correction=correction+officialStart.toSecondOfDay()*1000-start.getMillisOfDay();
-                                 start= start.withMillisOfDay(officialStart.toSecondOfDay()*1000);
-                                
-                                
-                                  }
+                                if (duration < dailyHours - dailyPause) {
+                                    overtime = duration - dailyHours + dailyPause;
                                 }
-                                if(end.getMillisOfDay()>officialEnd.toSecondOfDay()*1000)
-                                {
-                                   if(end.getMillisOfDay()<officialEnd.toSecondOfDay()*1000+Long.valueOf(shiftDataInCurrentDate.getShiftAdjustOut())*60*1000)      
-                                  {
-                                       correction=correction+end.getMillisOfDay()-officialEnd.toSecondOfDay()*1000;
-                                 end= end.withMillisOfDay(officialEnd.toSecondOfDay()*1000);
-                                
-                                  }
-                                }    
-                                     duration =duration -correction;  
-                                long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
-                                long dailyHours = officialEnd.isAfter(officialStart)
-                                        ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
-                                        : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
-                                if (shiftDataInCurrentDate.isHasOvertime()) {
-                                    
-                                    if (pause > dailyPause) {
-                                        overtime = duration - dailyHours + dailyPause;
-                                    } else {
-                                        overtime = duration + pause - dailyHours;
-                                        duration = duration - (dailyPause - pause) > 0 ? duration - (dailyPause - pause) : 0;
-                                        pause = dailyPause;
-                                    }
-                                } else {
-                                    if (duration < dailyHours-dailyPause) {
-                                        overtime = duration - dailyHours+dailyPause;
-                                    }
-                                }
-                                if(entry.getKey().getValue().isAfter(dateTime.plusDays(1))&& officialStart.isBefore(officialEnd) )
-                                {
-                                    earlytime = entry.getKey().getValue().getSecondOfDay() +24*3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
-
-                                } else {
-                                    earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
-                                }
-                                latetime = entry.getKey().getKey().getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (entry.getKey().getKey().getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
                             }
+                            if (entry.getKey().getValue().isAfter(dateTime.plusDays(1)) && officialStart.isBefore(officialEnd)) {
+                                earlytime = entry.getKey().getValue().getSecondOfDay() + 24 * 3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+
+                            } else {
+                                earlytime = entry.getKey().getValue().getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - entry.getKey().getValue().getSecondOfDay()) : 0l;
+                            }
+                            latetime = entry.getKey().getKey().getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (entry.getKey().getKey().getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
                         }
-                    }
-                result.add(new DailyData(userId, dateTime, start.toString(dtf), end.toString(dtf), earlytime,  duration, pause, overtime, latetime, new ArrayList<>(),aditional));
-
-
+                         usedDates.add(dateTime.toString(dtf3));
+                    }                            
+                }
+                            result.add(new DailyData(userId, dateTime, start.toString(dtf), end.toString(dtf), earlytime, duration, pause, overtime, latetime, "", aditional));
             }
+
         }
 
+         for (String day : getNeededPresence(userData, shiftData, userName, dateTime, dateTime)) {
 
+                if (!usedDates.contains(day)) {
+                    ShiftData shiftDataInCurrentDate = shiftData.get(userId).get(day);
+                    LocalTime officialStart = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftStartHour()));
+                    LocalTime officialEnd = LocalTime.from(dtf4.parse(shiftDataInCurrentDate.getShiftEndHour()));
+                    long dailyPause = Long.valueOf(shiftDataInCurrentDate.getShiftBreakTime()) * 1000 * 60l;
+                    long dailyHours = officialEnd.isAfter(officialStart)
+                            ? 1000 * (officialEnd.toSecondOfDay() - officialStart.toSecondOfDay())
+                            : 1000 * (officialEnd.toSecondOfDay() + (24 * 60 * 60 - officialStart.toSecondOfDay()));
+                    String holiday = shiftDataInCurrentDate.getHoliday();
+
+                    if (!holiday.equals("")) {
+                        result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, 0, 0, holiday, ""));
+
+                    } else {
+                        if (wrongPerDay.containsKey(DateTime.parse(day, dtf3))) {
+                            if (wrongPerDay.get(DateTime.parse(day, dtf3)).size() > 0) {
+                                String ev = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getEventDateTime().toString(dtf);
+                                Boolean isIn = wrongPerDay.get(DateTime.parse(day, dtf3)).get(0).getAddr().contains("In");
+
+                                result.add(new DailyData(userId, DateTime.parse(day, dtf3), isIn == true ? ev : "", isIn == false ? ev : "", 0, 0, 0, dailyPause - dailyHours, 0, "Da***", ""));
+                            } else {
+                                result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, dailyPause - dailyHours, 0, "Da", ""));
+
+                            }
+                        } else {
+                            result.add(new DailyData(userId, DateTime.parse(day, dtf3), "", "", 0, 0, 0, dailyPause - dailyHours, 0, "Da", ""));
+
+                        }
+                    }
+                }
+            }
         return result;
     }
 

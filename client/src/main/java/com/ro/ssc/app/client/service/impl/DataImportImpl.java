@@ -46,7 +46,7 @@ public enum DataImportImpl implements DataImport {
                   //  System.out.println(u+" "+date+" "+dai.size());
                     if(dai.size()>1)
                     {
-                                        System.out.println(u+" "+date+" "+dai.get(0));
+                                     
                                    return dd.stream().filter(d -> d.getUserId().equals(u) && d.getAdditionalDetails().equals(department)&& d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).get(1);
 
 
@@ -62,11 +62,7 @@ public enum DataImportImpl implements DataImport {
                     if (dd.isEmpty()) {
                         return false;
                     } else {
-                        if(department.contains("Vaho"))
-                        {
-                           System.out.println(user+" "+date+" "+ dd.stream().filter(d -> d.getUserId().equals(user) && d.getAdditionalDetails().equals(department) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay())).collect(Collectors.toList()).size());
-                 
-                        }
+                       
                         return dd.stream().anyMatch(d -> d.getUserId().equals(user) && d.getDate().withTimeAtStartOfDay().equals(date.withTimeAtStartOfDay()) && d.getAdditionalDetails().equals(department));
                     }
                 }

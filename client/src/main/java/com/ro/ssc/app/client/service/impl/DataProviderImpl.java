@@ -116,8 +116,8 @@ public enum DataProviderImpl implements DataProvider {
                                         tearlys++;
                                     }
                                     tearly += day.getEarlyTime();
-                                    if (day.getFirstInEvent().equals("") || day.getLastOutEvent().equals("")) {
-                                        if (day.getWrongEvents().size() > 0) {
+                                    if (day.getAbsence().contains("Da")) {
+                                        if (day.getAbsence().contains("**")) {
                                             withWrongEv = true;
                                         }
 
@@ -153,16 +153,8 @@ public enum DataProviderImpl implements DataProvider {
                         List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, user, iniDate, endDate);
                         for (DailyData day : dailyList) {
 
-                            int absent = 0;
-
-                            if (day.getFirstInEvent().equals("") || day.getLastOutEvent().equals("")) {
-                                if (day.getWrongEvents().size() > 0) {
-                                    absent = 2;
-                                } else {
-                                    absent = 1;
-                                }
-                            }
-                            data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()), formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime())));
+                            data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()),
+                                            formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), day.getAbsence(), formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime())));
                         }
                     }
 
@@ -182,14 +174,10 @@ public enum DataProviderImpl implements DataProvider {
                                 for (DailyData d : dd) {
                                     int absent = 0;
 
-                                    if (d.getFirstInEvent().equals("") || d.getLastOutEvent().equals("")) {
-                                        if (d.getWrongEvents().size() > 0) {
-                                            absent = 2;
-                                        } else {
-                                            absent = 1;
-                                        }
-                                    }
-                                    data.add(new GenericModel(entry.getValue().getName(), d.getFirstInEvent(), d.getAdditionalDetails(), d.getLastOutEvent(), formatMillis2(d.getWorkTime()), formatMillis2(d.getPauseTime()), formatMillis2(d.getWorkTime() + d.getPauseTime()), entry.getValue().getDepartment(), d.getDate().toString(dtf2), formatMillis(d.getOverTime()), absent == 2 ? "Da***" : absent == 1 ? "Da" : "", formatMillis(d.getLateTime()), formatMillis(d.getEarlyTime())));
+                                    data.add(new GenericModel(entry.getValue().getName(), d.getFirstInEvent(), d.getAdditionalDetails(), d.getLastOutEvent(),
+                                                    formatMillis2(d.getWorkTime()), formatMillis2(d.getPauseTime()), formatMillis2(d.getWorkTime() + d.getPauseTime()),
+                                                    entry.getValue().getDepartment(), d.getDate().toString(dtf2),
+                                                    formatMillis(d.getOverTime()), d.getAbsence(), formatMillis(d.getLateTime()), formatMillis(d.getEarlyTime())));
                                 }
                             }
                         }
@@ -346,14 +334,7 @@ public enum DataProviderImpl implements DataProvider {
                             tearlys++;
                         }
                         tearly += day.getEarlyTime();
-                        if (day.getFirstInEvent().equals("") || day.getLastOutEvent().equals("")) {
-                            if (day.getWrongEvents().size() > 0) {
-                                withWrongEv = true;
-                            }
 
-                            tabsent++;
-
-                        }
                         if (DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), day.getDate())) {
                             final DailyData da = DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), day.getDate());
                             tduration += da.getWorkTime();
@@ -364,7 +345,7 @@ public enum DataProviderImpl implements DataProvider {
                         }
 
                         if (day.getOverTime() > 0) {
-                            tovertime += day.getOverTime() ;
+                            tovertime += day.getOverTime();
                         } else {
                             tundertime += Math.abs(day.getOverTime());
                         }
@@ -372,7 +353,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     if (!ini.equals(end)) {
                         if (ordinal == 1) {
- return formatMillis2(tovertime-tundertime);
+                            return formatMillis2(tovertime - tundertime);
                         }
                         if (ordinal == 2) {
                             return formatMillis2(tduration + tpause);
@@ -395,14 +376,16 @@ public enum DataProviderImpl implements DataProvider {
                                 return formatMillis2(wt);
                             }
                             for (DailyData dd : dailyList) {
-                                 log.debug("apel lunar"+u+" "+ini+" "+dd.toString());
+                                log.debug("apel lunar" + u + " " + ini + " " + dd.toString());
                                 if (dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())) {
                                     if (shift == 0) {
-                                       
-                                        return  formatMillis2(dd.getOverTime());
-                                    } else {
-                                        return formatMillis2(dd.getWorkTime());
 
+                                        return formatMillis2(dd.getOverTime());
+                                    } else {
+                                        if (dd.getWorkTime() == 0 && !dd.getAbsence().isEmpty() && !dd.getAbsence().contains("Da")) {
+                                            return dd.getAbsence().substring(0, 1);
+                                        }
+                                        return formatMillis2(dd.getWorkTime());
                                     }
                                 }
                             }
@@ -434,8 +417,8 @@ public enum DataProviderImpl implements DataProvider {
                             userList.sort((Comparator.comparing(User::getName)));
                             for (User user : userList) {
                                 result.add(user.getName() + "#" + user.getUserNo());
-                                if(i==1 && hasShiftData(user.getName() + "#" + user.getUserNo())){
-                                 result.add(user.getName() + "#" + user.getUserNo()+"$1");
+                                if (i == 1 && hasShiftData(user.getName() + "#" + user.getUserNo())) {
+                                    result.add(user.getName() + "#" + user.getUserNo() + "$1");
                                 }
                             }
                         }
@@ -443,7 +426,7 @@ public enum DataProviderImpl implements DataProvider {
                     return result;
                 }
 
-                               private boolean hasShiftData(String user) {
+                private boolean hasShiftData(String user) {
                     if (userData.containsKey(user)) {
                         return shiftData.containsKey(userData.get(user).getUserId());
                     } else {

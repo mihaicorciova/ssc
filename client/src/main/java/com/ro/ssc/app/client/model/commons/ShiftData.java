@@ -16,11 +16,12 @@ public class ShiftData {
     private String shiftBreakTime;
     private String shiftStartHour;
     private String shiftEndHour;
-      private String shiftAdjustIn;
+    private String shiftAdjustIn;
     private String shiftAdjustOut;
+    private String holiday;
     private boolean hasOvertime;
 
-    public ShiftData(String shiftId, String shiftName, String shiftBreakTime, String shiftStartHour, String shiftEndHour, String shiftAdjustIn, String shiftAdjustOut, boolean hasOvertime) {
+   public ShiftData(String shiftId, String shiftName, String shiftBreakTime, String shiftStartHour, String shiftEndHour, String shiftAdjustIn, String shiftAdjustOut, boolean hasOvertime) {
         this.shiftId = shiftId;
         this.shiftName = shiftName;
         this.shiftBreakTime = shiftBreakTime;
@@ -29,8 +30,30 @@ public class ShiftData {
         this.shiftAdjustIn = shiftAdjustIn;
         this.shiftAdjustOut = shiftAdjustOut;
         this.hasOvertime = hasOvertime;
+        this.holiday="";
     }
 
+   public ShiftData(ShiftData shiftData, String holiday) {
+        this.shiftId = shiftData.getShiftId();
+        this.shiftName = shiftData.getShiftName();
+        this.shiftBreakTime = shiftData.getShiftBreakTime();
+        this.shiftStartHour = shiftData.getShiftStartHour();
+        this.shiftEndHour = shiftData.getShiftEndHour();
+        this.shiftAdjustIn = shiftData.getShiftAdjustIn();
+        this.shiftAdjustOut = shiftData.getShiftAdjustOut();
+        this.hasOvertime = shiftData.isHasOvertime();
+        this.holiday=holiday;
+    }
+   
+    public String getHoliday() {
+        return holiday;
+    }
+
+    public void setHoliday(String holyday) {
+        this.holiday = holyday;
+    }
+
+   
    
     public String getShiftAdjustIn() {
         return shiftAdjustIn;
@@ -100,6 +123,8 @@ public class ShiftData {
 
     @Override
     public String toString() {
-        return "ShiftData{" + "shiftId=" + shiftId + ", shiftName=" + shiftName + ", shiftBreakTime=" + shiftBreakTime + ", shiftStartHour=" + shiftStartHour + ", shiftEndHour=" + shiftEndHour + '}';
+        return "ShiftData{" + "shiftId=" + shiftId + ", shiftName=" + shiftName + ", shiftBreakTime=" + shiftBreakTime + ", shiftStartHour=" + shiftStartHour + ", shiftEndHour=" + shiftEndHour + ", shiftAdjustIn=" + shiftAdjustIn + ", shiftAdjustOut=" + shiftAdjustOut + ", holiday=" + holiday + ", hasOvertime=" + hasOvertime + '}';
     }
+
+   
 }
