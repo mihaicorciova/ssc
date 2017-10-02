@@ -383,7 +383,7 @@ public enum DataProviderImpl implements DataProvider {
                                         return formatMillis2(dd.getOverTime());
                                     } else {
                                         if (dd.getWorkTime() == 0 && !dd.getAbsence().isEmpty() && !dd.getAbsence().contains("Da")) {
-                                            return dd.getAbsence().substring(0, 1);
+                                            return dd.getAbsence().substring(0, 7);
                                         }
                                         return formatMillis2(dd.getWorkTime());
                                     }

@@ -15,20 +15,18 @@ public class ShiftData {
     private String shiftName;
     private String shiftBreakTime;
     private String shiftStartHour;
+    private ShiftCorrection sc; 
     private String shiftEndHour;
-    private String shiftAdjustIn;
-    private String shiftAdjustOut;
     private String holiday;
     private boolean hasOvertime;
 
-   public ShiftData(String shiftId, String shiftName, String shiftBreakTime, String shiftStartHour, String shiftEndHour, String shiftAdjustIn, String shiftAdjustOut, boolean hasOvertime) {
+   public ShiftData(String shiftId, String shiftName, String shiftBreakTime, String shiftStartHour, String shiftEndHour, ShiftCorrection sc, boolean hasOvertime) {
         this.shiftId = shiftId;
         this.shiftName = shiftName;
         this.shiftBreakTime = shiftBreakTime;
         this.shiftStartHour = shiftStartHour;
         this.shiftEndHour = shiftEndHour;
-        this.shiftAdjustIn = shiftAdjustIn;
-        this.shiftAdjustOut = shiftAdjustOut;
+        this.sc=sc;
         this.hasOvertime = hasOvertime;
         this.holiday="";
     }
@@ -39,8 +37,7 @@ public class ShiftData {
         this.shiftBreakTime = shiftData.getShiftBreakTime();
         this.shiftStartHour = shiftData.getShiftStartHour();
         this.shiftEndHour = shiftData.getShiftEndHour();
-        this.shiftAdjustIn = shiftData.getShiftAdjustIn();
-        this.shiftAdjustOut = shiftData.getShiftAdjustOut();
+        this.sc=sc;
         this.hasOvertime = shiftData.isHasOvertime();
         this.holiday=holiday;
     }
@@ -53,24 +50,17 @@ public class ShiftData {
         this.holiday = holyday;
     }
 
+    public ShiftCorrection getSc() {
+        return sc;
+    }
+
+    public void setSc(ShiftCorrection sc) {
+        this.sc = sc;
+    }
+
    
    
-    public String getShiftAdjustIn() {
-        return shiftAdjustIn;
-    }
-
-    public void setShiftAdjustIn(String shiftAdjustIn) {
-        this.shiftAdjustIn = shiftAdjustIn;
-    }
-
-    public String getShiftAdjustOut() {
-        return shiftAdjustOut;
-    }
-
-    public void setShiftAdjustOut(String shiftAdjustOut) {
-        this.shiftAdjustOut = shiftAdjustOut;
-    }
-
+ 
    
 
     public String getShiftId() {
@@ -123,8 +113,9 @@ public class ShiftData {
 
     @Override
     public String toString() {
-        return "ShiftData{" + "shiftId=" + shiftId + ", shiftName=" + shiftName + ", shiftBreakTime=" + shiftBreakTime + ", shiftStartHour=" + shiftStartHour + ", shiftEndHour=" + shiftEndHour + ", shiftAdjustIn=" + shiftAdjustIn + ", shiftAdjustOut=" + shiftAdjustOut + ", holiday=" + holiday + ", hasOvertime=" + hasOvertime + '}';
+        return "ShiftData{" + "shiftId=" + shiftId + ", shiftName=" + shiftName + ", shiftBreakTime=" + shiftBreakTime + ", shiftStartHour=" + shiftStartHour + ", sc=" + sc + ", shiftEndHour=" + shiftEndHour + ", holiday=" + holiday + ", hasOvertime=" + hasOvertime + '}';
     }
 
+    
    
 }

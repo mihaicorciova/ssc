@@ -68,7 +68,7 @@
                                       
                                         <TreeItem expanded="false" value="Raport Absente Individual">
                                         </TreeItem>   
-                                         <TreeItem expanded="false" value="Raport Zilnic">
+                                         <TreeItem expanded="false" value="Raport Periodic">
                                         </TreeItem>        
                                         <TreeItem expanded="false" value="Raport Lunar">
                                         </TreeItem>                                                     
@@ -83,11 +83,7 @@
                     <children>
                         <Label AnchorPane.leftAnchor="5.0" AnchorPane.bottomAnchor="85.0" text="Ora limita"/> 
                         <TextField fx:id="timeTextField" text="12:00" prefWidth="60.0"  AnchorPane.leftAnchor="75.0" AnchorPane.bottomAnchor="80.0" />
-                        <ImageView  fitHeight="70.0" fitWidth="113.0" layoutX="94.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="5.0">
-                            <image>
-                                <Image url="@/images/ssc.png" />
-                            </image>
-                        </ImageView>
+                        
                     </children>
                 </AnchorPane>
             </children>

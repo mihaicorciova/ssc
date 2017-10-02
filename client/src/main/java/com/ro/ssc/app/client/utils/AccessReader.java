@@ -10,6 +10,7 @@ import com.healthmarketscience.jackcess.CursorBuilder;
 import com.healthmarketscience.jackcess.DatabaseBuilder;
 import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
+import com.ro.ssc.app.client.model.commons.ShiftCorrection;
 import com.ro.ssc.app.client.model.commons.ShiftData;
 import java.io.File;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class AccessReader {
 
             table = DatabaseBuilder.open(file).getTable("t_b_ShiftSet");
             Cursor cursor = CursorBuilder.createCursor(table);
-            shiftMap.put("0", new ShiftData("0", "weekend", "", "", "", "", "", true));
+            shiftMap.put("0", new ShiftData("0", "weekend", "", "", "",new ShiftCorrection("", "", "", "", "", ""), true));
             for (Row row : cursor.newIterable()) {
 
                 final String shiftId = String.format("%s", row.get("f_ShiftID")).trim();
@@ -99,8 +100,13 @@ public class AccessReader {
                 final String onDuty = String.format("%s", row.get("f_OnDuty1"));
                 final String offDuty = String.format("%s", row.get("f_OffDuty1"));
 
+                final String onDuty2 = String.format("%s", row.get("f_OnDuty2"));
+                final String offDuty2 = String.format("%s", row.get("f_OffDuty2"));
+                final String onDuty3 = String.format("%s", row.get("f_OnDuty3"));
+                final String offDuty3 = String.format("%s", row.get("f_OffDuty3"));
                 shiftMap.put(shiftId, new ShiftData(shiftId, shiftName,
-                        shiftPause, onDuty, offDuty, shiftAdjustIn, shiftAdjustOut, String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
+                     shiftPause, onDuty==null?"":onDuty, offDuty=="null"?"":offDuty, new ShiftCorrection(shiftAdjustIn, shiftAdjustOut, onDuty2 ==null?"":onDuty2,offDuty2==null?"":offDuty2, onDuty3==null?"":onDuty3 ,offDuty3==null?"":offDuty3),String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
+      //shiftPause, onDuty==null?"":onDuty, offDuty=="null"?"":offDuty, new ShiftCorrection(shiftAdjustIn, shiftAdjustOut, "","","",""),String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
 
             }
 

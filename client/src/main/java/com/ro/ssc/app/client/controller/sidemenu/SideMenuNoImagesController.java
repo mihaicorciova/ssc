@@ -162,7 +162,7 @@ public class SideMenuNoImagesController implements Initializable {
                         java.util.logging.Logger.getLogger(SideMenuNoImagesController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     break;
-                case "Raport Zilnic":
+                case "Raport Periodic":
                     try {
                         mainController.handleDailyViewLaunch();
                     } catch (IOException ex) {
