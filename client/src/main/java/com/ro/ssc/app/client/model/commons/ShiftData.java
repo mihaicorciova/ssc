@@ -37,7 +37,7 @@ public class ShiftData {
         this.shiftBreakTime = shiftData.getShiftBreakTime();
         this.shiftStartHour = shiftData.getShiftStartHour();
         this.shiftEndHour = shiftData.getShiftEndHour();
-        this.sc=sc;
+        this.sc=shiftData.getSc();
         this.hasOvertime = shiftData.isHasOvertime();
         this.holiday=holiday;
     }
