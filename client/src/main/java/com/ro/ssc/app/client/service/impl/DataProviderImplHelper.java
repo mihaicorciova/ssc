@@ -72,8 +72,8 @@ public class DataProviderImplHelper {
                               
             //aici schimb tipurile
 //        if (Configuration.IS_EXPIRED.getAsBoolean()) {
-            eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), iniDate, endDate);
-            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), iniDate, endDate);
+            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), iniDate, endDate);
+            wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), iniDate, endDate);
 //        } else {
             ////      eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), iniDate, endDate);
             //      wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), iniDate, endDate);
@@ -222,8 +222,8 @@ public class DataProviderImplHelper {
         Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
         String userId = userData.get(userName).getUserId().trim();
         Set<String> usedDates = new HashSet<>();
-        eventsPerDay = splitPerDay(time, applyExcludeLogic(excludedGates, events).get(0), dateTime, dateTime);
-        Map<DateTime, List<Event>> wrongPerDay = splitPerDayWrong(time, applyExcludeLogic(excludedGates, events).get(1), dateTime, dateTime);
+        eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), dateTime, dateTime);
+        Map<DateTime, List<Event>> wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), dateTime, dateTime);
         for (Map.Entry<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> entry : eventsPerDay.entrySet()) {
             if (entry.getKey().getKey().withTimeAtStartOfDay().isEqual(dateTime)) {
 
