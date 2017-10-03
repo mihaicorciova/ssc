@@ -83,6 +83,8 @@ public class OverallReportController implements Initializable {
     private TableColumn<GenericModel, Object> lateTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> earlyTableColumn;
+      @FXML
+    private TableColumn<GenericModel, Object> nightTimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -191,7 +193,8 @@ public class OverallReportController implements Initializable {
         earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
         undertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
         allovertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("eleven"));
-
+    nightTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
+    
         earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -203,6 +206,8 @@ public class OverallReportController implements Initializable {
         overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
         undertimeTableColumn.setStyle("-fx-alignment:CENTER;");
         allovertimeTableColumn.setStyle("-fx-alignment:CENTER;");
+                nightTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+
 
         Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1 = ((String) o1).replace("!", "").split(":");
@@ -217,6 +222,7 @@ public class OverallReportController implements Initializable {
         overtimeTableColumn.setComparator(timeComparator);
    allovertimeTableColumn.setComparator(timeComparator);
         undertimeTableColumn.setComparator(timeComparator);
+        nightTimeTableColumn.setComparator(timeComparator);
         List<GenericModel> ll = DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString());
 
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));

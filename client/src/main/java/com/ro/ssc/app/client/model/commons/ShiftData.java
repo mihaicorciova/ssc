@@ -13,19 +13,16 @@ public class ShiftData {
 
     private String shiftId;
     private String shiftName;
-    private String shiftBreakTime;
-    private String shiftStartHour;
+   
     private ShiftCorrection sc; 
-    private String shiftEndHour;
+    private ShiftHours sh;
     private String holiday;
     private boolean hasOvertime;
 
-   public ShiftData(String shiftId, String shiftName, String shiftBreakTime, String shiftStartHour, String shiftEndHour, ShiftCorrection sc, boolean hasOvertime) {
+   public ShiftData(String shiftId, String shiftName, ShiftHours sh, ShiftCorrection sc, boolean hasOvertime) {
         this.shiftId = shiftId;
         this.shiftName = shiftName;
-        this.shiftBreakTime = shiftBreakTime;
-        this.shiftStartHour = shiftStartHour;
-        this.shiftEndHour = shiftEndHour;
+        this.sh=sh;
         this.sc=sc;
         this.hasOvertime = hasOvertime;
         this.holiday="";
@@ -34,9 +31,7 @@ public class ShiftData {
    public ShiftData(ShiftData shiftData, String holiday) {
         this.shiftId = shiftData.getShiftId();
         this.shiftName = shiftData.getShiftName();
-        this.shiftBreakTime = shiftData.getShiftBreakTime();
-        this.shiftStartHour = shiftData.getShiftStartHour();
-        this.shiftEndHour = shiftData.getShiftEndHour();
+        this.sh=shiftData.getSh();
         this.sc=shiftData.getSc();
         this.hasOvertime = shiftData.isHasOvertime();
         this.holiday=holiday;
@@ -79,29 +74,15 @@ public class ShiftData {
         this.shiftName = shiftName;
     }
 
-    public String getShiftBreakTime() {
-        return shiftBreakTime;
+    public ShiftHours getSh() {
+        return sh;
     }
 
-    public void setShiftBreakTime(String shiftBreakTime) {
-        this.shiftBreakTime = shiftBreakTime;
+    public void setSh(ShiftHours sh) {
+        this.sh = sh;
     }
 
-    public String getShiftStartHour() {
-        return shiftStartHour;
-    }
-
-    public void setShiftStartHour(String shiftStartHour) {
-        this.shiftStartHour = shiftStartHour;
-    }
-
-    public String getShiftEndHour() {
-        return shiftEndHour;
-    }
-
-    public void setShiftEndHour(String shiftEndHour) {
-        this.shiftEndHour = shiftEndHour;
-    }
+ 
 
     public boolean isHasOvertime() {
         return hasOvertime;
@@ -113,9 +94,10 @@ public class ShiftData {
 
     @Override
     public String toString() {
-        return "ShiftData{" + "shiftId=" + shiftId + ", shiftName=" + shiftName + ", shiftBreakTime=" + shiftBreakTime + ", shiftStartHour=" + shiftStartHour + ", sc=" + sc + ", shiftEndHour=" + shiftEndHour + ", holiday=" + holiday + ", hasOvertime=" + hasOvertime + '}';
+        return "ShiftData{" + "shiftId=" + shiftId + ", shiftName=" + shiftName + ", sc=" + sc + ", sh=" + sh + ", holiday=" + holiday + ", hasOvertime=" + hasOvertime + '}';
     }
 
+   
     
    
 }

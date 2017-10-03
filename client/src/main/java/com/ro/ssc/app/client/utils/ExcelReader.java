@@ -236,7 +236,7 @@ public class ExcelReader {
                                 wtime=-1;
                                 ptime=-1;
                             }
-                            final DailyData dai = new DailyData(WordUtils.capitalizeFully(user), DateTime.parse(date, dtf), row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), 0, wtime, ptime, 0, 0, "", dep);
+                            final DailyData dai = new DailyData(WordUtils.capitalizeFully(user), DateTime.parse(date, dtf), row.getCell(ExcelEnum2.IN.getAsInteger()).toString().trim(), row.getCell(ExcelEnum2.OUT.getAsInteger()).toString().trim(), 0, wtime, ptime, 0,0, 0, "", dep);
                             result.add(dai);
                         
 

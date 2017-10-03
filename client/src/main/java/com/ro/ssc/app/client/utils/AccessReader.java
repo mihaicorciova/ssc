@@ -12,6 +12,7 @@ import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
 import com.ro.ssc.app.client.model.commons.ShiftCorrection;
 import com.ro.ssc.app.client.model.commons.ShiftData;
+import com.ro.ssc.app.client.model.commons.ShiftHours;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -82,7 +83,7 @@ public class AccessReader {
 
             table = DatabaseBuilder.open(file).getTable("t_b_ShiftSet");
             Cursor cursor = CursorBuilder.createCursor(table);
-            shiftMap.put("0", new ShiftData("0", "weekend", "", "", "",new ShiftCorrection("", "", "", "", "", ""), true));
+            shiftMap.put("0", new ShiftData("0", "weekend", new ShiftHours("", "", "", "", ""), new ShiftCorrection("", "", "", "", "", ""), true));
             for (Row row : cursor.newIterable()) {
 
                 final String shiftId = String.format("%s", row.get("f_ShiftID")).trim();
@@ -104,9 +105,13 @@ public class AccessReader {
                 final String offDuty2 = String.format("%s", row.get("f_OffDuty2"));
                 final String onDuty3 = String.format("%s", row.get("f_OnDuty3"));
                 final String offDuty3 = String.format("%s", row.get("f_OffDuty3"));
+                final String onDuty4 = String.format("%s", row.get("f_OnDuty4"));
+                final String offDuty4 = String.format("%s", row.get("f_OffDuty4"));
+
+                final ShiftCorrection sc = new ShiftCorrection(shiftAdjustIn, shiftAdjustOut, onDuty2 == null ? "" : onDuty2, offDuty2 == null ? "" : offDuty2, onDuty3 == null ? "" : onDuty3, offDuty3 == null ? "" : offDuty3);
+                final ShiftHours sh = new ShiftHours(shiftPause, onDuty == null || onDuty.equals("null")? "" : onDuty, offDuty == null  || offDuty.equals("null")? "" : offDuty, onDuty4 == null  || onDuty4.equals("null") ? "" : onDuty4, offDuty4 == null  || offDuty4.equals("null")? "" : offDuty4);
                 shiftMap.put(shiftId, new ShiftData(shiftId, shiftName,
-                     shiftPause, onDuty==null?"":onDuty, offDuty=="null"?"":offDuty, new ShiftCorrection(shiftAdjustIn, shiftAdjustOut, onDuty2 ==null?"":onDuty2,offDuty2==null?"":offDuty2, onDuty3==null?"":onDuty3 ,offDuty3==null?"":offDuty3),String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
-      //shiftPause, onDuty==null?"":onDuty, offDuty=="null"?"":offDuty, new ShiftCorrection(shiftAdjustIn, shiftAdjustOut, "","","",""),String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
+                        sh, sc, String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
 
             }
 
@@ -170,11 +175,11 @@ public class AccessReader {
                             if (lMap.containsKey(userId)) {
                                 final Map<String, String> usd = lMap.get(userId);
                                 if (usd.containsKey(date)) {
-                                    result.get(userId).put(date,new ShiftData(result.get(userId).get(date),usd.get(date)));
+                                    result.get(userId).put(date, new ShiftData(result.get(userId).get(date), usd.get(date)));
                                 }
                             }
                             if (hMap.containsKey(date)) {
-                                result.get(userId).put(date,new ShiftData(result.get(userId).get(date),hMap.get(date)));
+                                result.get(userId).put(date, new ShiftData(result.get(userId).get(date), hMap.get(date)));
                             }
                         }
 
@@ -188,17 +193,17 @@ public class AccessReader {
                             if (lMap.containsKey(userId)) {
                                 final Map<String, String> usd = lMap.get(userId);
                                 if (usd.containsKey(date)) {
-                                     result.get(userId).put(date,new ShiftData(result.get(userId).get(date),usd.get(date)));
+                                    result.get(userId).put(date, new ShiftData(result.get(userId).get(date), usd.get(date)));
                                 }
                             }
                             if (hMap.containsKey(date)) {
-                                  result.get(userId).put(date,new ShiftData(result.get(userId).get(date),hMap.get(date)));
+                                result.get(userId).put(date, new ShiftData(result.get(userId).get(date), hMap.get(date)));
 
                             }
                         }
                     }
                 }
-                }
+            }
 
 //              table = DatabaseBuilder.open(file).getTable("t_d_ShiftData");
 //            cursor = CursorBuilder.createCursor(table);
@@ -263,12 +268,12 @@ public class AccessReader {
 //                    }
 //                }
 //            }
-                log.debug("aici");
-            }catch (IOException ex) {
+            log.debug("aici");
+        } catch (IOException ex) {
             log.error("Exceptie", ex);
         }
 
-            return result;
-        }
-
+        return result;
     }
+
+}

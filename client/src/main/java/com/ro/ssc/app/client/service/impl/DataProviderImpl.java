@@ -99,6 +99,7 @@ public enum DataProviderImpl implements DataProvider {
                                 Long tpause = 0L;
                                 Long tovertime = 0L;
                                 Long tundertime = 0l;
+                                   Long tnight = 0l;
                                 int tabsent = 0;
                                 int tlaters = 0;
                                 long tlate = 0;
@@ -124,6 +125,7 @@ public enum DataProviderImpl implements DataProvider {
                                         tabsent++;
 
                                     }
+                                    tnight +=day.getNightTime();
                                     tduration += day.getWorkTime();
                                     tpause += day.getPauseTime();
                                     if (day.getOverTime() > 0) {
@@ -133,7 +135,8 @@ public enum DataProviderImpl implements DataProvider {
                                     }
                                 }
 
-                                data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration), formatMillis(tovertime), withWrongEv == true ? tabsent + "***" : tabsent + "", formatMillis(tlate) + "(" + tlaters + ")", formatMillis(tearly) + "(" + tearlys + ")", formatMillis(tundertime), formatMillis(tovertime - tundertime)));
+                                data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration), 
+                                        formatMillis(tovertime), withWrongEv == true ? tabsent + "***" : tabsent + "", formatMillis(tlate) + "(" + tlaters + ")", formatMillis(tearly) + "(" + tearlys + ")", formatMillis(tundertime), formatMillis(tovertime - tundertime),formatMillis(tnight)));
                             }
                         }
 
@@ -154,7 +157,7 @@ public enum DataProviderImpl implements DataProvider {
                         for (DailyData day : dailyList) {
 
                             data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()),
-                                            formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), day.getAbsence(), formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime())));
+                                            formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), day.getAbsence(), formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime()),formatMillis(day.getNightTime())));
                         }
                     }
 
@@ -177,7 +180,7 @@ public enum DataProviderImpl implements DataProvider {
                                     data.add(new GenericModel(entry.getValue().getName(), d.getFirstInEvent(), d.getAdditionalDetails(), d.getLastOutEvent(),
                                                     formatMillis2(d.getWorkTime()), formatMillis2(d.getPauseTime()), formatMillis2(d.getWorkTime() + d.getPauseTime()),
                                                     entry.getValue().getDepartment(), d.getDate().toString(dtf2),
-                                                    formatMillis(d.getOverTime()), d.getAbsence(), formatMillis(d.getLateTime()), formatMillis(d.getEarlyTime())));
+                                                    formatMillis(d.getOverTime()), d.getAbsence(), formatMillis(d.getLateTime()), formatMillis(d.getEarlyTime()),formatMillis(d.getNightTime())));
                                 }
                             }
                         }
@@ -316,6 +319,7 @@ public enum DataProviderImpl implements DataProvider {
                     Long tpause = 0L;
                     Long tovertime = 0L;
                     Long tundertime = 0l;
+                    Long tnight =0l;
                     int tabsent = 0;
                     int tlaters = 0;
                     long tlate = 0;
@@ -376,7 +380,6 @@ public enum DataProviderImpl implements DataProvider {
                                 return formatMillis2(wt);
                             }
                             for (DailyData dd : dailyList) {
-                                log.debug("apel lunar" + u + " " + ini + " " + dd.toString());
                                 if (dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())) {
                                     if (shift == 0) {
 

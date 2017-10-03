@@ -21,13 +21,14 @@ public class DailyData {
     long earlyTime;
     long workTime;
     long pauseTime;
+    long nightTime;
     long overTime;
     long lateTime;
      String absence;
     String additionalDetails;
      
 
-    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, long earlyTime, long workTime, long pauseTime, long overTime, long lateTime, String absence, String additionalDetails) {
+    public DailyData(String userId, DateTime date, String firstInEvent, String lastOutEvent, long earlyTime, long workTime, long pauseTime, long nightTime,long overTime, long lateTime, String absence, String additionalDetails) {
         this.userId = userId;
         this.date = date;
         this.firstInEvent = firstInEvent;
@@ -35,6 +36,7 @@ public class DailyData {
         this.earlyTime = earlyTime;
         this.workTime = workTime;
         this.pauseTime = pauseTime;
+        this.nightTime= nightTime;
         this.overTime = overTime;
         this.lateTime = lateTime;
         this.absence = absence;
@@ -119,6 +121,14 @@ public class DailyData {
 
     public void setAbsence(String absence) {
         this.absence = absence;
+    }
+
+    public long getNightTime() {
+        return nightTime;
+    }
+
+    public void setNightTime(long nightTime) {
+        this.nightTime = nightTime;
     }
 
  

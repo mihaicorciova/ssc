@@ -59,6 +59,7 @@
                        
                       <TableColumn fx:id="offTimeTableColumn" prefWidth="87.0" text="Timp Pauza" />
                   <TableColumn fx:id="totalTimeTableColumn" prefWidth="75.0" text="Timp Total" />
+                  <TableColumn fx:id="nightTimeTableColumn" prefWidth="75.0" text="Ore noapte" />
                    <TableColumn fx:id="overtimeTableColumn" prefWidth="137.0" text="Ore suplimentare" />
                   <TableColumn fx:id="absenceTableColumn" prefWidth="75.0" text="Absente" />
                   <TableColumn fx:id="lateTableColumn" prefWidth="75.0" text="Intarzieri" />

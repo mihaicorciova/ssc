@@ -84,6 +84,8 @@ public class SingleDayReportController implements Initializable {
     private TableColumn<GenericModel, Object> earlyTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> dateTableColumn;
+      @FXML
+    private TableColumn<GenericModel, Object> nightTimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -173,6 +175,7 @@ public class SingleDayReportController implements Initializable {
         absenceTableColumn.setCellValueFactory(new PropertyValueFactory<>("eleven"));
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
         earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("thirteen"));
+         nightTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("fourteen"));
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -186,6 +189,7 @@ public class SingleDayReportController implements Initializable {
         earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         lateTableColumn.setStyle("-fx-alignment:CENTER;");
         absenceTableColumn.setStyle("-fx-alignment:CENTER;");
+          nightTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1 = ((String) o1).replace("!", "").split(":");
             String[] s2 = ((String) o2).replace("!", "").split(":");
@@ -199,7 +203,7 @@ public class SingleDayReportController implements Initializable {
             DateTime d2 = DateTime.parse((String) o2, format);
             return Long.compare(d1.getMillis(), d2.getMillis());
         };
-
+ nightTimeTableColumn.setComparator(timeComparator);
         workTimeTableColumn.setComparator(timeComparator);
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
