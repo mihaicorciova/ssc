@@ -158,12 +158,14 @@ public class OverallReportController implements Initializable {
                     content[rowNo][2] = (String) tableData.getThree();
                     content[rowNo][3] = (String) tableData.getFour();
                     content[rowNo][4] = (String) tableData.getFive();
-                    content[rowNo][5] = (String) tableData.getSix();
-                    content[rowNo][6] = (String) tableData.getTen();
-                    content[rowNo][7] = (String) tableData.getEleven();
-                    content[rowNo][8] = (String) tableData.getSeven();
-                    content[rowNo][9] = (String) tableData.getEight();
-                    content[rowNo][10] = (String) tableData.getNine();
+                    content[rowNo][5] = (String) tableData.getTwelve();
+                    content[rowNo][6] = (String) tableData.getSix();
+                    content[rowNo][7] = (String) tableData.getTen();
+                    content[rowNo][8] = (String) tableData.getEleven();
+                    content[rowNo][9] = (String) tableData.getSeven();
+                    content[rowNo][10] = (String) tableData.getEight();
+                    content[rowNo][11] = (String) tableData.getNine();
+
                     rowNo++;
                 }
                 return content;

@@ -265,11 +265,11 @@ public class SingleDayReportController implements Initializable {
                     content[rowNo][6] = (String) tableData.getSix();
                     content[rowNo][7] = (String) tableData.getSeven();
                     content[rowNo][8] = (String) tableData.getNine();
-                    content[rowNo][9] = (String) tableData.getTen();
-                    content[rowNo][10] = (String) tableData.getEleven();
-                    content[rowNo][11] = (String) tableData.getTwelve();
-                    content[rowNo][12] = (String) tableData.getThirteen();
-
+                    content[rowNo][9] = (String) tableData.getFourteen();
+                    content[rowNo][10] = (String) tableData.getTen();
+                    content[rowNo][11] = (String) tableData.getEleven();
+                    content[rowNo][12] = (String) tableData.getTwelve();
+                    content[rowNo][13] = (String) tableData.getThirteen();
                     rowNo++;
                 }
                 return content;

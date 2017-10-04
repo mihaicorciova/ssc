@@ -192,6 +192,7 @@ public class DataProviderImplHelper {
                                     latetime = start.getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (start.getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
 
                                     if (nightStart != null && nightEnd != null) {
+                                        if((officialStart.isAfter(officialEnd) && nightStart.isAfter(nightEnd)) || (officialStart.isBefore(officialEnd) && nightStart.isBefore(nightEnd))){
                                          if(officialStart.isBefore(nightStart) && officialEnd.isAfter(nightEnd)){
                                         if (start.getSecondOfDay() < nightStart.toSecondOfDay()) {
                                             if (end.getSecondOfDay() < nightEnd.toSecondOfDay()) {
@@ -210,7 +211,7 @@ public class DataProviderImplHelper {
                                             nighttime = nighttime + 24 * 1000 * 3600;
                                         }
                                     }
-                                    }
+                                    }}
                                 }
                             }
                         }
@@ -406,6 +407,7 @@ public class DataProviderImplHelper {
                             latetime = start.getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (start.getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
                             if (nightStart != null && nightEnd != null) {
                                 if(officialStart.isBefore(nightStart) && officialEnd.isAfter(nightEnd)){
+                                    if((officialStart.isAfter(officialEnd) && nightStart.isAfter(nightEnd)) || (officialStart.isBefore(officialEnd) && nightStart.isBefore(nightEnd))){
                                 if (start.getSecondOfDay() < nightStart.toSecondOfDay()) {
                                     if (end.getSecondOfDay() < nightEnd.toSecondOfDay()) {
                                         nighttime = end.getMillis() - nightStart.toSecondOfDay() * 1000l;
@@ -422,7 +424,7 @@ public class DataProviderImplHelper {
                                 if (nightEnd.isBefore(nightStart)) {
                                     nighttime = nighttime + 24 * 1000 * 3600;
                                 }
-                            }
+                            }}
                             }
                         }
                         usedDates.add(dateTime.toString(dtf3));

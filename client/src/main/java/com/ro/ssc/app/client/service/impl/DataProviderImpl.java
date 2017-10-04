@@ -338,12 +338,13 @@ public enum DataProviderImpl implements DataProvider {
                             tearlys++;
                         }
                         tearly += day.getEarlyTime();
-
+                        tnight +=day.getNightTime();
                         if (DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), day.getDate())) {
                             final DailyData da = DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), day.getDate());
                             tduration += da.getWorkTime();
                             tpause += da.getPauseTime();
                         } else {
+
                             tduration += day.getWorkTime();
                             tpause += day.getPauseTime();
                         }
@@ -357,14 +358,17 @@ public enum DataProviderImpl implements DataProvider {
 
                     if (!ini.equals(end)) {
                         if (ordinal == 1) {
-                            return formatMillis2(tovertime - tundertime);
+                            return formatMillis2(tnight);
                         }
                         if (ordinal == 2) {
+                            return formatMillis2(tovertime - tundertime);
+                        }
+                        if (ordinal == 3) {
                             return formatMillis2(tduration + tpause);
-                        } else if (ordinal == 3) {
+                        } else if (ordinal == 4) {
                             return formatMillis2(tpause);
 
-                        } else if (ordinal == 4) {
+                        } else if (ordinal == 5) {
                             return formatMillis2(tduration);
 
                         }

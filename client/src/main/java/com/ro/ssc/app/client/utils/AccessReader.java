@@ -108,7 +108,7 @@ public class AccessReader {
                 final String onDuty4 = String.format("%s", row.get("f_OnDuty4"));
                 final String offDuty4 = String.format("%s", row.get("f_OffDuty4"));
 
-                final ShiftCorrection sc = new ShiftCorrection(shiftAdjustIn, shiftAdjustOut, onDuty2 == null ? "" : onDuty2, offDuty2 == null ? "" : offDuty2, onDuty3 == null ? "" : onDuty3, offDuty3 == null ? "" : offDuty3);
+                final ShiftCorrection sc = new ShiftCorrection(shiftAdjustIn, shiftAdjustOut, onDuty2 == null || onDuty2.equals("null")? "" : onDuty2, offDuty2 == null || offDuty2.equals("null") ? "" : offDuty2, onDuty3 == null|| onDuty3.equals("null") ? "" : onDuty3, offDuty3  == null|| offDuty3.equals("null") ? "" : offDuty3);
                 final ShiftHours sh = new ShiftHours(shiftPause, onDuty == null || onDuty.equals("null")? "" : onDuty, offDuty == null  || offDuty.equals("null")? "" : offDuty, onDuty4 == null  || onDuty4.equals("null") ? "" : onDuty4, offDuty4 == null  || offDuty4.equals("null")? "" : offDuty4);
                 shiftMap.put(shiftId, new ShiftData(shiftId, shiftName,
                         sh, sc, String.format("%s", row.get("f_bOvertimeShift")).contains("1")));
