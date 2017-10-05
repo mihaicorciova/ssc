@@ -10,6 +10,7 @@ import com.ro.ssc.app.client.model.commons.DailyData;
 import com.ro.ssc.app.client.model.commons.Event;
 import com.ro.ssc.app.client.model.commons.ShiftData;
 import com.ro.ssc.app.client.model.commons.User;
+import com.ro.ssc.app.client.utils.Utils;
 import static com.ro.ssc.app.client.utils.Utils.applyExcludeLogic;
 import static com.ro.ssc.app.client.utils.Utils.applyExcludeLogic2;
 import static com.ro.ssc.app.client.utils.Utils.splitPerDay;
@@ -191,27 +192,41 @@ public class DataProviderImplHelper {
                                     }
                                     latetime = start.getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (start.getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
 
-                                    if (nightStart != null && nightEnd != null) {
-                                        if((officialStart.isAfter(officialEnd) && nightStart.isAfter(nightEnd)) || (officialStart.isBefore(officialEnd) && nightStart.isBefore(nightEnd))){
-                                         if(officialStart.isBefore(nightStart) && officialEnd.isAfter(nightEnd)){
-                                        if (start.getSecondOfDay() < nightStart.toSecondOfDay()) {
-                                            if (end.getSecondOfDay() < nightEnd.toSecondOfDay()) {
-                                                nighttime = end.getMillis() - nightStart.toSecondOfDay() * 1000l;
-                                            } else {
-                                                nighttime = nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
-                                            }
+                                  if (nightStart != null && nightEnd != null) {
+                                if (start.getSecondOfDay() < nightStart.toSecondOfDay()) {
+                                    if (end.getSecondOfDay() < nightEnd.toSecondOfDay()) {
+                                        if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
+                                            nighttime = end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
                                         } else {
-                                            if (start.getSecondOfDay() < nightEnd.toSecondOfDay()) {
-                                                nighttime = end.getMillisOfDay() - start.getMillisOfDay() * 1l;
-                                            } else {
-                                                nighttime = nightEnd.toSecondOfDay() * 1000l - start.getMillisOfDay();
-                                            }
+                                            nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
                                         }
-                                        if (nightEnd.isBefore(nightStart)) {
-                                            nighttime = nighttime + 24 * 1000 * 3600;
+                                    } else {
+                                        if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
+                                            nighttime = nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
+                                        } else {
+                                            nighttime = 24 * 3600 * 100 + nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
                                         }
                                     }
-                                    }}
+                                } else {
+                                    if (start.getSecondOfDay() < nightEnd.toSecondOfDay()) {
+                                        if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
+                                            if (end.getSecondOfDay() > start.getSecondOfDay()) {
+
+                                                nighttime = end.getMillisOfDay() - start.getMillisOfDay() * 1l;
+                                            } else {
+                                                nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                            }
+                                        } else {
+                                            if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
+                                                nighttime = nightEnd.toSecondOfDay() * 1000l - start.getMillisOfDay();
+                                            } else {
+                                                nighttime = 24 * 3600 * 100 +nightEnd.toSecondOfDay() *100l- nightStart.toSecondOfDay() * 1000l;
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
                                 }
                             }
                         }
@@ -398,6 +413,7 @@ public class DataProviderImplHelper {
                                     overtime = duration - dailyHours + dailyPause;
                                 }
                             }
+                            
                             if (end.isAfter(dateTime.plusDays(1)) && officialStart.isBefore(officialEnd)) {
                                 earlytime = end.getSecondOfDay() + 24 * 3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - end.getSecondOfDay()) : 0l;
 
@@ -406,33 +422,47 @@ public class DataProviderImplHelper {
                             }
                             latetime = start.getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (start.getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
                             if (nightStart != null && nightEnd != null) {
-                                if(officialStart.isBefore(nightStart) && officialEnd.isAfter(nightEnd)){
-                                    if((officialStart.isAfter(officialEnd) && nightStart.isAfter(nightEnd)) || (officialStart.isBefore(officialEnd) && nightStart.isBefore(nightEnd))){
                                 if (start.getSecondOfDay() < nightStart.toSecondOfDay()) {
                                     if (end.getSecondOfDay() < nightEnd.toSecondOfDay()) {
-                                        nighttime = end.getMillis() - nightStart.toSecondOfDay() * 1000l;
+                                        if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
+                                            nighttime = end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                        } else {
+                                            nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                        }
                                     } else {
-                                        nighttime = nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
+                                        if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
+                                            nighttime = nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
+                                        } else {
+                                            nighttime = 24 * 3600 * 100 + nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
+                                        }
                                     }
                                 } else {
                                     if (start.getSecondOfDay() < nightEnd.toSecondOfDay()) {
-                                        nighttime = end.getMillisOfDay() - start.getMillisOfDay() * 1l;
-                                    } else {
-                                        nighttime = nightEnd.toSecondOfDay() * 1000l - start.getMillisOfDay();
+                                        if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
+                                            if (end.getSecondOfDay() > start.getSecondOfDay()) {
+
+                                                nighttime = end.getMillisOfDay() - start.getMillisOfDay() * 1l;
+                                            } else {
+                                                nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                            }
+                                        } else {
+                                            if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
+                                                nighttime = nightEnd.toSecondOfDay() * 1000l - start.getMillisOfDay();
+                                            } else {
+                                                nighttime = 24 * 3600 * 100 +nightEnd.toSecondOfDay() *100l- nightStart.toSecondOfDay() * 1000l;
+                                            }
+                                        }
                                     }
+
                                 }
-                                if (nightEnd.isBefore(nightStart)) {
-                                    nighttime = nighttime + 24 * 1000 * 3600;
-                                }
-                            }}
                             }
+                            usedDates.add(dateTime.toString(dtf3));
                         }
-                        usedDates.add(dateTime.toString(dtf3));
                     }
                 }
-                result.add(new DailyData(userId, dateTime, start.toString(dtf), end.toString(dtf), earlytime, duration, pause, nighttime, overtime, latetime, "", aditional));
+                    result.add(new DailyData(userId, dateTime, start.toString(dtf), end.toString(dtf), earlytime, duration, pause, nighttime, overtime, latetime, "", aditional));
+                
             }
-
         }
 
         for (String day : getNeededPresence(userData, shiftData, userName, dateTime, dateTime)) {

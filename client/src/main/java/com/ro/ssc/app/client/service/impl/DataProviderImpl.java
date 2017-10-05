@@ -136,7 +136,7 @@ public enum DataProviderImpl implements DataProvider {
                                 }
 
                                 data.add(new GenericModel(entry.getValue().getName(), entry.getValue().getDepartment(), formatMillis(tduration), formatMillis(tpause), formatMillis(tpause + tduration), 
-                                        formatMillis(tovertime), withWrongEv == true ? tabsent + "***" : tabsent + "", formatMillis(tlate) + "(" + tlaters + ")", formatMillis(tearly) + "(" + tearlys + ")", formatMillis(tundertime), formatMillis(tovertime - tundertime),formatMillis(tnight)));
+                                        formatMillis(tovertime), withWrongEv == true ? tabsent + "***" : tabsent + "", formatMillis(tlate) + "(" + tlaters + ")", formatMillis(tearly) + "(" + tearlys + ")", formatMillis(tundertime), formatMillis(tovertime - tundertime),formatMillis(tnight),formatMillis(tduration-tnight)));
                             }
                         }
 

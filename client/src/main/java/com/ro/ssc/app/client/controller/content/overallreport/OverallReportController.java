@@ -83,8 +83,10 @@ public class OverallReportController implements Initializable {
     private TableColumn<GenericModel, Object> lateTableColumn;
     @FXML
     private TableColumn<GenericModel, Object> earlyTableColumn;
-      @FXML
+    @FXML
     private TableColumn<GenericModel, Object> nightTimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> dayTimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -159,13 +161,14 @@ public class OverallReportController implements Initializable {
                     content[rowNo][3] = (String) tableData.getFour();
                     content[rowNo][4] = (String) tableData.getFive();
                     content[rowNo][5] = (String) tableData.getTwelve();
-                    content[rowNo][6] = (String) tableData.getSix();
-                    content[rowNo][7] = (String) tableData.getTen();
-                    content[rowNo][8] = (String) tableData.getEleven();
-                    content[rowNo][9] = (String) tableData.getSeven();
-                    content[rowNo][10] = (String) tableData.getEight();
-                    content[rowNo][11] = (String) tableData.getNine();
 
+                    content[rowNo][6] = (String) tableData.getThirteen();
+                    content[rowNo][7] = (String) tableData.getSix();
+                    content[rowNo][8] = (String) tableData.getTen();
+                    content[rowNo][9] = (String) tableData.getEleven();
+                    content[rowNo][10] = (String) tableData.getSeven();
+                    content[rowNo][11] = (String) tableData.getEight();
+                    content[rowNo][12] = (String) tableData.getNine();
                     rowNo++;
                 }
                 return content;
@@ -195,8 +198,8 @@ public class OverallReportController implements Initializable {
         earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
         undertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
         allovertimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("eleven"));
-    nightTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
-    
+        nightTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
+        dayTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("thirteen"));
         earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -208,8 +211,8 @@ public class OverallReportController implements Initializable {
         overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
         undertimeTableColumn.setStyle("-fx-alignment:CENTER;");
         allovertimeTableColumn.setStyle("-fx-alignment:CENTER;");
-                nightTimeTableColumn.setStyle("-fx-alignment:CENTER;");
-
+        nightTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+        dayTimeTableColumn.setStyle("-fx-alignment:CENTER;");
 
         Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1 = ((String) o1).replace("!", "").split(":");
@@ -222,9 +225,10 @@ public class OverallReportController implements Initializable {
         totalTimeTableColumn.setComparator(timeComparator);
         offTimeTableColumn.setComparator(timeComparator);
         overtimeTableColumn.setComparator(timeComparator);
-   allovertimeTableColumn.setComparator(timeComparator);
+        allovertimeTableColumn.setComparator(timeComparator);
         undertimeTableColumn.setComparator(timeComparator);
         nightTimeTableColumn.setComparator(timeComparator);
+        dayTimeTableColumn.setComparator(timeComparator);
         List<GenericModel> ll = DataProviderImpl.getInstance().getOverallTableData(iniDate, endDate, departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? null : departmentChoiceBox.getSelectionModel().getSelectedItem().toString());
 
         overallReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
