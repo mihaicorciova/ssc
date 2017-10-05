@@ -86,6 +86,8 @@ public class SingleReportController implements Initializable {
     private TableColumn<GenericModel, Object> earlyTableColumn;
       @FXML
     private TableColumn<GenericModel, Object> nightTimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> dayTimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -174,7 +176,7 @@ public class SingleReportController implements Initializable {
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("nine"));
  earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("ten"));
          nightTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("eleven"));
- 
+        dayTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
     earlyTableColumn.setStyle("-fx-alignment:CENTER;");
         dateTableColumn.setStyle("-fx-alignment:CENTER;");
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -186,6 +188,7 @@ public class SingleReportController implements Initializable {
         lateTableColumn.setStyle("-fx-alignment:CENTER;");
         overtimeTableColumn.setStyle("-fx-alignment:CENTER;");
   nightTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+  dayTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         Comparator timeComparator=(Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1= ((String) o1).replace("!", "").split(":");
              String[] s2= ((String) o2).replace("!", "").split(":");
@@ -205,6 +208,7 @@ public class SingleReportController implements Initializable {
         offTimeTableColumn.setComparator(timeComparator);
          nightTimeTableColumn.setComparator(timeComparator);
         dateTableColumn.setComparator(dateComparator);
+        dayTimeTableColumn.setComparator(timeComparator);
         log.debug("DAte "+iniDate.toString());
         List<GenericModel> ll=DataProviderImpl.getInstance().getUserSpecificTableData(userChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate, endDate);
        singleReportTableView.getItems().setAll(FXCollections.observableArrayList(ll));
@@ -238,10 +242,11 @@ public class SingleReportController implements Initializable {
                     content[rowNo][4] = (String) tableData.getFive();
                     content[rowNo][5] = (String) tableData.getSix();
                       content[rowNo][6] = (String) tableData.getEleven();
-                    content[rowNo][7] = (String) tableData.getSeven();
-                    content[rowNo][8] = (String) tableData.getEight();
-                    content[rowNo][9] = (String) tableData.getNine();
-                    content[rowNo][10] = (String) tableData.getTen();
+                    content[rowNo][7] = (String) tableData.getTwelve();
+                    content[rowNo][8] = (String) tableData.getSeven();
+                    content[rowNo][9] = (String) tableData.getEight();
+                    content[rowNo][10] = (String) tableData.getNine();
+                    content[rowNo][11] = (String) tableData.getTen();
                   
                     rowNo++;
                 }

@@ -41,6 +41,7 @@ public class GenericModel {
     private Object twelve;
     private Object thirteen;
     private Object fourteen;
+    private Object fifteen;
 
     public GenericModel(Object... args) {
         Field[] fields = getClass().getDeclaredFields();
@@ -128,7 +129,8 @@ public class GenericModel {
     public Object getFourteen() {
         return fourteen;
     }
-    
-    
 
+    public Object getFifteen() {
+        return fifteen;
+    }
 }
