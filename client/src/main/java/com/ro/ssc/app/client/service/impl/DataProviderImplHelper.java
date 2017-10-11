@@ -21,6 +21,7 @@ import java.util.*;
 
 import javafx.util.Pair;
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -192,41 +193,20 @@ public class DataProviderImplHelper {
                                     }
                                     latetime = start.getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (start.getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
 
-                                  if (nightStart != null && nightEnd != null) {
-                                if (start.getSecondOfDay() < nightStart.toSecondOfDay()) {
-                                    if (end.getSecondOfDay() < nightEnd.toSecondOfDay()) {
-                                        if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
-                                            nighttime = end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
-                                        } else {
-                                            nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                    if (nightStart != null && nightEnd != null  && start.isBefore(end)) {
+
+                                        final DateTime ns = start.withMillisOfDay(nightStart.toSecondOfDay() * 1000);
+                                        DateTime ne = start.withMillisOfDay(nightStart.toSecondOfDay() * 1000);
+                                        if (nightStart.toSecondOfDay() > nightEnd.toSecondOfDay()) {
+                                            ne = ne.plusDays(1);
                                         }
-                                    } else {
-                                        if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
-                                            nighttime = nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
-                                        } else {
-                                            nighttime = 24 * 3600 * 100 + nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
+
+                                        Interval interval = new Interval(start, end);
+                                        Interval interval2 = new Interval(ns, ne);
+                                        if (interval.overlaps(interval2)) {
+                                            nighttime = interval.overlap(interval2).toDurationMillis();
                                         }
                                     }
-                                } else {
-                                    if (start.getSecondOfDay() < nightEnd.toSecondOfDay()) {
-                                        if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
-                                            if (end.getSecondOfDay() > start.getSecondOfDay()) {
-
-                                                nighttime = end.getMillisOfDay() - start.getMillisOfDay() * 1l;
-                                            } else {
-                                                nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
-                                            }
-                                        } else {
-                                            if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
-                                                nighttime = nightEnd.toSecondOfDay() * 1000l - start.getMillisOfDay();
-                                            } else {
-                                                nighttime = 24 * 3600 * 100 +nightEnd.toSecondOfDay() *100l- nightStart.toSecondOfDay() * 1000l;
-                                            }
-                                        }
-                                    }
-
-                                }
-                            }
                                 }
                             }
                         }
@@ -413,7 +393,7 @@ public class DataProviderImplHelper {
                                     overtime = duration - dailyHours + dailyPause;
                                 }
                             }
-                            
+
                             if (end.isAfter(dateTime.plusDays(1)) && officialStart.isBefore(officialEnd)) {
                                 earlytime = end.getSecondOfDay() + 24 * 3600 < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - end.getSecondOfDay()) : 0l;
 
@@ -421,7 +401,7 @@ public class DataProviderImplHelper {
                                 earlytime = end.getSecondOfDay() < officialEnd.toSecondOfDay() ? 1000 * (officialEnd.toSecondOfDay() - end.getSecondOfDay()) : 0l;
                             }
                             latetime = start.getSecondOfDay() > officialStart.toSecondOfDay() ? 1000 * (start.getSecondOfDay() - officialStart.toSecondOfDay()) : 0l;
-                            if (nightStart != null && nightEnd != null) {
+                            if (nightStart != null && nightEnd != null && start.isAfter(end) && start.isBefore(end)) {
                                 if (start.getSecondOfDay() < nightStart.toSecondOfDay()) {
                                     if (end.getSecondOfDay() < nightEnd.toSecondOfDay()) {
                                         if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
@@ -449,7 +429,7 @@ public class DataProviderImplHelper {
                                             if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
                                                 nighttime = nightEnd.toSecondOfDay() * 1000l - start.getMillisOfDay();
                                             } else {
-                                                nighttime = 24 * 3600 * 100 +nightEnd.toSecondOfDay() *100l- nightStart.toSecondOfDay() * 1000l;
+                                                nighttime = 24 * 3600 * 100 + nightEnd.toSecondOfDay() * 100l - nightStart.toSecondOfDay() * 1000l;
                                             }
                                         }
                                     }
@@ -460,8 +440,8 @@ public class DataProviderImplHelper {
                         }
                     }
                 }
-                    result.add(new DailyData(userId, dateTime, start.toString(dtf), end.toString(dtf), earlytime, duration, pause, nighttime, overtime, latetime, "", aditional));
-                
+                result.add(new DailyData(userId, dateTime, start.toString(dtf), end.toString(dtf), earlytime, duration, pause, nighttime, overtime, latetime, "", aditional));
+
             }
         }
 
