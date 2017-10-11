@@ -86,6 +86,8 @@ public class SingleDayReportController implements Initializable {
     private TableColumn<GenericModel, Object> dateTableColumn;
       @FXML
     private TableColumn<GenericModel, Object> nightTimeTableColumn;
+    @FXML
+    private TableColumn<GenericModel, Object> dayTimeTableColumn;
 
     /**
      * Initializes the controller class.
@@ -176,6 +178,7 @@ public class SingleDayReportController implements Initializable {
         lateTableColumn.setCellValueFactory(new PropertyValueFactory<>("twelve"));
         earlyTableColumn.setCellValueFactory(new PropertyValueFactory<>("thirteen"));
          nightTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("fourteen"));
+         dayTimeTableColumn.setCellValueFactory(new PropertyValueFactory<>("fifteen"));
         workTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         offTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         entryTimeTableColumn.setStyle("-fx-alignment:CENTER;");
@@ -190,6 +193,7 @@ public class SingleDayReportController implements Initializable {
         lateTableColumn.setStyle("-fx-alignment:CENTER;");
         absenceTableColumn.setStyle("-fx-alignment:CENTER;");
           nightTimeTableColumn.setStyle("-fx-alignment:CENTER;");
+          dayTimeTableColumn.setStyle("-fx-alignment:CENTER;");
         Comparator timeComparator = (Comparator<Object>) (Object o1, Object o2) -> {
             String[] s1 = ((String) o1).replace("!", "").split(":");
             String[] s2 = ((String) o2).replace("!", "").split(":");
@@ -211,6 +215,7 @@ public class SingleDayReportController implements Initializable {
         earlyTableColumn.setComparator(timeComparator);
         lateTableColumn.setComparator(timeComparator);
         dateTableColumn.setComparator(dateComparator);
+        dayTimeTableColumn.setComparator(dateComparator);
         List<GenericModel> ll = new ArrayList();
         if (endDate != null) {
             log.debug("aici"+endDate.toString(dtf));
@@ -266,10 +271,11 @@ public class SingleDayReportController implements Initializable {
                     content[rowNo][7] = (String) tableData.getSeven();
                     content[rowNo][8] = (String) tableData.getNine();
                     content[rowNo][9] = (String) tableData.getFourteen();
-                    content[rowNo][10] = (String) tableData.getTen();
-                    content[rowNo][11] = (String) tableData.getEleven();
-                    content[rowNo][12] = (String) tableData.getTwelve();
-                    content[rowNo][13] = (String) tableData.getThirteen();
+                    content[rowNo][10] = (String) tableData.getFifteen();
+                    content[rowNo][11] = (String) tableData.getTen();
+                    content[rowNo][12] = (String) tableData.getEleven();
+                    content[rowNo][13] = (String) tableData.getTwelve();
+                    content[rowNo][14] = (String) tableData.getThirteen();
                     rowNo++;
                 }
                 return content;

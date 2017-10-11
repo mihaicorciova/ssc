@@ -183,18 +183,20 @@ public class MonthlyReportController<T> implements Initializable {
 
             if (column == 0) {
                 grid.getColumnHeaders().add("Nume");
-            } else if (column == grid.getColumnCount() - 5) {
+            } else if (column == grid.getColumnCount() - 6) {
                 grid.getColumnHeaders().add("Timp lucrat");
-            } else if (column == grid.getColumnCount() - 4) {
+            } else if (column == grid.getColumnCount() - 5) {
                 grid.getColumnHeaders().add("Timp pauza");
-            } else if (column == grid.getColumnCount() - 3) {
+            } else if (column == grid.getColumnCount() - 4) {
                 grid.getColumnHeaders().add("Timp total");
-            } else if (column == grid.getColumnCount() - 2) {
+            } else if (column == grid.getColumnCount() - 3) {
                 grid.getColumnHeaders().add("Timp suplimentar");
             }
-
+            else if (column == grid.getColumnCount() - 2) {
+                grid.getColumnHeaders().add("Timp noapte");
+            }
          else if (column == grid.getColumnCount() - 1) {
-            grid.getColumnHeaders().add("Timp noapte");
+            grid.getColumnHeaders().add("Timp zi");
         }else {
                 grid.getColumnHeaders().add(dates.get(column - 1).toString(dtf2));
 
@@ -230,6 +232,10 @@ public class MonthlyReportController<T> implements Initializable {
                     list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
                             DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 5,1)));
                 }
+                    else if (column == grid.getColumnCount() - 6) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 6,1)));
+                    }
                     else {
                          String user=users.get(row);
                         if(user.contains("$1")){

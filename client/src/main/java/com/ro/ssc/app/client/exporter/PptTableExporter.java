@@ -189,12 +189,12 @@ public abstract class PptTableExporter {
 
             for (int i = 0; i <= colNo; i++) {
 
-                if(i<colNo-6) {
+                if(i<colNo-7) {
                     HSSFCell cell = row.createCell(i);
                     cell.setCellValue(fxTable.getColumns().get(i).getText());
                 }else if(i==colNo)
                 {
-                    HSSFCell cell = row.createCell(i-6);
+                    HSSFCell cell = row.createCell(i-7);
                     cell.setCellValue("Penalizari");
                 }
                 else

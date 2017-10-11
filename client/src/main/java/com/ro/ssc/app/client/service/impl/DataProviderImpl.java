@@ -157,7 +157,7 @@ public enum DataProviderImpl implements DataProvider {
                         for (DailyData day : dailyList) {
 
                             data.add(new GenericModel(day.getDate().toString(dtf2), day.getFirstInEvent(), day.getLastOutEvent(), formatMillis(day.getWorkTime()), formatMillis(day.getPauseTime()),
-                                            formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), day.getAbsence(), formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime()),formatMillis(day.getNightTime())));
+                                            formatMillis(day.getWorkTime() + day.getPauseTime()), formatMillis(day.getOverTime()), day.getAbsence(), formatMillis(day.getLateTime()), formatMillis(day.getEarlyTime()),formatMillis(day.getNightTime()),formatMillis(day.getWorkTime()-day.getNightTime())));
                         }
                     }
 
@@ -180,7 +180,7 @@ public enum DataProviderImpl implements DataProvider {
                                     data.add(new GenericModel(entry.getValue().getName(), d.getFirstInEvent(), d.getAdditionalDetails(), d.getLastOutEvent(),
                                                     formatMillis2(d.getWorkTime()), formatMillis2(d.getPauseTime()), formatMillis2(d.getWorkTime() + d.getPauseTime()),
                                                     entry.getValue().getDepartment(), d.getDate().toString(dtf2),
-                                                    formatMillis(d.getOverTime()), d.getAbsence(), formatMillis(d.getLateTime()), formatMillis(d.getEarlyTime()),formatMillis(d.getNightTime())));
+                                                    formatMillis(d.getOverTime()), d.getAbsence(), formatMillis(d.getLateTime()), formatMillis(d.getEarlyTime()),formatMillis(d.getNightTime()),formatMillis(d.getWorkTime()-d.getNightTime())));
                                 }
                             }
                         }
@@ -327,54 +327,60 @@ public enum DataProviderImpl implements DataProvider {
                     long tearly = 0;
                     boolean withWrongEv = false;
 
-                    List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini, end);
-                    for (DailyData day : dailyList) {
-
-                        if (day.getLateTime() > 0) {
-                            tlaters++;
-                        }
-                        tlate += day.getLateTime();
-                        if (day.getEarlyTime() > 0) {
-                            tearlys++;
-                        }
-                        tearly += day.getEarlyTime();
-                        tnight +=day.getNightTime();
-                        if (DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), day.getDate())) {
-                            final DailyData da = DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), day.getDate());
-                            tduration += da.getWorkTime();
-                            tpause += da.getPauseTime();
-                        } else {
-
-                            tduration += day.getWorkTime();
-                            tpause += day.getPauseTime();
-                        }
-
-                        if (day.getOverTime() > 0) {
-                            tovertime += day.getOverTime();
-                        } else {
-                            tundertime += Math.abs(day.getOverTime());
-                        }
-                    }
 
                     if (!ini.equals(end)) {
+
+                        List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini, end);
+                        for (DailyData day : dailyList) {
+
+                            if (day.getLateTime() > 0) {
+                                tlaters++;
+                            }
+                            tlate += day.getLateTime();
+                            if (day.getEarlyTime() > 0) {
+                                tearlys++;
+                            }
+                            tearly += day.getEarlyTime();
+                            tnight +=day.getNightTime();
+                            if (DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), day.getDate())) {
+                                final DailyData da = DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), day.getDate());
+                                tduration += da.getWorkTime();
+                                tpause += da.getPauseTime();
+                            } else {
+
+                                tduration += day.getWorkTime();
+                                tpause += day.getPauseTime();
+                            }
+
+                            if (day.getOverTime() > 0) {
+                                tovertime += day.getOverTime();
+                            } else {
+                                tundertime += Math.abs(day.getOverTime());
+                            }
+                        }
+
                         if (ordinal == 1) {
-                            return formatMillis2(tnight);
+                            return formatMillis2(tduration-tnight);
                         }
                         if (ordinal == 2) {
-                            return formatMillis2(tovertime - tundertime);
+                            return formatMillis2(tnight);
                         }
                         if (ordinal == 3) {
-                            return formatMillis2(tduration + tpause);
+                            return formatMillis2(tovertime-tundertime);
                         } else if (ordinal == 4) {
-                            return formatMillis2(tpause);
+                            return formatMillis2(tduration+tpause);
 
                         } else if (ordinal == 5) {
+                            return formatMillis2(tpause);
+
+                        }
+                        else if (ordinal == 6) {
                             return formatMillis2(tduration);
 
                         }
 
                     } else {
-                        dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini.minusDays(1), end.plusDays(1));
+                        List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini.minusDays(1), end.plusDays(1));
                         if (!dailyList.isEmpty()) {
                             if (DataImportImpl.getInstance().hasDayUserDepartment(u.split("#")[0], userData.get(u).getDepartment(), ini.withTimeAtStartOfDay())) {
                                 long wt = DataImportImpl.getInstance().getWorkData(u.split("#")[0], userData.get(u).getDepartment(), ini.withTimeAtStartOfDay()).getWorkTime();
@@ -390,7 +396,7 @@ public enum DataProviderImpl implements DataProvider {
                                         return formatMillis2(dd.getOverTime());
                                     } else {
                                         if (dd.getWorkTime() == 0 && !dd.getAbsence().isEmpty() && !dd.getAbsence().contains("Da")) {
-                                            return dd.getAbsence().substring(0, 7);
+                                            return dd.getAbsence().substring(0, 8);
                                         }
                                         return formatMillis2(dd.getWorkTime());
                                     }
