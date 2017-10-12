@@ -151,17 +151,29 @@ public class DataProviderImplHelper {
                                     }
 
                                     if (penOut != null && penTimeOut != null) {
+
+                                        if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 - penTimeOut.toSecondOfDay() * 1000) {
+                                            correction = correction + penOut.toSecondOfDay() * 1000;
+                                            end = end.minusSeconds(penOut.toSecondOfDay());
+
+                                        }
+                                    }
+
+                                    if (end.getHourOfDay() == 0 && officialEnd.getHour() == 23) {
+                                        if (end.getMillisOfDay() + 24 * 3600 * 1000 > officialEnd.toSecondOfDay() * 1000) {
+                                            if (end.getMillisOfDay() + 24 * 3600 * 1000 < officialEnd.toSecondOfDay() * 1000 + Long.valueOf(shiftDataInCurrentDate.getSc().getAdjustOut()) * 60 * 1000) {
+                                                correction = correction + end.getMillisOfDay() + 24 * 3600 * 1000 - officialEnd.toSecondOfDay() * 1000;
+                                                end = end.withMillisOfDay(officialEnd.toSecondOfDay() * 1000);
+
+                                            }
+                                        }
+                                    } else {
                                         if (end.getMillisOfDay() > officialEnd.toSecondOfDay() * 1000) {
                                             if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 + Long.valueOf(shiftDataInCurrentDate.getSc().getAdjustOut()) * 60 * 1000) {
                                                 correction = correction + end.getMillisOfDay() - officialEnd.toSecondOfDay() * 1000;
                                                 end = end.withMillisOfDay(officialEnd.toSecondOfDay() * 1000);
 
                                             }
-                                        }
-                                        if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 - penTimeOut.toSecondOfDay() * 1000) {
-                                            correction = correction + penOut.toSecondOfDay() * 1000;
-                                            end = end.minusSeconds(penOut.toSecondOfDay());
-
                                         }
                                     }
 
@@ -198,13 +210,13 @@ public class DataProviderImplHelper {
                                         if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
                                             nighttime = end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
                                         } else {
-                                            nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                            nighttime = 24 * 3600 * 1000 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
                                         }
                                     } else {
                                         if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
                                             nighttime = nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
                                         } else {
-                                            nighttime = 24 * 3600 * 100 + nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
+                                            nighttime = 24 * 3600 * 1000 + nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
                                         }
                                     }
                                 } else {
@@ -214,13 +226,13 @@ public class DataProviderImplHelper {
 
                                                 nighttime = end.getMillisOfDay() - start.getMillisOfDay() * 1l;
                                             } else {
-                                                nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                                nighttime = 24 * 3600 * 1000 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
                                             }
                                         } else {
                                             if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
                                                 nighttime = nightEnd.toSecondOfDay() * 1000l - start.getMillisOfDay();
                                             } else {
-                                                nighttime = 24 * 3600 * 100 +nightEnd.toSecondOfDay() *100l- nightStart.toSecondOfDay() * 1000l;
+                                                nighttime = 24 * 3600 * 1000 +nightEnd.toSecondOfDay() *100l- nightStart.toSecondOfDay() * 1000l;
                                             }
                                         }
                                     }
@@ -363,19 +375,14 @@ public class DataProviderImplHelper {
                             }
 
                             if (penOut != null && penTimeOut != null) {
-                                if (end.getMillisOfDay() > officialEnd.toSecondOfDay() * 1000) {
-                                    if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 + Long.valueOf(shiftDataInCurrentDate.getSc().getAdjustOut()) * 60 * 1000) {
-                                        correction = correction + end.getMillisOfDay() - officialEnd.toSecondOfDay() * 1000;
-                                        end = end.withMillisOfDay(officialEnd.toSecondOfDay() * 1000);
 
-                                    }
-                                }
                                 if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 - penTimeOut.toSecondOfDay() * 1000) {
                                     correction = correction + penOut.toSecondOfDay() * 1000;
                                     end = end.minusSeconds(penOut.toSecondOfDay());
 
                                 }
                             }
+
 
                             if (end.getHourOfDay() == 0 && officialEnd.getHour() == 23) {
                                 if (end.getMillisOfDay() + 24 * 3600 * 1000 > officialEnd.toSecondOfDay() * 1000) {
@@ -427,13 +434,13 @@ public class DataProviderImplHelper {
                                         if (end.getSecondOfDay() > nightStart.toSecondOfDay()) {
                                             nighttime = end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
                                         } else {
-                                            nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                            nighttime = 24 * 3600 * 1000 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
                                         }
                                     } else {
                                         if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
                                             nighttime = nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
                                         } else {
-                                            nighttime = 24 * 3600 * 100 + nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
+                                            nighttime = 24 * 3600 * 1000 + nightEnd.toSecondOfDay() * 1000l - nightStart.toSecondOfDay() * 1000l;
                                         }
                                     }
                                 } else {
@@ -443,13 +450,13 @@ public class DataProviderImplHelper {
 
                                                 nighttime = end.getMillisOfDay() - start.getMillisOfDay() * 1l;
                                             } else {
-                                                nighttime = 24 * 3600 * 100 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
+                                                nighttime = 24 * 3600 * 1000 + end.getMillisOfDay() - nightStart.toSecondOfDay() * 1000l;
                                             }
                                         } else {
                                             if (nightEnd.toSecondOfDay() > nightStart.toSecondOfDay()) {
                                                 nighttime = nightEnd.toSecondOfDay() * 1000l - start.getMillisOfDay();
                                             } else {
-                                                nighttime = 24 * 3600 * 100 +nightEnd.toSecondOfDay() *100l- nightStart.toSecondOfDay() * 1000l;
+                                                nighttime = 24 * 3600 * 1000 +nightEnd.toSecondOfDay() *100l- nightStart.toSecondOfDay() * 1000l;
                                             }
                                         }
                                     }
