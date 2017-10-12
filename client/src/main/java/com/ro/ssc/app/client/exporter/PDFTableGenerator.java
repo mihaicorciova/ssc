@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 
 public class PDFTableGenerator {
@@ -112,7 +113,10 @@ public class PDFTableGenerator {
     }
 
     private PDPage generatePage(PDDocument doc, Table table) {
-        PDPage page = new PDPage();
+        float POINTS_PER_INCH = 72;
+        float POINTS_PER_MM = 1 / (10 * 2.54f) * POINTS_PER_INCH;
+
+        PDPage page = new PDPage(new PDRectangle(297 * POINTS_PER_MM, 210 * POINTS_PER_MM));;
         page.setMediaBox(table.getPageSize());
         page.setRotation(table.isLandscape() ? 90 : 0);
         doc.addPage(page);
