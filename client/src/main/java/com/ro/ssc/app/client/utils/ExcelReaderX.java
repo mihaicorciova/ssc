@@ -20,6 +20,10 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -33,9 +37,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author DauBufu
  */
-public class ExcelReader {
+public class ExcelReaderX {
 
-    private static final Logger log = LoggerFactory.getLogger(ExcelReader.class);
+    private static final Logger log = LoggerFactory.getLogger(ExcelReaderX.class);
 
     /**
      *
@@ -46,11 +50,11 @@ public class ExcelReader {
         Map<String, User> result = new HashMap<>();
         List<Event> events = new ArrayList();
         try {
-            POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
-            HSSFWorkbook wb = new HSSFWorkbook(fs);
-            HSSFSheet sheet = wb.getSheetAt(0);
-            HSSFRow row;
-            HSSFCell cell;
+            FileInputStream fs = new FileInputStream(file);
+            XSSFWorkbook wb = new XSSFWorkbook(fs);
+            XSSFSheet sheet = wb.getSheetAt(0);
+            XSSFRow row;
+            XSSFCell cell;
 
             int rows; // No of rows
             rows = sheet.getPhysicalNumberOfRows();
@@ -69,7 +73,7 @@ public class ExcelReader {
                 }
             }
 
-            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss EEEE").withLocale(Locale.ENGLISH);
+            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss EEEE");
             for (int r = 1; r < rows; r++) {
                 row = sheet.getRow(r);
 
@@ -117,11 +121,11 @@ public class ExcelReader {
     public static List<DailyData> readFile(File file) {
         final List<DailyData> result = new ArrayList<>();
         try {
-            POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
-            HSSFWorkbook wb = new HSSFWorkbook(fs);
-            HSSFSheet sheet = wb.getSheetAt(0);
-            HSSFRow row;
-            HSSFCell cell;
+             FileInputStream fs = new FileInputStream(file);
+            XSSFWorkbook wb = new XSSFWorkbook(fs);
+            XSSFSheet sheet = wb.getSheetAt(0);
+            XSSFRow row;
+            XSSFCell cell;
             int rows; // No of rows
             rows = sheet.getPhysicalNumberOfRows();
 

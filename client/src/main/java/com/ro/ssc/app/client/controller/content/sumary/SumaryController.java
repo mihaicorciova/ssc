@@ -149,7 +149,7 @@ DataProviderImpl.getInstance().getUserData().clear();
                 new File(System.getProperty("user.home"))
         );
         FileChooser.ExtensionFilter extFilter
-                = new FileChooser.ExtensionFilter("Files (*.xls,*.mdb)", "*.xls;*.mdb");
+                = new FileChooser.ExtensionFilter("Files (*.xls,*.xlsx,*.mdb)", "*.xlsx;*.xls;*.mdb");
         fileChooser.getExtensionFilters().add(extFilter);
     }
 }

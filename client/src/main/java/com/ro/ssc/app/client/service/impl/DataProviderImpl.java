@@ -15,6 +15,7 @@ import com.ro.ssc.app.client.service.api.DataProvider;
 import static com.ro.ssc.app.client.utils.AccessReader.getShiftData;
 import static com.ro.ssc.app.client.utils.AccessReader.updateUserMap;
 import static com.ro.ssc.app.client.utils.ExcelReader.readExcel;
+import com.ro.ssc.app.client.utils.ExcelReaderX;
 import static com.ro.ssc.app.client.utils.Utils.formatMillis;
 import static com.ro.ssc.app.client.utils.Utils.formatMillis2;
 
@@ -278,8 +279,11 @@ public enum DataProviderImpl implements DataProvider {
 
                 @Override
                 public void importUserData(File file) {
+                    if(file.getName().contains("xlsx")){
+                        userData = ExcelReaderX.readExcel(file);
+                    }else{
                     userData = readExcel(file);
-
+                    }
                     enrichUserData();
                 }
 
