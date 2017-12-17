@@ -63,7 +63,8 @@ public enum DataProviderImpl implements DataProvider {
                 private LocalTime time;
                 private DecimalFormat df = new DecimalFormat();
                 private final Logger log = LoggerFactory.getLogger(DataProviderImpl.class);
-
+                private Pair<DateTime,DateTime> pair= new Pair<>(DateTime.now(),DateTime.now());
+                private List<DailyData> data= new ArrayList<>();
                 @Override
                 public List<GenericModel> getUserData() {
                     List<GenericModel> data = new ArrayList<>();
@@ -311,6 +312,14 @@ public enum DataProviderImpl implements DataProvider {
                         });
                         excludedGates = ls.get(1);
                         excludedUsers = ls.get(2);
+                        ls.get(3).forEach(e->{
+                        String[] st = e.split("^");
+                            String dep = st[0];
+                            String email = st[1];
+                            userData.entrySet().stream().filter(en->en.getValue().getDepartment().equals(dep)).forEach(u->{
+                            u.getValue().setEmailOfDep(email);
+                            });
+                        });
                         shiftData = getShiftData(dir.listFiles()[0]);
                         //    shiftData.entrySet().forEach(s->log.debug(s.getKey()+" "+s.getValue().entrySet().size()));
                     }
@@ -319,6 +328,15 @@ public enum DataProviderImpl implements DataProvider {
                 @Override
                 public String getCellData(String u, DateTime ini, DateTime end, int ordinal, int shift) {
 
+                    if(pair.getKey().equals(ini) && pair.getValue().equals(end))
+                    {
+                    
+                    }
+                    else
+                    {
+                    pair=new Pair<>(ini,end);
+                    data=DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini, end);
+                    }
                     Long tduration = 0L;
                     Long tpause = 0L;
                     Long tovertime = 0L;
@@ -334,7 +352,7 @@ public enum DataProviderImpl implements DataProvider {
 
                     if (!ini.equals(end)) {
 
-                        List<DailyData> dailyList = DataProviderImplHelper.getListPerDay(userData, time, shiftData, excludedGates, u, ini, end);
+                        List<DailyData> dailyList = data;
                         for (DailyData day : dailyList) {
 
                             if (day.getLateTime() > 0) {
@@ -450,6 +468,11 @@ public enum DataProviderImpl implements DataProvider {
                         return false;
                     }
                 }
+
+        @Override
+        public String getEmailFromDep(String dep) {
+          return userData.entrySet().stream().filter(en->en.getValue().getDepartment().equals(dep)).findFirst().get().getValue().getEmailOfDep();
+        }
 
             };
 

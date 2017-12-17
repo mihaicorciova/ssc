@@ -16,7 +16,7 @@ public class User {
     private String userNo;
     private String cardNo;
     private String department;
-
+    private String emailOfDep;
     private List<Event> events;
 
     public User(String name, String userId, String cardNo, String department, List<Event> events) {
@@ -105,4 +105,13 @@ public class User {
         this.events = events;
     }
 
+    public String getEmailOfDep() {
+        return emailOfDep;
+    }
+
+    public void setEmailOfDep(String emailOfDep) {
+        this.emailOfDep = emailOfDep;
+    }
+
+    
 }

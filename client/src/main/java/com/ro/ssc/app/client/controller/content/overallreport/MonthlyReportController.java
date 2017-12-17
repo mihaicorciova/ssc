@@ -159,24 +159,24 @@ public class MonthlyReportController<T> implements Initializable {
 
         List<String> users = new ArrayList();
 
-        users.addAll(DataProviderImpl.getInstance().getUsersDep(department,1));
+        users.addAll(DataProviderImpl.getInstance().getUsersDep(department, 1));
 
         List<DateTime> dates = getDatesForMonth();
-       
-        final GridBase grid = new GridBase(users.size(), dates.size() + 5);
+
+        final GridBase grid = new GridBase(users.size(), dates.size() + 7);
 
         grid.getColumnHeaders().clear();
         grid.getRowHeaders().clear();
 
         for (String entry : users) {
 
-            if(entry.contains("$1")){
-                department = DataProviderImpl.getInstance().getDepartmentFromUser(entry.substring(0, entry.length()-2));
-              
+            if (entry.contains("$1")) {
+                department = DataProviderImpl.getInstance().getDepartmentFromUser(entry.substring(0, entry.length() - 2));
+
             } else {
                 department = DataProviderImpl.getInstance().getDepartmentFromUser(entry);
             }
-  grid.getRowHeaders().add(department);
+            grid.getRowHeaders().add(department);
         }
 
         for (int column = 0; column < grid.getColumnCount(); ++column) {
@@ -191,13 +191,11 @@ public class MonthlyReportController<T> implements Initializable {
                 grid.getColumnHeaders().add("Timp total");
             } else if (column == grid.getColumnCount() - 3) {
                 grid.getColumnHeaders().add("Timp suplimentar");
-            }
-            else if (column == grid.getColumnCount() - 2) {
+            } else if (column == grid.getColumnCount() - 2) {
                 grid.getColumnHeaders().add("Timp noapte");
-            }
-         else if (column == grid.getColumnCount() - 1) {
-            grid.getColumnHeaders().add("Timp zi");
-        }else {
+            } else if (column == grid.getColumnCount() - 1) {
+                grid.getColumnHeaders().add("Timp zi");
+            } else {
                 grid.getColumnHeaders().add(dates.get(column - 1).toString(dtf2));
 
             }
@@ -212,38 +210,35 @@ public class MonthlyReportController<T> implements Initializable {
             for (int column = 0; column < grid.getColumnCount(); ++column) {
 
                 if (p == 1) {
-                    
+
                     if (column == 0) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row).split("#")[0]));
                     } else if (column == grid.getColumnCount() - 1) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1,1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1, 1)));
                     } else if (column == grid.getColumnCount() - 2) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2,1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2, 1)));
                     } else if (column == grid.getColumnCount() - 3) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3,1)));
-                    }  else if (column == grid.getColumnCount() - 4) {
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3, 1)));
+                    } else if (column == grid.getColumnCount() - 4) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 4,1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 4, 1)));
 
-                }  else if (column == grid.getColumnCount() - 5) {
-                    list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                            DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 5,1)));
-                }
-                    else if (column == grid.getColumnCount() - 6) {
+                    } else if (column == grid.getColumnCount() - 5) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 6,1)));
-                    }
-                    else {
-                         String user=users.get(row);
-                        if(user.contains("$1")){
-                        user=user.substring(0,user.length()-2);
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 5, 1)));
+                    } else if (column == grid.getColumnCount() - 6) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 6, 1)));
+                    } else {
+                        String user = users.get(row);
+                        if (user.contains("$1")) {
+                            user = user.substring(0, user.length() - 2);
                         }
                         final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                
-                                DataProviderImpl.getInstance().getCellData(user, dates.get(column - 1), dates.get(column - 1), 0,users.get(row).contains("$1")?0:1));
+                                DataProviderImpl.getInstance().getCellData(user, dates.get(column - 1), dates.get(column - 1), 0, users.get(row).contains("$1") ? 0 : 1));
                         list.add(cell);
                     }
                 }
@@ -257,7 +252,7 @@ public class MonthlyReportController<T> implements Initializable {
 
     private List<DateTime> getDatesForMonth() {
         final List<DateTime> result = new ArrayList<>();
-        for (DateTime dd = iniDate; dd.isBefore(endDate.plusDays(1)); dd = dd.plusDays(1)) {
+        for (DateTime dd = iniDate.withTimeAtStartOfDay(); dd.isBefore(endDate.withTimeAtStartOfDay().plusDays(1)); dd = dd.plusDays(1)) {
             result.add(dd);
         }
         return result;

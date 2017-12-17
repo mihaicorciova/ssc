@@ -25,7 +25,8 @@ public interface DataProvider {
 
     public List<GenericModel> getUserSpecificTableData(String user, DateTime iniDate, DateTime endDate);
 
-
+    //public Map<String>
+            
     public List<GenericModel> getDaySpecificTableData(String department, DateTime iniDate);
 
     public DateTime getPossibleDateStart(String userId);
@@ -45,6 +46,8 @@ public interface DataProvider {
     public String getCellData(String u, DateTime ini, DateTime end, int ordinal, int shift);
 
     public String getDepartmentFromUser(String entry);
+    
+    public String getEmailFromDep(String dep);
     
     
 }

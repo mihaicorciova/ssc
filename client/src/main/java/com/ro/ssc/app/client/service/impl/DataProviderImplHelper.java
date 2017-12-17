@@ -353,19 +353,14 @@ public class DataProviderImplHelper {
                             }
 
                             if (penOut != null && penTimeOut != null) {
-                                if (end.getMillisOfDay() > officialEnd.toSecondOfDay() * 1000) {
-                                    if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 + Long.valueOf(shiftDataInCurrentDate.getSc().getAdjustOut()) * 60 * 1000) {
-                                        correction = correction + end.getMillisOfDay() - officialEnd.toSecondOfDay() * 1000;
-                                        end = end.withMillisOfDay(officialEnd.toSecondOfDay() * 1000);
 
-                                    }
-                                }
                                 if (end.getMillisOfDay() < officialEnd.toSecondOfDay() * 1000 - penTimeOut.toSecondOfDay() * 1000) {
                                     correction = correction + penOut.toSecondOfDay() * 1000;
                                     end = end.minusSeconds(penOut.toSecondOfDay());
 
                                 }
                             }
+
 
                             if (end.getHourOfDay() == 0 && officialEnd.getHour() == 23) {
                                 if (end.getMillisOfDay() + 24 * 3600 * 1000 > officialEnd.toSecondOfDay() * 1000) {

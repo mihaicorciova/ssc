@@ -24,7 +24,7 @@ public class DailyData {
     long nightTime;
     long overTime;
     long lateTime;
-     String absence;
+    String absence;
     String additionalDetails;
      
 

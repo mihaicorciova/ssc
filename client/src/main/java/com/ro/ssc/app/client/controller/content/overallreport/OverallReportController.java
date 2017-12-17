@@ -5,7 +5,7 @@
  */
 package com.ro.ssc.app.client.controller.content.overallreport;
 
-import com.ro.ssc.app.client.exporter.PptTableExporter;
+import com.ro.ssc.app.client.exporter.*;
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
@@ -13,11 +13,8 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -30,6 +27,10 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -59,7 +60,7 @@ public class OverallReportController implements Initializable {
     @FXML
     private DatePicker endDatePicker;
     @FXML
-    private TableView overallReportTableView;
+    private TableView<GenericModel> overallReportTableView;
     @FXML
     private TableColumn<GenericModel, Object> offTimeTableColumn;
     @FXML
@@ -173,10 +174,11 @@ public class OverallReportController implements Initializable {
                 return content;
             }
         };
-        if (!file.getPath().endsWith(ext[0])) {
+        if (file.getPath().endsWith(ext[1])) {
             pptExporter.exportTableToPpt(overallReportTableView, file, "Raport cumulativ de la " + iniDatePicker.getValue().format(formatter) + " pana la " + endDatePicker.getValue().format(formatter));
             fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in PPT.");
-        } else {
+        }
+               else {
 
             pptExporter.exportTableToXls(overallReportTableView, file, "Raport individual absente pentru ");
             fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLS.");

@@ -9,7 +9,7 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="sumaryAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.sumary.SumaryController">
+<AnchorPane  id="AnchorPane" fx:id="sumaryAnchorPane" minHeight="180.0" prefHeight="600.0" prefWidth="800.0" styleClass="airpad" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ro.ssc.app.client.controller.content.sumary.SumaryController">
     <children>
       <GridPane layoutX="149.0" layoutY="418.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
@@ -27,11 +27,33 @@
                         <Insets left="25.0" right="25.0" top="25.0" />
                      </HBox.margin>
                   </Button>
-                    <ListView fx:id="filesListView" prefHeight="92.0" prefWidth="437.0">
+                    <ListView fx:id="filesListView" prefHeight="66.0" prefWidth="259.0">
                      <HBox.margin>
                         <Insets bottom="10.0" top="10.0" />
                      </HBox.margin>
                   </ListView>
+               
+                  <DatePicker fx:id="iniDatePicker">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </DatePicker>
+                  <DatePicker fx:id="endDatePicker">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </DatePicker>
+                 <Button fx:id="printButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#printReports" text="Printare Rapoarte">
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="emailButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#emailReports" text="Trimitere Rapoarte">
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </Button>
+               
                </children>
             </HBox>
               <TableView fx:id="sumaryTableView" prefHeight="392.0" prefWidth="679.0" GridPane.rowIndex="1">

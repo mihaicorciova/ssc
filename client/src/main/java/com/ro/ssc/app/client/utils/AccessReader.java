@@ -41,6 +41,7 @@ public class AccessReader {
         Set<String> excludedGates = new LinkedHashSet<>();
         Set<String> excludedUsers = new LinkedHashSet<>();
         Set<String> idMapping = new LinkedHashSet<>();
+        Set<String> emailMapping = new LinkedHashSet<>();
         List<Set<String>> result = new LinkedList<>();
 
         Table table;
@@ -52,9 +53,16 @@ public class AccessReader {
 
                 excludedGates.add(String.format("%s", row.get("f_ReaderName")));
             }
+             table = DatabaseBuilder.open(file).getTable("t_b_Group");
+             cursor = CursorBuilder.createCursor(table);
+            for (Row row : cursor.newIterable().addMatchPattern("f_Attend", 0)) {
+
+                emailMapping.add(String.format("%s", row.get("f_GroupName")));
+            }
             table = DatabaseBuilder.open(file).getTable("t_b_Consumer");
             cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable()) {
+               
                 idMapping.add(WordUtils.capitalizeFully(String.format("%s", row.get("f_ConsumerName")).trim()) + "#" + String.format("%s", row.get("f_ConsumerNO")).trim() + "~" + String.format("%s", row.get("f_ConsumerID")).trim());
 
                 if (!String.format("%s", row.get("f_AttendEnabled")).contains("1")) {
@@ -69,7 +77,7 @@ public class AccessReader {
         result.add(idMapping);
         result.add(excludedGates);
         result.add(excludedUsers);
-
+        result.add(emailMapping);
         return result;
     }
 
