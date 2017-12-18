@@ -26,8 +26,17 @@ public class User {
         this.cardNo = cardNo;
         this.events = events;
         this.department = department;
+        this.emailOfDep="";
     }
-
+  public User(String name, String userId, String cardNo, String department, String email, List<Event> events) {
+        this.name = name;
+        this.userId = userId;
+        this.userNo = userId;
+        this.cardNo = cardNo;
+        this.events = events;
+        this.department = department;
+        this.emailOfDep=email;
+    }
     public void getConnection() {
         Connection connection = null;
         try {

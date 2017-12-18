@@ -14,6 +14,11 @@ public class TableBuilder {
         return this;
     }
 
+      public TableBuilder setTitle(String title) {
+        table.setTitle(title);
+        return this;
+    }
+
     public TableBuilder setNumberOfRows(Integer numberOfRows) {
         table.setNumberOfRows(numberOfRows);
         return this;

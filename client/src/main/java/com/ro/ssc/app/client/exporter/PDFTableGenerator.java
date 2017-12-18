@@ -44,8 +44,12 @@ public class PDFTableGenerator {
     // Draws current page table grid and border lines and content
     private void drawCurrentPage(Table table, String[][] currentPageContent, PDPageContentStream contentStream)
             throws IOException {
-        float tableTopY = table.isLandscape() ? table.getPageSize().getWidth() - table.getMargin() : table.getPageSize().getHeight() - table.getMargin();
 
+        float tableTopY = table.isLandscape() ? table.getPageSize().getWidth() - table.getMargin() : table.getPageSize().getHeight() - table.getMargin();
+        contentStream.beginText();
+        contentStream.moveTextPositionByAmount(table.getMargin(), table.getPageSize().getWidth());
+        contentStream.drawString(table.getTitle() != null ? table.getTitle() : "");
+        contentStream.endText();
         // Draws grid and borders
         drawTableGrid(table, currentPageContent, contentStream, tableTopY);
 
@@ -62,8 +66,8 @@ public class PDFTableGenerator {
 
         // Write content
         for (int i = 0; i < currentPageContent.length; i++) {
-            if(currentPageContent[i]!=null){
-            writeContentLine(currentPageContent[i], contentStream, nextTextX, nextTextY, table);
+            if (currentPageContent[i] != null) {
+                writeContentLine(currentPageContent[i], contentStream, nextTextX, nextTextY, table);
             }
             nextTextY -= table.getRowHeight();
             nextTextX = table.getMargin() + table.getCellMargin();
@@ -118,7 +122,7 @@ public class PDFTableGenerator {
         float POINTS_PER_INCH = 72;
         float POINTS_PER_MM = 1 / (10 * 2.54f) * POINTS_PER_INCH;
 
-        PDPage page = new PDPage(new PDRectangle(297 * POINTS_PER_MM, 210 * POINTS_PER_MM));;
+        PDPage page = new PDPage(new PDRectangle(297 * POINTS_PER_MM, 210 * POINTS_PER_MM));
         page.setMediaBox(table.getPageSize());
         page.setRotation(table.isLandscape() ? 90 : 0);
         doc.addPage(page);

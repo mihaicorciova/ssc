@@ -13,7 +13,7 @@ public class Table {
     private PDRectangle pageSize;
     private boolean isLandscape;
     private float rowHeight;
-
+    private String title;
     // font attributes
     private PDFont textFont;
     private float fontSize;
@@ -134,4 +134,14 @@ public class Table {
     public void setLandscape(boolean isLandscape) {
         this.isLandscape = isLandscape;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
+    
 }

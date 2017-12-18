@@ -311,6 +311,7 @@ public class SumaryController implements Initializable {
                         content[rowNo][12] = (String) tableData.getNine();
                         rowNo++;
                     }
+                    tableBuilder.setTitle(report+" de la: "+iniDate+" pana la: "+endDate +" pentru departamenutul "+((String) entry.getKey()).replace("\\", "_") );
                     tableBuilder.setContent(content);
                     tableBuilder.setNumberOfRows(list.size());
                     tableBuilder.setHeight(600);
@@ -319,7 +320,7 @@ public class SumaryController implements Initializable {
                     tableBuilder.setPageSize(new PDRectangle(1080, 720));
                     tableBuilder.setCellMargin(2);
                     tableBuilder.setLandscape(false);
-                    tableBuilder.setMargin(10);
+                    tableBuilder.setMargin(20);
                     tableBuilder.setTextFont(PDType1Font.TIMES_ROMAN);
                     try {
 
@@ -378,6 +379,8 @@ public class SumaryController implements Initializable {
                         content[rowNo][13] = (String) tableData.getFifteen();
                         rowNo++;
                     }
+                     tableBuilder.setTitle(report+" de la: "+iniDate+" pana la: "+endDate +" pentru departamenutul "+((String) entry.getKey()).replace("\\", "_") );
+                   
                     tableBuilder.setContent(content);
                     tableBuilder.setNumberOfRows(list.size());
                     tableBuilder.setHeight(600);
@@ -386,7 +389,7 @@ public class SumaryController implements Initializable {
                     tableBuilder.setPageSize(new PDRectangle(1080, 720));
                     tableBuilder.setCellMargin(2);
                     tableBuilder.setLandscape(false);
-                    tableBuilder.setMargin(10);
+                    tableBuilder.setMargin(20);
                     tableBuilder.setTextFont(PDType1Font.TIMES_ROMAN);
                     try {
 
@@ -471,6 +474,8 @@ public class SumaryController implements Initializable {
                             }
                         }
                     }
+                     tableBuilder.setTitle(report+" de la: "+iniDate+" pana la: "+endDate +" pentru departamenutul "+dep );
+                   
                      tableBuilder.setContent(content);
                     tableBuilder.setNumberOfRows(users.size());
                     tableBuilder.setHeight(600);
@@ -510,13 +515,13 @@ public class SumaryController implements Initializable {
             String to = DataProviderImpl.getInstance().getEmailFromDep(dep);
 
             // Sender's email ID needs to be mentioned
-            String from = "do-not-reply@softpontaj.ro";
+            String from = "pontaj@ssc.ro";
 
-            final String username = "mihai";//change accordingly
-            final String password = "kowalski1";//change accordingly
+            final String username = "contac@ssc.ro";//change accordingly
+            final String password = "Ssc192719";//change accordingly
 
             // Assuming you are sending email through relay.jangosmtp.net
-            String host = "localhost";
+            String host = "ssc.ro";
 
             Properties props = new Properties();
             props.put("mail.smtp.auth", "true");
