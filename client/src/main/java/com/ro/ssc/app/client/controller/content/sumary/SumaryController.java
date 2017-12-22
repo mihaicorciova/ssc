@@ -84,7 +84,7 @@ public class SumaryController implements Initializable {
     private static final Logger log = LoggerFactory.getLogger(SumaryController.class);
     private static final List<String> reportName = Arrays.asList("Raport Cumulativ", "Raport Periodic", "Raport Lunar");
     private static final List<String> overallReport = Arrays.asList("Nume", "Departament", "Timp Lucru", "Timp Pauza", "Timp Total", "Ore noapte", "Ore zi", "Ore suplimentare", "Ore lipsa", "Total ore suplimentare/lipsa", "Absente", "Intarzieri", "Plecari timpurii");
-    private static final List<String> dailyReport = Arrays.asList("Nume", "Intrare", "Iesire", "Timp Lucru", "Timp Pauza", "Timp Total", "Departament", "Data", "Ore noapte", "Ore zi", "Ore suplimentare", "Absente", "Intarzieri", "Plecari timpurii");
+    private static final List<String> dailyReport = Arrays.asList("Nume", "Intrare", "Iesire", "Timp Lucru", "Timp Pauza", "Timp Total", "Departament", "Data", "Ore suplimentare", "Absente","Intarzieri", "Plecari timpurii","Ore noapte", "Ore zi"  );
 
     @FXML
     private DatePicker iniDatePicker;
@@ -515,19 +515,22 @@ public class SumaryController implements Initializable {
             String to = DataProviderImpl.getInstance().getEmailFromDep(dep);
 
             // Sender's email ID needs to be mentioned
-            String from = "pontaj@ssc.ro";
+            String from = "pontaj@mnir.ro";
 
-            final String username = "contac@ssc.ro";//change accordingly
-            final String password = "Ssc192719";//change accordingly
+            final String username = "pontaj@mnir.ro";//change accordingly
+            final String password = "MNIR2017pontaj";//change accordingly
 
             // Assuming you are sending email through relay.jangosmtp.net
-            String host = "ssc.ro";
+            String host = "mail.mnir.ro";
 
             Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
+             props.put("mail.smtp.socketFactory.port", "465");
+    props.put("mail.smtp.socketFactory.class",
+            "javax.net.ssl.SSLSocketFactory");
+    props.put("mail.smtp.auth", "true");
+    props.put("mail.smtp.port", "465"); 
             props.put("mail.smtp.host", host);
-            props.put("mail.smtp.port", "25");
+           
 
             // Get the Session object.
             Session session = Session.getInstance(props,
@@ -551,18 +554,15 @@ public class SumaryController implements Initializable {
                 // Set Subject: header field
                 message.setSubject("Rapoarte soft pontaj");
 
-                // Create the message part
-                BodyPart messageBodyPart = new MimeBodyPart();
+               
 
                 // Now set the actual message
-                messageBodyPart.setText("Rapoarte selectate in perioada: " + iniDate.toString(dtf) + " / " + endDate.toString(dtf));
+                message.setText("Rapoarte selectate in perioada: " + iniDate.toString(dtf) + " / " + endDate.toString(dtf));
 
                 // Create a multipar message
                 Multipart multipart = new MimeMultipart();
 
-                // Set text message part
-                multipart.addBodyPart(messageBodyPart);
-
+              
                 files.stream().filter(f -> f.getName().contains(dep)).forEach(file -> {
 
                     try {
@@ -570,8 +570,8 @@ public class SumaryController implements Initializable {
                         BodyPart messageBodyPartFile = new MimeBodyPart();
                         String filename = file.getPath();
                         DataSource source = new FileDataSource(filename);
-                        messageBodyPart.setDataHandler(new DataHandler(source));
-                        messageBodyPart.setFileName(file.getName());
+                        messageBodyPartFile.setDataHandler(new DataHandler(source));
+                        messageBodyPartFile.setFileName(file.getName());
                         multipart.addBodyPart(messageBodyPartFile);
                     } catch (MessagingException ex) {
                         java.util.logging.Logger.getLogger(SumaryController.class.getName()).log(Level.SEVERE, null, ex);
