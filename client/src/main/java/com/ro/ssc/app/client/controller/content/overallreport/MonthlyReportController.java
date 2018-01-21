@@ -1,6 +1,7 @@
 package com.ro.ssc.app.client.controller.content.overallreport;
 
 import com.ro.ssc.app.client.exporter.XlsTableExporter;
+import com.ro.ssc.app.client.exporter.XlsxTableExporter;
 import com.ro.ssc.app.client.service.impl.DataImportImpl;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
@@ -46,6 +47,8 @@ public class MonthlyReportController<T> implements Initializable {
     private ChoiceBox departmentChoiceBox;
     @FXML
     private Button exportButton;
+    @FXML
+    private Button exportcButton;
     @FXML
     private DatePicker iniDatePicker;
     @FXML
@@ -115,7 +118,23 @@ public class MonthlyReportController<T> implements Initializable {
         populateMyTable();
 
     }
+    @FXML
+    private void exportTableToXLS() {
+        String[] ext = {".xlsx"};
 
+        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLSX files (*.xlsx)", Arrays.asList(ext));
+
+        if (file == null) {
+            return;
+        }
+
+        XlsxTableExporter pptExporter = new XlsxTableExporter();
+
+        pptExporter.exportTableToXls(getGridBase2(departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? ALL : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(),1), file, "Raport lunar ",
+                departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? "" : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate.toString(dtf), endDate.toString(dtf));
+        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLSX.");
+
+    }
     @FXML
     private void exportTableToPPT() {
         String[] ext = {".xls"};
@@ -215,30 +234,112 @@ public class MonthlyReportController<T> implements Initializable {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row).split("#")[0]));
                     } else if (column == grid.getColumnCount() - 1) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1, 1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1, 1, false)));
                     } else if (column == grid.getColumnCount() - 2) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2, 1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2, 1, false)));
                     } else if (column == grid.getColumnCount() - 3) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3, 1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3, 1, false)));
                     } else if (column == grid.getColumnCount() - 4) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 4, 1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 4, 1, false)));
 
                     } else if (column == grid.getColumnCount() - 5) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 5, 1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 5, 1, false)));
                     } else if (column == grid.getColumnCount() - 6) {
                         list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 6, 1)));
+                                DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 6, 1, false)));
                     } else {
                         String user = users.get(row);
                         if (user.contains("$1")) {
                             user = user.substring(0, user.length() - 2);
                         }
                         final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
-                                DataProviderImpl.getInstance().getCellData(user, dates.get(column - 1), dates.get(column - 1), 0, users.get(row).contains("$1") ? 0 : 1));
+                                DataProviderImpl.getInstance().getCellData(user, dates.get(column - 1), dates.get(column - 1), 0, users.get(row).contains("$1") ? 0 : 1, false));
+                        list.add(cell);
+                    }
+                }
+            }
+            rows.add(list);
+        }
+        grid.setRows(rows);
+
+        return grid;
+    }
+    private static final List<String> fixedCols = Arrays.asList("cnp_salariat", "ContractNr", "den_salariat","den_formatie","tip_ore");
+
+    private GridBase getGridBase2(String department, int p) {
+
+        List<String> users = new ArrayList();
+
+        users.addAll(DataProviderImpl.getInstance().getUsersDep(department, 2));
+
+        List<DateTime> dates = getDatesForMonth();
+
+        final GridBase grid = new GridBase(users.size(), 35);
+
+        grid.getColumnHeaders().clear();
+        grid.getRowHeaders().clear();
+
+
+
+        for (int column = 0; column < grid.getColumnCount(); ++column) {
+
+            if (column <5) {
+                grid.getColumnHeaders().add(fixedCols.get(column));
+
+            } else if (column <14) {
+                grid.getColumnHeaders().add("ore_0"+(column-4));
+            } else {
+                grid.getColumnHeaders().add("ore_"+(column-4));
+            }
+        }
+
+        final ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
+        for (int row = 0; row < grid.getRowCount(); ++row) {
+
+            final ObservableList<SpreadsheetCell> list = FXCollections.observableArrayList();
+
+            for (int column = 0; column < grid.getColumnCount(); ++column) {
+
+                if (p == 1) {
+                    String user = users.get(row);
+                    if (user.contains("$")) {
+                        user = user.substring(0, user.length() - 2);
+                    }
+                    if (column == 2) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row).split("#")[0]));
+                    } else if (column == 3) {
+
+                            department = DataProviderImpl.getInstance().getDepartmentFromUser(user);
+                                                list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                department));
+                    } else if (column ==0) {
+                        String s=user.split("#")[1];
+
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                s));
+                    } else if (column ==1) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                DataProviderImpl.getInstance().getCtrFromUser(user)));
+                    } else if (column == 4) {
+                        String tip="RG";
+                        if(users.get(row).contains("$1")){
+                            tip="SUP";
+                        }
+                        if(users.get(row).contains("$2")){
+                            tip="NPT";
+                        }
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                               tip));
+
+                    } else {
+                          final int dd=column-5;
+                        Optional<DateTime> date= dates.stream().filter(d->d.getDayOfMonth()==dd).findFirst();
+                        final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                              date.isPresent()?  DataProviderImpl.getInstance().getCellData(user,date.get(),date.get(), 0, users.get(row).contains("$1") ? users.get(row).contains("$2") ?  2:0 : 1, true):"");
                         list.add(cell);
                     }
                 }

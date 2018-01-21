@@ -18,6 +18,7 @@ import static com.ro.ssc.app.client.utils.ExcelReader.readExcel;
 import com.ro.ssc.app.client.utils.ExcelReaderX;
 import static com.ro.ssc.app.client.utils.Utils.formatMillis;
 import static com.ro.ssc.app.client.utils.Utils.formatMillis2;
+import static com.ro.ssc.app.client.utils.Utils.formatMillis3;
 
 import java.io.File;
 import java.io.IOException;
@@ -199,7 +200,14 @@ public enum DataProviderImpl implements DataProvider {
 
                 }
 
-                @Override
+        @Override
+        public String getCtrFromUser(String user) {
+         return userData.get(user).getContract();
+
+        }
+
+
+        @Override
                 public DateTime getPossibleDateEnd(String user) {
                     DateTime result = new DateTime().withYear(1970);
 
@@ -313,20 +321,31 @@ public enum DataProviderImpl implements DataProvider {
                         excludedGates = ls.get(1);
                         excludedUsers = ls.get(2);
                         ls.get(3).forEach(e->{
-                        String[] st = e.split("^");
+                            if(e.contains("~")){
+                        String[] st = e.split("~");
                             String dep = st[0];
                             String email = st[1];
                             userData.entrySet().stream().filter(en->en.getValue().getDepartment().equals(dep)).forEach(u->{
                             u.getValue().setEmailOfDep(email);
                             });
-                        });
+                        }});
+                        ls.get(4).forEach(p->{
+                            if(p.contains("~")) {
+                                String[] st = p.split("~");
+                                String userctr = st[1];
+                                String userId = st[0];
+                                userData.entrySet().stream().filter(en -> en.getValue().getUserId().equals(userId)).forEach(u -> {
+                                    u.getValue().setContract(userctr);
+                                });
+                            }});
                         shiftData = getShiftData(dir.listFiles()[0]);
                         //    shiftData.entrySet().forEach(s->log.debug(s.getKey()+" "+s.getValue().entrySet().size()));
                     }
                 }
 
                 @Override
-                public String getCellData(String u, DateTime ini, DateTime end, int ordinal, int shift) {
+                public String
+                getCellData(String u, DateTime ini, DateTime end, int ordinal, int shift, boolean round) {
 
                     if(pair.getKey().equals(ini) && pair.getValue().equals(end))
                     {
@@ -413,14 +432,30 @@ public enum DataProviderImpl implements DataProvider {
                             }
                             for (DailyData dd : dailyList) {
                                 if (dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())) {
-                                    if (shift == 0) {
+                                    if (round) {
+                                        if (shift == 0) {
 
-                                        return formatMillis2(dd.getOverTime());
-                                    } else {
-                                        if (dd.getWorkTime() == 0 && !dd.getAbsence().isEmpty() && !dd.getAbsence().contains("Da")) {
-                                            return dd.getAbsence().substring(0, 8);
+                                            return formatMillis3(dd.getOverTime());
+                                        } else if (shift == 2) {
+                                            return formatMillis3(dd.getNightTime());
+                                        } else {
+                                            if (dd.getWorkTime() == 0 && !dd.getAbsence().isEmpty() && !dd.getAbsence().contains("Da")) {
+                                                return "";
+                                            }
+                                            return formatMillis3(dd.getWorkTime());
                                         }
-                                        return formatMillis2(dd.getWorkTime());
+                                    } else {
+                                        if (shift == 0) {
+
+                                            return formatMillis2(dd.getOverTime());
+                                        } else if (shift == 2) {
+                                            return formatMillis2(dd.getNightTime());
+                                        } else {
+                                            if (dd.getWorkTime() == 0 && !dd.getAbsence().isEmpty() && !dd.getAbsence().contains("Da")) {
+                                                return dd.getAbsence().substring(0, 8);
+                                            }
+                                            return formatMillis2(dd.getWorkTime());
+                                        }
                                     }
                                 }
                             }
@@ -430,7 +465,8 @@ public enum DataProviderImpl implements DataProvider {
                     return "";
                 }
 
-                @Override
+
+        @Override
                 public String getDepartmentFromUser(String entry) {
 
                     if (userData.containsKey(entry)) {
@@ -454,6 +490,10 @@ public enum DataProviderImpl implements DataProvider {
                                 result.add(user.getName() + "#" + user.getUserNo());
                                 if (i == 1 && hasShiftData(user.getName() + "#" + user.getUserNo())) {
                                     result.add(user.getName() + "#" + user.getUserNo() + "$1");
+                                }
+                                if (i == 2 && hasShiftData(user.getName() + "#" + user.getUserNo())) {
+                                    result.add(user.getName() + "#" + user.getUserNo() + "$1");
+                                    result.add(user.getName() + "#" + user.getUserNo() + "$2");
                                 }
                             }
                         }

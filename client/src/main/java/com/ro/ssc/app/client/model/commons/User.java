@@ -17,6 +17,7 @@ public class User {
     private String cardNo;
     private String department;
     private String emailOfDep;
+    private String contract;
     private List<Event> events;
 
     public User(String name, String userId, String cardNo, String department, List<Event> events) {
@@ -27,6 +28,7 @@ public class User {
         this.events = events;
         this.department = department;
         this.emailOfDep="";
+        this.contract="";
     }
   public User(String name, String userId, String cardNo, String department, String email, List<Event> events) {
         this.name = name;
@@ -122,5 +124,11 @@ public class User {
         this.emailOfDep = emailOfDep;
     }
 
-    
+    public String getContract() {
+        return contract;
+    }
+
+    public void setContract(String contract) {
+        this.contract = contract;
+    }
 }

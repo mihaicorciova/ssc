@@ -18,9 +18,6 @@ import java.io.IOException;
  */
 public class XlsTableExporter {
 
-    public static final String POTX_PATH = "/template/template.potm";
-
-
     public void exportTableToXls(Grid fxTable, File file, String title, String department, String iniDate, String outDate) {
         try {
 

@@ -446,30 +446,30 @@ public class SumaryController implements Initializable {
                              
                     } else if (column == colNo - 1) {
                                 content[row][column] =
-                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1, 1);
+                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 1, 1, false);
                             } else if (column == colNo - 2) {
                                content[row][column] =
-                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2, 1);
+                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 2, 1, false);
                             } else if (column == colNo - 3) {
                                content[row][column] =
-                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3, 1);
+                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 3, 1, false);
                             } else if (column == colNo - 4) {
                                 content[row][column] =
-                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 4, 1);
+                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 4, 1, false);
 
                             } else if (column == colNo - 5) {
                                content[row][column] =
-                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 5, 1);
+                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 5, 1, false);
                             } else if (column == colNo - 6) {
                                content[row][column] =
-                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 6, 1);
+                                        DataProviderImpl.getInstance().getCellData(users.get(row), iniDate, endDate, 6, 1, false);
                             } else {
                                 String user = users.get(row);
                                 if (user.contains("$1")) {
                                     user = user.substring(0, user.length() - 2);
                                 }
                               content[row][column] =
-                                        DataProviderImpl.getInstance().getCellData(user, dates.get(column - 1), dates.get(column - 1), 0, users.get(row).contains("$1") ? 0 : 1);
+                                        DataProviderImpl.getInstance().getCellData(user, dates.get(column - 1), dates.get(column - 1), 0, users.get(row).contains("$1") ? 0 : 1, false);
                               
                             }
                         }

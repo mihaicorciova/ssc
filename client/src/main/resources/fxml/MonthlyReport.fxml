@@ -49,6 +49,11 @@
                                 <Insets left="20.0" />
                             </HBox.margin>
                         </Button>
+                        <Button fx:id="exportcButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#exportTableToXLS" text="Salvare Export">
+                            <HBox.margin>
+                                <Insets left="20.0" />
+                            </HBox.margin>
+                        </Button>
                     </children>
                 </HBox>
             

@@ -231,4 +231,12 @@ public class Utils {
                 TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1));
         return hms;
     }
+
+    public static String formatMillis3(Long millis) {
+        long roundedtimeMs = Math.round( (double)( (double)millis/(double)(60*60*1000) ) ) * (60*60*1000) ;
+
+        String hms = String.format("%2d", TimeUnit.MILLISECONDS.toHours(roundedtimeMs)
+               );
+        return hms;
+    }
 }

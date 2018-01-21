@@ -42,6 +42,7 @@ public class AccessReader {
         Set<String> excludedUsers = new LinkedHashSet<>();
         Set<String> idMapping = new LinkedHashSet<>();
         Set<String> emailMapping = new LinkedHashSet<>();
+        Set<String> contractMapping = new LinkedHashSet<>();
         List<Set<String>> result = new LinkedList<>();
 
         Table table;
@@ -55,9 +56,15 @@ public class AccessReader {
             }
              table = DatabaseBuilder.open(file).getTable("t_b_Group");
              cursor = CursorBuilder.createCursor(table);
-            for (Row row : cursor.newIterable().addMatchPattern("f_Attend", 0)) {
+            for (Row row : cursor.newIterable()) {
 
                 emailMapping.add(String.format("%s", row.get("f_GroupName")));
+            }
+            table = DatabaseBuilder.open(file).getTable("t_b_Consumer_Other");
+            cursor = CursorBuilder.createCursor(table);
+            for (Row row : cursor.newIterable()) {
+
+                contractMapping.add(String.format("%s", row.get("f_ConsumerID")).trim() + "~"+String.format("%s", row.get("f_WorkNo")));
             }
             table = DatabaseBuilder.open(file).getTable("t_b_Consumer");
             cursor = CursorBuilder.createCursor(table);
@@ -78,6 +85,7 @@ public class AccessReader {
         result.add(excludedGates);
         result.add(excludedUsers);
         result.add(emailMapping);
+        result.add(contractMapping);
         return result;
     }
 
