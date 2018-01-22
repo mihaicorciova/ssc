@@ -11,6 +11,9 @@
 
     <properties>
         <!-- PLUGIN VERSIONS -->
+
+            <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+         
         <apache.maven.plugins.compiler.version>3.3</apache.maven.plugins.compiler.version>
         <zenjava.maven.plugins.javafx.version>8.1.2</zenjava.maven.plugins.javafx.version>
         <!-- DEPENDENCY VERSIONS -->

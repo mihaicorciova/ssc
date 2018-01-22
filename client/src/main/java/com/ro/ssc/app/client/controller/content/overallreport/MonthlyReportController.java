@@ -2,6 +2,7 @@ package com.ro.ssc.app.client.controller.content.overallreport;
 
 import com.ro.ssc.app.client.exporter.XlsTableExporter;
 import com.ro.ssc.app.client.exporter.XlsxTableExporter;
+import com.ro.ssc.app.client.licensing.TrialKeyGenerator;
 import com.ro.ssc.app.client.service.impl.DataImportImpl;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import com.ro.ssc.app.client.ui.commons.UiCommonTools;
@@ -121,19 +122,23 @@ public class MonthlyReportController<T> implements Initializable {
     @FXML
     private void exportTableToXLS() {
         String[] ext = {".xlsx"};
+        if(endDate.getMonthOfYear()!=iniDate.getMonthOfYear()){
+            UiCommonTools.getInstance().showInfoDialogStatus("Atentionare", "Va rugam selectati date din aceeasi luna ", "");
 
-        File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLSX files (*.xlsx)", Arrays.asList(ext));
+        }else {
 
-        if (file == null) {
-            return;
+            File file = fxCommonTools.getFileByChooser(exportButton.getContextMenu(), "XLSX files (*.xlsx)", Arrays.asList(ext));
+
+            if (file == null) {
+                return;
+            }
+
+            XlsxTableExporter pptExporter = new XlsxTableExporter();
+
+            pptExporter.exportTableToXls(getGridBase2(departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? ALL : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), 1), file, "Raport lunar ",
+                    departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? "" : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate.toString(dtf), endDate.toString(dtf));
+            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLSX.");
         }
-
-        XlsxTableExporter pptExporter = new XlsxTableExporter();
-
-        pptExporter.exportTableToXls(getGridBase2(departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? ALL : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(),1), file, "Raport lunar ",
-                departmentChoiceBox.getSelectionModel().getSelectedItem() == null ? "" : departmentChoiceBox.getSelectionModel().getSelectedItem().toString(), iniDate.toString(dtf), endDate.toString(dtf));
-        fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLSX.");
-
     }
     @FXML
     private void exportTableToPPT() {
@@ -278,7 +283,7 @@ public class MonthlyReportController<T> implements Initializable {
 
         List<DateTime> dates = getDatesForMonth();
 
-        final GridBase grid = new GridBase(users.size(), 35);
+        final GridBase grid = new GridBase(users.size(), 36);
 
         grid.getColumnHeaders().clear();
         grid.getRowHeaders().clear();
@@ -336,7 +341,7 @@ public class MonthlyReportController<T> implements Initializable {
                                tip));
 
                     } else {
-                          final int dd=column-5;
+                          final int dd=column-4;
                         Optional<DateTime> date= dates.stream().filter(d->d.getDayOfMonth()==dd).findFirst();
                         final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
                               date.isPresent()?  DataProviderImpl.getInstance().getCellData(user,date.get(),date.get(), 0, users.get(row).contains("$1") ? users.get(row).contains("$2") ?  2:0 : 1, true):"");
