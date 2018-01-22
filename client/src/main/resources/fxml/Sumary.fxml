@@ -32,17 +32,24 @@
                         <Insets bottom="10.0" top="10.0" />
                      </HBox.margin>
                   </ListView>
-               
+               <VBox prefHeight="200.0" prefWidth="500.0">
+                   <children>
+                   <HBox prefHeight="100.0" prefWidth="250.0">
+                   <children>
                   <DatePicker fx:id="iniDatePicker">
                      <HBox.margin>
-                        <Insets left="10.0" />
+                         <Insets left="25.0"  top="10.0" />
                      </HBox.margin>
                   </DatePicker>
                   <DatePicker fx:id="endDatePicker">
                      <HBox.margin>
-                        <Insets left="10.0" />
+                         <Insets left="25.0"  top="10.0" />
                      </HBox.margin>
                   </DatePicker>
+                   </children>
+                   </HBox>
+                   <HBox prefHeight="100.0" prefWidth="250.0">
+                   <children>
                  <Button fx:id="printButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#printReports" text="Printare Rapoarte">
                      <HBox.margin>
                         <Insets left="20.0" />
@@ -53,7 +60,15 @@
                         <Insets left="20.0" />
                      </HBox.margin>
                   </Button>
-               
+                   <Button fx:id="exportcButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#exportTableToXLS" text="Salvare Export">
+                       <HBox.margin>
+                           <Insets left="20.0" />
+                       </HBox.margin>
+                   </Button>
+                   </children>
+                   </HBox>
+                   </children>
+               </VBox>
                </children>
             </HBox>
               <TableView fx:id="sumaryTableView" prefHeight="392.0" prefWidth="679.0" GridPane.rowIndex="1">

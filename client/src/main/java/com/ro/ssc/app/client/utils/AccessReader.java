@@ -64,7 +64,7 @@ public class AccessReader {
             cursor = CursorBuilder.createCursor(table);
             for (Row row : cursor.newIterable()) {
 
-                contractMapping.add(String.format("%s", row.get("f_ConsumerID")).trim() + "~"+String.format("%s", row.get("f_WorkNo")));
+                contractMapping.add(String.format("%s", row.get("f_ConsumerID")).trim() + "~"+String.format("%s", row.get("f_Note")));
             }
             table = DatabaseBuilder.open(file).getTable("t_b_Consumer");
             cursor = CursorBuilder.createCursor(table);

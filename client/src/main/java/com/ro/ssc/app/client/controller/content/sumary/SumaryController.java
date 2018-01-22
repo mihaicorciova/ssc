@@ -9,6 +9,7 @@ import com.google.common.io.Files;
 import com.ro.ssc.app.client.exporter.Column;
 import com.ro.ssc.app.client.exporter.PDFTableGenerator;
 import com.ro.ssc.app.client.exporter.TableBuilder;
+import com.ro.ssc.app.client.exporter.XlsxTableExporter;
 import com.ro.ssc.app.client.model.commons.GenericModel;
 import com.ro.ssc.app.client.service.impl.DataProviderImpl;
 import java.awt.print.PrinterJob;
@@ -19,15 +20,11 @@ import javax.mail.PasswordAuthentication;
 import java.net.URL;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+
+import com.ro.ssc.app.client.ui.commons.UiCommonTools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -64,6 +61,9 @@ import javax.print.SimpleDoc;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.controlsfx.control.spreadsheet.GridBase;
+import org.controlsfx.control.spreadsheet.SpreadsheetCell;
+import org.controlsfx.control.spreadsheet.SpreadsheetCellType;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -85,6 +85,7 @@ public class SumaryController implements Initializable {
     private static final List<String> reportName = Arrays.asList("Raport Cumulativ", "Raport Periodic", "Raport Lunar");
     private static final List<String> overallReport = Arrays.asList("Nume", "Departament", "Timp Lucru", "Timp Pauza", "Timp Total", "Ore noapte", "Ore zi", "Ore suplimentare", "Ore lipsa", "Total ore suplimentare/lipsa", "Absente", "Intarzieri", "Plecari timpurii");
     private static final List<String> dailyReport = Arrays.asList("Nume", "Intrare", "Iesire", "Timp Lucru", "Timp Pauza", "Timp Total", "Departament", "Data", "Ore suplimentare", "Absente","Intarzieri", "Plecari timpurii","Ore noapte", "Ore zi"  );
+    private static final UiCommonTools fxCommonTools = UiCommonTools.getInstance();
 
     @FXML
     private DatePicker iniDatePicker;
@@ -92,6 +93,8 @@ public class SumaryController implements Initializable {
     private DatePicker endDatePicker;
     @FXML
     private Button selectButton;
+    @FXML
+    private Button exportcButton;
     @FXML
     private ListView filesListView;
     @FXML
@@ -109,6 +112,7 @@ public class SumaryController implements Initializable {
     @FXML
     private TableColumn<GenericModel, Object> eventTableColumn;
     private final DateTimeFormatter dtf2 = DateTimeFormat.forPattern("dd/MM");
+    private static final List<String> fixedCols = Arrays.asList("cnp_salariat", "ContractNr", "den_salariat","den_formatie","tip_ore");
 
     /**
      * Initializes the controller class.
@@ -197,6 +201,114 @@ public class SumaryController implements Initializable {
         printPDF(files);
     }
 
+    @FXML
+    private void exportTableToXLS() {
+        String[] ext = {".xlsx"};
+        if(endDate.getMonthOfYear()!=iniDate.getMonthOfYear()){
+            UiCommonTools.getInstance().showInfoDialogStatus("Atentionare", "Va rugam selectati date din aceeasi luna ", "");
+
+        }else {
+
+            File file = fxCommonTools.getFileByChooser(exportcButton.getContextMenu(), "XLSX files (*.xlsx)", Arrays.asList(ext));
+
+            if (file == null) {
+                return;
+            }
+
+            XlsxTableExporter pptExporter = new XlsxTableExporter();
+
+            pptExporter.exportTableToXls(getGridBase2(ALL, 1), file, "Raport lunar ",
+                    "", iniDate.toString(dtf), endDate.toString(dtf));
+            fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLSX.");
+        }
+    }
+    private GridBase getGridBase2(String department, int p) {
+
+        List<String> users = new ArrayList();
+
+        users.addAll(DataProviderImpl.getInstance().getUsersDep(department, 2));
+
+        List<DateTime> dates = getDatesForMonth();
+
+        final GridBase grid = new GridBase(users.size(), 36);
+
+        grid.getColumnHeaders().clear();
+        grid.getRowHeaders().clear();
+
+
+
+        for (int column = 0; column < grid.getColumnCount(); ++column) {
+
+            if (column <5) {
+                grid.getColumnHeaders().add(fixedCols.get(column));
+
+            } else if (column <14) {
+                grid.getColumnHeaders().add("ore_0"+(column-4));
+            } else {
+                grid.getColumnHeaders().add("ore_"+(column-4));
+            }
+        }
+
+        final ObservableList<ObservableList<SpreadsheetCell>> rows = FXCollections.observableArrayList();
+        for (int row = 0; row < grid.getRowCount(); ++row) {
+
+            final ObservableList<SpreadsheetCell> list = FXCollections.observableArrayList();
+
+            for (int column = 0; column < grid.getColumnCount(); ++column) {
+
+                if (p == 1) {
+                    String user = users.get(row);
+                    if (user.contains("$")) {
+                        user = user.substring(0, user.length() - 2);
+                    }
+                    if (column == 2) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1, users.get(row).split("#")[0]));
+                    } else if (column == 3) {
+
+                        department = DataProviderImpl.getInstance().getDepartmentFromUser(user);
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                department));
+                    } else if (column ==0) {
+                        String s=user.split("#")[1];
+
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                s));
+                    } else if (column ==1) {
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                DataProviderImpl.getInstance().getCtrFromUser(user)));
+                    } else if (column == 4) {
+                        String tip="RG";
+                        if(users.get(row).contains("$1")){
+                            tip="SUP";
+                        }
+                        if(users.get(row).contains("$2")){
+                            tip="NPT";
+                        }
+                        list.add(SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                tip));
+
+                    } else {
+                        final int dd=column-4;
+                        Optional<DateTime> date= dates.stream().filter(d->d.getDayOfMonth()==dd).findFirst();
+                        int n=1;
+                        if(users.get(row).contains("$1")){
+                            n=0;
+                        }
+                        if(users.get(row).contains("$2")){
+                            n=2;
+                        }
+                        final SpreadsheetCell cell = SpreadsheetCellType.STRING.createCell(row, column, 1, 1,
+                                date.isPresent()?  DataProviderImpl.getInstance().getCellData(user,date.get(),date.get(), 0,n, true):"");
+                        list.add(cell);
+                    }
+                }
+            }
+            rows.add(list);
+        }
+        grid.setRows(rows);
+
+        return grid;
+    }
     public void printPDF(List<File> files) {
         PrinterJob printerJob = PrinterJob.getPrinterJob();
 
