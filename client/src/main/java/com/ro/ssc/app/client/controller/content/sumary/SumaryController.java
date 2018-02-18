@@ -178,6 +178,26 @@ public class SumaryController implements Initializable {
 
     }
 
+    private GridBase adjustGrid(GridBase grid) {
+        List l = new ArrayList<>();
+        for (int r = 0; r < grid.getRowCount(); ++r) {
+            boolean emp = true;
+            for (SpreadsheetCell cont : grid.getRows().get(r)) {
+                if (cont.getColumn() == 4 && cont.getText().equals("RG")) {
+                    emp = false;
+                }
+                if (cont.getColumn() <= 4 || cont.getText().contains("0") || cont.getText().isEmpty()) continue;
+                emp = false;
+            }
+            if (emp) continue;
+            l.add(grid.getRows().get(r));
+        }
+        GridBase newGrid = new GridBase(l.size(), 36);
+        newGrid.getColumnHeaders().addAll(grid.getColumnHeaders());
+        newGrid.getRows().addAll(l);
+        return newGrid;
+    }
+
     private void populateListView(List<File> files) {
         List<String> ls = new ArrayList<>();
         files.stream().forEach((file) -> {
@@ -217,7 +237,7 @@ public class SumaryController implements Initializable {
 
             XlsxTableExporter pptExporter = new XlsxTableExporter();
 
-            pptExporter.exportTableToXls(getGridBase2(ALL, 1), file, "Raport lunar ",
+            pptExporter.exportTableToXls(adjustGrid(getGridBase2(ALL, 1)), file, "Raport lunar ",
                     "", iniDate.toString(dtf), endDate.toString(dtf));
             fxCommonTools.showInfoDialogStatus("Raport exportat", "Status-ul exportului", "Raportul s- a exportat cu succes in XLSX.");
         }

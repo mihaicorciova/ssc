@@ -233,10 +233,11 @@ public class Utils {
     }
 
     public static String formatMillis3(Long millis) {
-        long roundedtimeMs = Math.round( (double)( (double)millis/(double)(60*60*1000) ) ) * (60*60*1000) ;
-
-        String hms = String.format("%2d", TimeUnit.MILLISECONDS.toHours(roundedtimeMs)
-               );
+        long roundedtimeMs = Math.round((double)millis.longValue() / 3600000.0) * 3600000L;
+        if (roundedtimeMs <= 0L) {
+            return "";
+        }
+        String hms = String.format("%2d", TimeUnit.MILLISECONDS.toHours(roundedtimeMs));
         return hms;
     }
 }

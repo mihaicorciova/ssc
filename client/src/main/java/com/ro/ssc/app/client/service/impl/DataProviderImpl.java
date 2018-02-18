@@ -442,7 +442,7 @@ public enum DataProviderImpl implements DataProvider {
                                             if (dd.getWorkTime() == 0 && !dd.getAbsence().isEmpty() && !dd.getAbsence().contains("Da")) {
                                                 return "";
                                             }
-                                            return formatMillis3(dd.getWorkTime());
+                                            return formatMillis3(dd.getWorkTime()+dd.getPauseTime()-dd.getOverTime());
                                         }
                                     } else {
                                         if (shift == 0) {
