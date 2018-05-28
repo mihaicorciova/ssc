@@ -15,12 +15,9 @@ import com.ro.ssc.app.client.model.commons.ShiftData;
 import com.ro.ssc.app.client.model.commons.ShiftHours;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import com.ro.ssc.app.client.model.commons.User;
 import org.apache.commons.lang.WordUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -36,6 +33,45 @@ public class AccessReader {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(AccessReader.class);
 
+
+    public static Map<String,User>  readUserDataMDB(File file) {
+        final  Map<String,User>  result = new HashMap<>();
+        final Map<String, String> depart = new HashMap<>();
+try {
+    Table table;
+
+    table = DatabaseBuilder.open(file).getTable("t_b_Group");
+    Cursor  cursor = CursorBuilder.createCursor(table);
+    for (Row row : cursor.newIterable()) {
+
+        String de =String.format("%s", row.get("f_GroupName"))!=null?String.format("%s", row.get("f_GroupName")).contains("~")?String.format("%s", row.get("f_GroupName")).split("~")[0]:String.format("%s", row.get("f_GroupName")):String.format("%s", row.get("f_GroupID"));
+        depart.put(String.format("%s", row.get("f_GroupID")),de);
+    }
+
+
+
+    table = DatabaseBuilder.open(file).getTable("t_b_Consumer");
+     cursor = CursorBuilder.createCursor(table);
+    for (Row row : cursor.newIterable()) {
+        final String id =
+                (String.format("%s", row.get("f_ConsumerNO")).trim()) ;
+        final String card =
+                (String.format("%s", row.get("f_CardNO")).trim()) ;
+        final String dep =
+                (String.format("%s", row.get("f_GroupID")).trim()) ;
+
+
+        final String name =WordUtils.capitalizeFully(String.format("%s", row.get("f_ConsumerName")).trim());
+       final User user= new User(name,id,card,depart.get(dep),new ArrayList<>());
+        result.put( name+"#"+id,user);
+
+
+    }
+} catch (IOException e){
+    e.printStackTrace();
+}
+        return result;
+    }
     public static List<Set<String>> updateUserMap(File file) {
 
         Set<String> excludedGates = new LinkedHashSet<>();

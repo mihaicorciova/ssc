@@ -36,6 +36,7 @@ public class Utils {
         List<Event> trimedEvents = new ArrayList<>();
         List<Event> remainingEvents = new ArrayList<>();
         Boolean shouldAdd = false;
+
         for (int i = 0; i < events.size() - 1; i++) {
 
             if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
@@ -83,24 +84,26 @@ public class Utils {
         Boolean shouldAddExit = false;
         Boolean shouldAddIn = true;
         Event in = null;
-        for (int i = 0; i < events.size() - 1; i++) {
+        if(events.size()>0) {
+            for (int i = 0; i < events.size() - 1; i++) {
 
-            if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
-                if (shouldAddExit && events.get(i).getAddr().contains("Exit") && events.get(i + 1).getAddr().contains("In")) {
-                    shouldAddIn = true;
-                    shouldAddExit = false;
-                    trimedEvents.add(events.get(i));
+                if (!excludedGates.contains(events.get(i).getAddr()) && events.get(i).getPassed()) {
+                    if (shouldAddExit && events.get(i).getAddr().contains("Exit") && events.get(i + 1).getAddr().contains("In")) {
+                        shouldAddIn = true;
+                        shouldAddExit = false;
+                        trimedEvents.add(events.get(i));
 
-                } else if (events.get(i).getAddr().contains("In") && shouldAddIn) {
-                    shouldAddIn = false;
-                    shouldAddExit = true;
-                    in = events.get(i);
-                    trimedEvents.add(events.get(i));
+                    } else if (events.get(i).getAddr().contains("In") && shouldAddIn) {
+                        shouldAddIn = false;
+                        shouldAddExit = true;
+                        in = events.get(i);
+                        trimedEvents.add(events.get(i));
 
-                } else if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
+                    } else if (events.get(i + 1).getEventDateTime().getMillis() - events.get(i).getEventDateTime().getMillis() > 15 * 1000l) {
 
-                    remainingEvents.add(events.get(i));
+                        remainingEvents.add(events.get(i));
 
+                    }
                 }
             }
         }

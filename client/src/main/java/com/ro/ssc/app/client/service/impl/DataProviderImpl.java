@@ -13,6 +13,7 @@ import com.ro.ssc.app.client.model.commons.ShiftData;
 import com.ro.ssc.app.client.model.commons.User;
 import com.ro.ssc.app.client.service.api.DataProvider;
 import static com.ro.ssc.app.client.utils.AccessReader.getShiftData;
+import static com.ro.ssc.app.client.utils.AccessReader.readUserDataMDB;
 import static com.ro.ssc.app.client.utils.AccessReader.updateUserMap;
 import static com.ro.ssc.app.client.utils.ExcelReader.readExcel;
 import com.ro.ssc.app.client.utils.ExcelReaderX;
@@ -288,11 +289,17 @@ public enum DataProviderImpl implements DataProvider {
 
                 @Override
                 public void importUserData(File file) {
+                    final Map<String,User>  userDataMDB = readUserData();
                     if(file.getName().contains("xlsx")){
                         userData = ExcelReaderX.readExcel(file);
                     }else{
                     userData = readExcel(file);
                     }
+                    userDataMDB.entrySet().stream().filter(k->!userData.containsKey(k.getKey())).forEach(e->
+                    {
+                        userData.put(e.getKey(),e.getValue());
+                    });
+
                     enrichUserData();
                 }
 
@@ -304,7 +311,13 @@ public enum DataProviderImpl implements DataProvider {
                     this.time = time;
                 }
 
-                private void enrichUserData() {
+
+                private Map<String,User> readUserData(){
+                  File dir =   new File(MDB_PATH);
+                  return  readUserDataMDB(dir.listFiles()[0]);
+                }
+
+        private void enrichUserData() {
 
                     File dir = new File(MDB_PATH);
                     List<Set<String>> ls = updateUserMap(dir.listFiles()[0]);
@@ -434,13 +447,19 @@ public enum DataProviderImpl implements DataProvider {
                                 if (dd.getDate().withTimeAtStartOfDay().equals(ini.withTimeAtStartOfDay())) {
                                     if (round) {
                                         if (shift == 0) {
-
+                                            if (dd.getOverTime() < 0) {
+                                                return "";
+                                            }
                                             return formatMillis3(dd.getOverTime());
+
                                         } else if (shift == 2) {
                                             return formatMillis3(dd.getNightTime());
                                         } else {
                                             if (dd.getWorkTime() == 0 && !dd.getAbsence().isEmpty() && !dd.getAbsence().contains("Da")) {
                                                 return "";
+                                            }
+                                            if (dd.getOverTime() < 0) {
+                                                return formatMillis3(dd.getWorkTime()+dd.getPauseTime());
                                             }
                                             return formatMillis3(dd.getWorkTime()+dd.getPauseTime()-dd.getOverTime());
                                         }

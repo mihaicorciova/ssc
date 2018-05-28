@@ -66,16 +66,18 @@ public class DataProviderImplHelper {
             final List<Event> events = userData.get(userName).getEvents();
             Collections.sort(events, Comparator.comparing(Event::getEventDateTime));
 
-            Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
-            Map<DateTime, List<Event>> wrongPerDay;
+            Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay = new HashMap<>();
+            Map<DateTime, List<Event>> wrongPerDay =new HashMap<>();
             Set<String> usedDates = new HashSet<>();
             String userId = userData.get(userName).getUserId().trim();
 
             //aici schimb tipurile
 //        if (Configuration.IS_EXPIRED.getAsBoolean()) {
+            if(events.size()>0){
             eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), iniDate, endDate);
             wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), iniDate, endDate);
-//        } else {
+      }
+// } else {
             ////      eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), iniDate, endDate);
             //      wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), iniDate, endDate);
 
@@ -270,11 +272,14 @@ public class DataProviderImplHelper {
         final List<Event> events = userData.get(userName).getEvents();
         Collections.sort(events, Comparator.comparing(Event::getEventDateTime));
 
-        Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay;
+        Map<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> eventsPerDay = new HashMap<>();
+        Map<DateTime, List<Event>> wrongPerDay= new HashMap<>();
         String userId = userData.get(userName).getUserId().trim();
         Set<String> usedDates = new HashSet<>();
-        eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), dateTime, dateTime);
-        Map<DateTime, List<Event>> wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), dateTime, dateTime);
+        if(events.size()>0) {
+            eventsPerDay = splitPerDay(time, applyExcludeLogic2(excludedGates, events).get(0), dateTime, dateTime);
+           wrongPerDay = splitPerDayWrong(time, applyExcludeLogic2(excludedGates, events).get(1), dateTime, dateTime);
+        }
         for (Map.Entry<Pair<DateTime, DateTime>, List<Pair<Event, Event>>> entry : eventsPerDay.entrySet()) {
             if (entry.getKey().getKey().withTimeAtStartOfDay().isEqual(dateTime)) {
 
